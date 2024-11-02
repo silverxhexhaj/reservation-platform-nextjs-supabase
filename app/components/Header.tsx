@@ -1,0 +1,6 @@
+import React from 'react';
+// ... other imports ...
+
+export function Header({ user }: { user: { username: string } | null }) {
+  // ... component logic ...
+}
