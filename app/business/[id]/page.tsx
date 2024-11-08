@@ -11,6 +11,7 @@ import { Footer } from '@/components/Footer';
 import { useLoadScript, GoogleMap, MarkerF } from '@react-google-maps/api';
 import Image from 'next/image';
 import { MasonryGallery } from '@/components/MasonryGallery';
+import { ImageGalleryModal } from "@/components/ImageGalleryModal";
 
 interface Business {
   id: string;
@@ -439,7 +440,7 @@ const openingHours = [
   { day: 'Sunday', hours: 'Closed' },
 ];
 
-export default function BusinessDetail() {
+export default function BusinessDetailPage({ params }: { params: { id: string } }) {
   const { id } = useParams();
   const [business, setBusiness] = useState<Business | null>(null);
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -453,6 +454,7 @@ export default function BusinessDetail() {
   const [isOpeningHoursOpen, setIsOpeningHoursOpen] = useState(false);
   const [isBusinessOpen, setIsBusinessOpen] = useState(false);
   const [isValidBookingTime, setIsValidBookingTime] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(-1);
 
   useEffect(() => {
     const foundBusiness = businesses.find(b => b.id === id);
@@ -574,9 +576,9 @@ export default function BusinessDetail() {
   const today = new Date().getDay(); // 0 is Sunday, 1 is Monday, etc.
 
   return (
-    <div className="min-h-screen font-sans bg-white">
-      <Header user={null} />
-      <main className="">
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-grow">
         <div className="bg-white">
           <div className="space-y-16 mb-20">
             {/* Cover Section */}
@@ -880,36 +882,54 @@ export default function BusinessDetail() {
             </div>
           {/* Gallery Section */}
           {business.galleryImages && business.galleryImages.length > 0 && (
-              <section className="max-w-screen-2xl mx-auto px-8">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-3xl font-semibold text-gray-800">Gallery</h2>
-                  <button className="flex items-center text-gray-600 hover:text-black transition-colors duration-200">
-                    <Camera size={20} className="mr-2" />
-                    <span>View all photos</span>
+            <section className="max-w-screen-2xl mx-auto px-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-semibold text-gray-800">Gallery</h2>
+                <button 
+                  onClick={() => setSelectedImageIndex(0)}
+                  className="flex items-center text-gray-600 hover:text-black transition-colors duration-200"
+                >
+                  <Camera size={20} className="mr-2" />
+                  <span>View all photos</span>
+                </button>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {business.galleryImages.slice(0, 8).map((image, index) => (
+                  <div 
+                    key={index} 
+                    className="relative aspect-square rounded-lg overflow-hidden cursor-pointer"
+                    onClick={() => setSelectedImageIndex(index)}
+                  >
+                    <Image
+                      src={image}
+                      alt={`${business.name} gallery image ${index + 1}`}
+                      width={300}
+                      height={0}
+                      className="object-cover hover:scale-110 transition-transform duration-300 !h-full w-full"
+                    />
+                  </div>
+                ))}
+              </div>
+              {business.galleryImages.length > 8 && (
+                <div className="mt-4 text-center">
+                  <button 
+                    onClick={() => setSelectedImageIndex(0)}
+                    className="text-gray-600 hover:text-black transition-colors duration-200"
+                  >
+                    View all {business.galleryImages.length} photos
                   </button>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {business.galleryImages.slice(0, 8).map((image, index) => (
-                    <div key={index} className="relative aspect-square rounded-lg overflow-hidden">
-                      <Image
-                        src={image}
-                        alt={`${business.name} gallery image ${index + 1}`}
-                        width={300}
-                        height={0}
-                        className="object-cover hover:scale-110 transition-transform duration-300 !h-full w-full"
-                      />
-                    </div>
-                  ))}
-                </div>
-                {business.galleryImages.length > 8 && (
-                  <div className="mt-4 text-center">
-                    <button className="text-gray-600 hover:text-black transition-colors duration-200">
-                      View all {business.galleryImages.length} photos
-                    </button>
-                  </div>
-                )}
-              </section>
-            )}
+              )}
+
+              {/* Image Gallery Modal */}
+              <ImageGalleryModal
+                images={business.galleryImages}
+                initialIndex={selectedImageIndex}
+                isOpen={selectedImageIndex !== -1}
+                onClose={() => setSelectedImageIndex(-1)}
+              />
+            </section>
+          )}
 
             {/* About Section */}
             <section className="mb-20 mt-20 max-w-screen-2xl mx-auto px-8">

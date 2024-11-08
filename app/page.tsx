@@ -14,7 +14,6 @@ import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 
 const categories = [
-  "All Services",
   "Hair Salon",
   "Nail Salon",
   "Waxing Salon",
@@ -33,19 +32,18 @@ const categories = [
 ];
 
 const categoryIcons: { [key: string]: ReactElement } = {
-  "All Services": <Search className="w-4 h-4" />,
   "Hair Salon": <Scissors className="w-4 h-4" />,
-  "Nail Salon": <Heart className="w-4 h-4" />, // Changed from Nail
-  "Waxing Salon": <Sun className="w-4 h-4" />, // Changed from Spa
+  "Nail Salon": <Heart className="w-4 h-4" />,
+  "Waxing Salon": <Sun className="w-4 h-4" />,
   "Beauty Salon": <Heart className="w-4 h-4" />,
   "Barbershop": <Scissors className="w-4 h-4" />,
   "Eyebrows & Lashes": <Eye className="w-4 h-4" />,
-  "Massage": <Heart className="w-4 h-4" />, // Changed from Spa
-  "Spa": <Heart className="w-4 h-4" />, // Changed from Spa
+  "Massage": <Heart className="w-4 h-4" />,
+  "Spa": <Heart className="w-4 h-4" />,
   "Gym & Fitness": <Dumbbell className="w-4 h-4" />,
   "Personal Trainer": <Dumbbell className="w-4 h-4" />,
   "Therapy Centre": <Heart className="w-4 h-4" />,
-  "Tattoo & Piercing": <Syringe className="w-4 h-4" />, // Changed from Eyedropper
+  "Tattoo & Piercing": <Syringe className="w-4 h-4" />,
   "Tanning Studio": <Sun className="w-4 h-4" />,
   "Aesthetics": <Syringe className="w-4 h-4" />,
   "Weight Loss": <Dumbbell className="w-4 h-4" />,
@@ -220,17 +218,20 @@ export default function Home() {
     <div className="min-h-screen font-sans bg-white flex flex-col">
       <Header user={user} />
       <main className="flex-grow relative">
-        <div className="p-8 pt-24 bg-gray-500 h-[680px] flex items-center justify-center">
+        <div className="p-8 pt-24 flex items-center justify-center relative h-screen">
           <div className='relative z-10'>
-            <h1 className="text-5xl font-bold mb-4 text-center text-white flex flex-col space-y-2">
-              <span>Look Amazing – Discover and Local</span>
-              <span className="italic">
-                <span className="bg-gradient-to-r from-green-500 to-teal-400 bg-clip-text text-transparent animate-gradient-x">Beauty & Health</span>
-                <span className="text-white not-italic pl-2">Services!</span>
+            <div className="flex flex-wrap justify-center gap-3 mb-8">
+              <span className="px-4 py-1.5 bg-white bg-opacity-10 backdrop-blur-xs rounded-full text-white text-sm font-medium border border-white border-opacity-20 transition-all duration-300 hover:bg-opacity-20">
+                1# Choice in Albania
               </span>
-            </h1>
-            <h1 className="text-xl mb-8 text-center text-white font-light">Discover a world of in-person and virtual fitness, wellness, and beauty services.</h1>
-            <div className="max-w-2xl mx-auto">
+            </div>
+            <div className='max-w-2xl mx-auto mb-12'>
+              <h1 className="text-5xl font-bold mb-4 text-center text-white flex flex-col space-y-2">
+                <span>Discover Local Beauty & Wellness – Book Your Perfect Service!</span>
+              </h1>
+            </div>
+            
+            <div className="max-w-2xl mx-auto mb-12">
               <div className="relative flex items-center bg-white rounded-full">
                 <div className="relative flex-grow">
                   <input
@@ -261,9 +262,34 @@ export default function Home() {
                 </Button>
               </div>
             </div>
+
+            {/* New Categories Section */}
+            <div className="max-w-screen-2xl mx-auto">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2">
+                {categories.map(category => {
+                  const slug = category.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-');
+                  return (
+                    <Link 
+                      key={category}
+                      href={`/explore/${slug}`}
+                      className="group bg-white bg-opacity-10 backdrop-blur-sm hover:bg-opacity-20 border border-white border-opacity-20 rounded-xl p-3 transition-all duration-300"
+                    >
+                      <div className="flex flex-col items-center text-center space-y-2">
+                        <span className="w-8 h-8 flex items-center justify-center bg-white bg-opacity-20 rounded-full group-hover:bg-opacity-30 transition-all duration-300 text-white">
+                          {categoryIcons[category]}
+                        </span>
+                        <span className="text-white text-sm font-medium line-clamp-2">
+                          {category}
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           </div>
           <div className='absolute inset-0'>
-            <div className="relative w-full h-[680px]">
+            <div className="relative w-full h-full">
               <video 
                 className="absolute inset-0 w-full h-full object-cover" 
                 crossOrigin="" 
@@ -271,7 +297,7 @@ export default function Home() {
                 muted 
                 autoPlay
                 loop
-                src="https://videos.pexels.com/video-files/4008320/4008320-uhd_2732_1440_25fps.mp4" 
+                src="https://videos.pexels.com/video-files/3753716/3753716-uhd_2560_1440_25fps.mp4" 
                 preload="metadata"
               >
                 <track kind="metadata" label="cuepoints" />
@@ -282,113 +308,23 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Pricing Section */}
-        {/* <section className="w-full py-16 bg-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-extrabold text-center text-gray-900 sm:text-4xl mb-8">
-              Choose Your Plan
-            </h2>
-            <div className="grid gap-8 lg:grid-cols-3 lg:gap-x-8">
-              {pricingPlans.map((plan) => (
-                <div key={plan.name} className={`bg-white rounded-lg shadow-lg overflow-hidden ${plan.recommended ? 'ring-2 ring-indigo-500' : ''}`}>
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900">{plan.name}</h3>
-                    <p className="mt-2 text-2xl font-bold text-gray-900">${plan.price}<span className="text-base font-medium text-gray-500">/month</span></p>
-                    <ul className="mt-4 space-y-2">
-                      {plan.features.slice(0, 3).map((feature) => (
-                        <li key={feature} className="flex items-start">
-                          <svg className="flex-shrink-0 h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          <span className="ml-2 text-sm text-gray-500">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="px-6 py-4 bg-gray-50">
-                    <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
-                      Get started
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-8 text-center">
-              <Link href="/pricing" className="text-indigo-600 hover:text-indigo-500 font-medium">
-                View full pricing details <ArrowRight className="inline-block ml-1 w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </section> */}
-
-        <div className="relative">
-          <Tabs className="flex flex-col" defaultValue="All Services">
-            <TabsList className="flex justify-start h-auto px-8 py-6 sticky top-20 bg-white overflow-x-auto lg:overflow-x-visible lg:flex-wrap gap-2 z-10 max-w-screen-2xl mx-auto">
-              {categories.map(category => (
-                <TabsTrigger 
-                  key={category} 
-                  value={category} 
-                  className="text-sm flex items-center justify-center"
-                >
-                  <span className="">{categoryIcons[category]}</span>
-                  <span className="">{category}</span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            
-            <TabsContent className="px-8 py-6 max-w-screen-2xl mx-auto" value="All Services">
-              <div className="space-y-12">
-                {filteredBusinesses.length === 0 ? (
-                  <NoResultsMessage />
-                ) : (
-                  <>
-                    <section>
-                      <h2 className="text-2xl font-bold mb-4 text-black">Recommended by Us</h2>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                        {recommendedBusinesses.map(renderBusinessCard)}
-                      </div>
-                    </section>
-                    
-                    {/* New section: Our Top Businesses */}
-                    <section>
-                      <h2 className="text-2xl font-bold mb-4 text-black">Our Top Businesses</h2>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                        {topBusinesses.map(renderBusinessCard)}
-                      </div>
-                    </section>
-                    
-                    <section>
-                      <h2 className="text-2xl font-bold mb-4 text-black">For a Healthy Body</h2>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                        {healthyBodyBusinesses.map(renderBusinessCard)}
-                      </div>
-                    </section>
-                    
-                    <section>
-                      <h2 className="text-2xl font-bold mb-4 text-black">Women&apos;s Section</h2>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                        {womenSectionBusinesses.map(renderBusinessCard)}
-                      </div>
-                    </section>
-                  </>
-                )}
+        {/* Business Sections */}
+        <div className="px-8 py-6 max-w-screen-2xl mx-auto">
+          <div className="space-y-12">
+            <section>
+              <h2 className="text-2xl font-bold mb-4 text-black">Recommended by Us</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {recommendedBusinesses.map(renderBusinessCard)}
               </div>
-            </TabsContent>
+            </section>
             
-            {categories.slice(1).map(category => (
-              <TabsContent className="px-8 py-6 max-w-screen-2xl mx-auto" key={category} value={category}>
-                {filteredBusinesses.filter(business => business.category === category).length === 0 ? (
-                  <NoResultsMessage />
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                    {filteredBusinesses
-                      .filter(business => business.category === category)
-                      .map(renderBusinessCard)}
-                  </div>
-                )}
-              </TabsContent>
-            ))}
-          </Tabs>
+            <section>
+              <h2 className="text-2xl font-bold mb-4 text-black">Our Top Businesses</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {topBusinesses.map(renderBusinessCard)}
+              </div>
+            </section>
+          </div>
         </div>
       </main>
       <Footer />
