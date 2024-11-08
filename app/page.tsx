@@ -220,7 +220,7 @@ export default function Home() {
     <div className="min-h-screen font-sans bg-white flex flex-col">
       <Header user={user} />
       <main className="flex-grow relative">
-        <div className="p-8 pt-24 bg-gray-500 h-[480px] flex items-center justify-center">
+        <div className="p-8 pt-24 bg-gray-500 h-[680px] flex items-center justify-center">
           <div className='relative z-10'>
             <h1 className="text-5xl font-bold mb-4 text-center text-white flex flex-col space-y-2">
               <span>Look Amazing – Discover and Local</span>
@@ -263,7 +263,7 @@ export default function Home() {
             </div>
           </div>
           <div className='absolute inset-0'>
-            <div className="relative w-full h-[480px]">
+            <div className="relative w-full h-[680px]">
               <video 
                 className="absolute inset-0 w-full h-full object-cover" 
                 crossOrigin="" 
