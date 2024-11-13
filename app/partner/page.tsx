@@ -15,7 +15,7 @@ interface SectionProps {
 
 function Section({ title, filter, onFilterChange, children }: SectionProps) {
   return (
-    <Card className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+    <Card className="bg-white border border-gray-200 rounded-lg overflow-hidden">
       <CardHeader className="bg-gray-50 border-b border-gray-200 flex flex-row justify-between items-center p-4">
         <CardTitle className="text-lg font-semibold text-gray-800">{title}</CardTitle>
         {filter && onFilterChange && (

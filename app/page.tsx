@@ -21,6 +21,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Shield, CheckCircle, Lock } from 'lucide-react';
 import { Instagram, Facebook, Music, Apple, Smartphone } from 'lucide-react';
+import { FeaturedDeals } from "@/components/FeaturedDeals";
 
 const categories = [
   "Hair Salon",
@@ -59,45 +60,67 @@ const categoryIcons: { [key: string]: ReactElement } = {
 };
 
 const renderBusinessCard = (business: Business) => (
-  <Card key={business.id} className="overflow-hidden transition-shadow duration-300 hover:shadow-lg">
-    <div className="h-48 overflow-hidden relative">
-      <img src={business.imageUrl} alt={business.name} className="w-full h-full object-cover" />
-      <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 flex items-center justify-center rounded-full">
-        <span className="text-white text-xs font-semibold px-2 py-1 uppercase tracking-wide">{business.category}</span>
+  <Link 
+    href={`/business/${business.id}`} 
+    key={business.id} 
+    className="group block h-full"
+  >
+    <Card className="overflow-hidden h-full transition-all duration-300 hover:shadow-lg border border-gray-100 hover:border-gray-200">
+      {/* Image Container */}
+      <div className="aspect-[4/3] overflow-hidden relative border-b border-gray-100">
+        <img 
+          src={business.imageUrl} 
+          alt={business.name} 
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+        {/* Category Badge */}
+        <div className="absolute top-4 left-4">
+          <Badge 
+            variant="secondary" 
+            className="bg-white/90 backdrop-blur-sm text-neutral-900 font-medium border border-gray-100/50"
+          >
+            {business.category}
+          </Badge>
+        </div>
       </div>
-    </div>
-    <CardContent className="pt-4 bg-white">
-      <CardTitle className="text-xl text-black pb-2">{business.name}</CardTitle>
-      <p className="text-gray-600 mb-4">{business.description}</p>
-      <div className="flex justify-between items-center text-sm">
-        <span className="flex items-center text-black">
-          <Star className="w-4 h-4 text-yellow-400 mr-1" />
-          {business.rating.toFixed(1)}
-        </span>
-        <span className="flex items-center space-x-1">
-          {['$', '$$', '$$$', '$$$$'].map((price, index) => (
-            <span
-              key={index}
-              className={`${
-                business.priceRange.length > index
-                  ? 'font-bold text-gray-600'
-                  : 'text-gray-400'
-              }`}
-            >
-              $
+
+      {/* Content */}
+      <CardContent className="p-4 flex flex-col justify-between h-[calc(100%-60%)]">
+        {/* Business Info */}
+        <div className="space-y-2 flex-1">
+          <CardTitle className="text-lg font-semibold line-clamp-1">
+            {business.name}
+          </CardTitle>
+          <p className="text-sm text-neutral-600 min-h-[2.5rem] line-clamp-2">
+            {business.description}
+          </p>
+        </div>
+
+        {/* Rating and Price */}
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+          {/* Rating */}
+          <div className="flex items-center space-x-1">
+            <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+            <span className="text-sm font-medium text-neutral-900">
+              {business.rating.toFixed(1)}
             </span>
-          ))}
-        </span>
-      </div>
-    </CardContent>
-    <CardFooter className="bg-white">
-      <Link href={`/business/${business.id}`} className="w-full">
-        <Button className="w-full bg-white hover:bg-gray-100 text-black font-semibold py-2 px-4 rounded-full transition duration-300 ease-in-out border border-gray-300">
-          Book Now
-        </Button>
-      </Link>
-    </CardFooter>
-  </Card>
+          </div>
+
+          {/* Price Range */}
+          <div className="flex items-center space-x-0.5">
+            {Array.from(business.priceRange).map((_, index) => (
+              <span
+                key={index}
+                className="text-sm font-medium text-neutral-900"
+              >
+                $
+              </span>
+            ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </Link>
 );
 
 // Import the pricing plans data
@@ -184,6 +207,155 @@ const socialProof = [
   { platform: "TikTok", followers: "25K+", handle: "@noorlife" }
 ];
 
+// Add this new interface for offers
+interface BusinessOffer {
+  id: string;
+  businessId: string;
+  title: string;
+  description: string;
+  originalPrice: number;
+  discountedPrice: number;
+  discountPercentage: number;
+  validUntil: string;
+  imageUrl: string;
+}
+
+// Update the businessOffers data with reliable image URLs
+const businessOffers: BusinessOffer[] = [
+  {
+    id: '1',
+    businessId: businesses[0].id,
+    title: 'Summer Spa Package',
+    description: 'Full body massage + facial treatment',
+    originalPrice: 150,
+    discountedPrice: 99,
+    discountPercentage: 34,
+    validUntil: '2024-08-31',
+    imageUrl: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&h=600&fit=crop'
+  },
+  {
+    id: '2',
+    businessId: businesses[1].id,
+    title: 'Hair Transformation',
+    description: 'Haircut + color + treatment',
+    originalPrice: 200,
+    discountedPrice: 149,
+    discountPercentage: 25,
+    validUntil: '2024-07-31',
+    imageUrl: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=800&h=600&fit=crop'
+  },
+  {
+    id: '3',
+    businessId: businesses[2].id,
+    title: 'Fitness Starter Pack',
+    description: '1 month membership + 3 PT sessions',
+    originalPrice: 300,
+    discountedPrice: 199,
+    discountPercentage: 33,
+    validUntil: '2024-06-30',
+    imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop'
+  }
+];
+
+// Add the render function for offer cards
+const renderOfferCard = (offer: BusinessOffer) => {
+  const business = businesses.find(b => b.id === offer.businessId);
+  
+  return (
+    <Link 
+      href={`/business/${offer.businessId}?offer=${offer.id}`}
+      key={offer.id}
+      className="group block"
+    >
+      <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-white hover:shadow-lg transition-all duration-300">
+        {/* Image and Discount Badge */}
+        <div className="relative aspect-[16/9] overflow-hidden">
+          <img 
+            src={offer.imageUrl}
+            alt={offer.title}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+          <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+            {offer.discountPercentage}% OFF
+          </div>
+          {business && (
+            <div className="absolute bottom-4 left-4 right-4">
+              <div className="bg-white/90 backdrop-blur-sm rounded-lg px-4 py-2 flex justify-between">
+                <p className="text-sm font-medium text-gray-900">{business.name}</p>
+                <div className="flex items-center space-x-1">
+                  <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                  <span className="text-xs text-gray-600">{business.rating}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">{offer.title}</h3>
+          <p className="text-sm text-gray-600 mb-4 min-h-[2.5rem] line-clamp-2">
+            {offer.description}
+          </p>
+          
+          {/* Price and CTA */}
+          <div className="flex items-end justify-between">
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500 line-through">${offer.originalPrice}</p>
+              <p className="text-xl font-bold text-gray-900">${offer.discountedPrice}</p>
+            </div>
+            <Button 
+              variant="outline"
+              className="text-sm border-gray-200 hover:bg-gray-50"
+            >
+              Book Now
+            </Button>
+          </div>
+
+          {/* Valid Until */}
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <p className="text-xs text-gray-500">
+              Valid until {formatDate(offer.validUntil)}
+            </p>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+};
+
+// Replace the existing formatDate function with this one at the top level
+function formatDate(dateString: string) {
+  // Create a UTC date to ensure consistent formatting between server and client
+  const date = new Date(dateString);
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${month}/${day}/${year}`;
+}
+
+// Update the FALLBACK_IMAGES with reliable URLs
+const FALLBACK_IMAGES = {
+  spa: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&h=600&fit=crop",
+  hair: "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=800&h=600&fit=crop",
+  fitness: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
+  beauty: "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=800&h=600&fit=crop",
+  default: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&h=600&fit=crop"
+};
+
+// Add this function after the FALLBACK_IMAGES constant
+function getFallbackImage(category?: string) {
+  if (!category) return FALLBACK_IMAGES.default;
+  const categoryLower = category.toLowerCase();
+  
+  if (categoryLower.includes('spa')) return FALLBACK_IMAGES.spa;
+  if (categoryLower.includes('hair')) return FALLBACK_IMAGES.hair;
+  if (categoryLower.includes('fitness') || categoryLower.includes('gym')) return FALLBACK_IMAGES.fitness;
+  if (categoryLower.includes('beauty')) return FALLBACK_IMAGES.beauty;
+  
+  return FALLBACK_IMAGES.default;
+}
+
 export default function Home() {
   const [user, setUser] = useState<{ username: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -263,8 +435,7 @@ export default function Home() {
     }
   }, [searchTerm]);
 
-  const recommendedBusinesses = filteredBusinesses.sort((a, b) => b.rating - a.rating).slice(0, 3);
-  const topBusinesses = filteredBusinesses.sort((a, b) => b.rating - a.rating).slice(3, 8); // New: Select top 5 businesses after the recommended ones
+  const topBusinesses = filteredBusinesses.sort((a, b) => b.rating - a.rating).slice(0, 5);
   const healthyBodyBusinesses = filteredBusinesses.filter(b => ['Gym & Fitness', 'Personal Trainer'].includes(b.category));
   const womenSectionBusinesses = filteredBusinesses.filter(b => ['Hair Salon', 'Nail Salon', 'Waxing Salon'].includes(b.category));
 
@@ -429,6 +600,12 @@ export default function Home() {
               >
                 <track kind="metadata" label="cuepoints" />
               </video>
+              <div 
+                className="absolute inset-0 mix-blend-overlay opacity-40"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+                }}
+              />
               <div className="absolute inset-0 bg-gradient-to-b from-red-700/40 to-pink-700/40 flex items-center justify-center opacity-80">
               </div>
             </div>
@@ -436,8 +613,9 @@ export default function Home() {
         </div>
 
         {/* Platform Statistics Section */}
-        <section className="bg-gradient-to-r from-pink-500 to-red-500 py-16">
+        <section className="bg-gradient-to-r from-pink-600 to-red-600 py-16">
           <div className="max-w-screen-2xl mx-auto px-8">
+            <h2 className="text-3xl font-bold text-center mb-12 text-white">Platform Statistics</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {platformStats.map((stat, index) => (
                 <div key={index} className="text-center">
@@ -450,17 +628,24 @@ export default function Home() {
         </section>
 
         {/* Platform Features Section */}
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-white">
           <div className="max-w-screen-2xl mx-auto px-8">
-            <h2 className="text-3xl font-bold text-center mb-12">Why Choose Noorlife</h2>
+            <h2 className="text-3xl font-bold text-center mb-12 text-neutral-900">Why Choose Noorlife</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {platformFeatures.map((feature, index) => (
-                <div key={index} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                  <div className="bg-red-100 w-12 h-12 rounded-full flex items-center justify-center mb-4">
+                <div 
+                  key={index} 
+                  className="p-6 hover:bg-gray-50 transition-colors duration-200 rounded-lg border border-gray-100"
+                >
+                  <div className="text-gray-900 mb-4">
                     {feature.icon}
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-gray-600">{feature.description}</p>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -468,67 +653,56 @@ export default function Home() {
         </section>
 
         {/* Business Sections */}
-        <div className="px-8 py-6 max-w-screen-2xl mx-auto">
+        <div className="px-8 py-16 max-w-screen-2xl mx-auto">
           <div className="space-y-12">
             <section>
-              <h2 className="text-2xl font-bold mb-4 text-black">Recommended by Us</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {recommendedBusinesses.map(renderBusinessCard)}
-              </div>
-            </section>
-            
-            <section>
-              <h2 className="text-2xl font-bold mb-4 text-black">Our Top Businesses</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {topBusinesses.map(renderBusinessCard)}
+              <div className="">
+                <h2 className="text-3xl font-bold mb-6 text-neutral-900">Our Top Businesses</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                  {topBusinesses.map(renderBusinessCard)}
+                </div>
               </div>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold mb-4 text-black">Health & Wellness</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {healthyBodyBusinesses.slice(0, 5).map(renderBusinessCard)}
+              <div className="">
+                <h2 className="text-3xl font-bold mb-6 text-neutral-900">Special Offers</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {businessOffers.map(renderOfferCard)}
+                </div>
+              </div>
+            </section>
+            <section>
+              <div className="">
+                <h2 className="text-3xl font-bold mb-6 text-neutral-900">New on Platform</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                  {filteredBusinesses
+                    .sort((a, b) => b.id.localeCompare(a.id))
+                    .slice(0, 5)
+                    .map(renderBusinessCard)}
+                </div>
               </div>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold mb-4 text-black">Beauty & Care</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {womenSectionBusinesses.slice(0, 5).map(renderBusinessCard)}
+              <div className="">
+                <h2 className="text-3xl font-bold mb-6 text-neutral-900">Best Rated</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                  {filteredBusinesses
+                    .filter(business => business.rating >= 4.5)
+                    .slice(0, 5)
+                    .map(renderBusinessCard)}
+                </div>
               </div>
             </section>
 
-            <section>
-              <h2 className="text-2xl font-bold mb-4 text-black">New on Platform</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {filteredBusinesses
-                  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                  .slice(0, 5)
-                  .map(renderBusinessCard)}
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-bold mb-4 text-black">Best Rated</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {filteredBusinesses
-                  .filter(business => business.rating >= 4.5)
-                  .slice(0, 5)
-                  .map(renderBusinessCard)}
-              </div>
-            </section>
           </div>
         </div>
 
         {/* Testimonials Section */}
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-gradient-to-br from-purple-50 to-indigo-50">
           <div className="max-w-screen-2xl mx-auto px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">What Our Users Say</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Don't just take our word for it. Here's what our community has to say about their Noorlife experience.
-              </p>
-            </div>
+            <h2 className="text-3xl font-bold text-center mb-12 text-neutral-900">What Our Users Say</h2>
             <div className="grid md:grid-cols-3 gap-8">
               {testimonials.map((testimonial, index) => (
                 <div key={index} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all">
@@ -560,10 +734,7 @@ export default function Home() {
         {/* Social Proof Section */}
         <section className="py-16 bg-white">
           <div className="max-w-screen-2xl mx-auto px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">Join Our Community</h2>
-              <p className="text-gray-600">Follow us on social media for beauty tips, wellness advice, and exclusive offers</p>
-            </div>
+            <h2 className="text-3xl font-bold text-center mb-12 text-neutral-900">Join Our Community</h2>
             <div className="grid md:grid-cols-3 gap-8">
               {socialProof.map((social, index) => (
                 <div key={index} className="text-center p-6 rounded-xl border border-gray-200 hover:border-red-500 transition-colors">
@@ -595,51 +766,11 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Download App Section */}
-        <section className="py-16 bg-gradient-to-r from-red-500 to-pink-500 text-white">
-          <div className="max-w-screen-2xl mx-auto px-8">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-3xl font-bold mb-6">Get the Noorlife App</h2>
-                <p className="mb-8 text-white/90">
-                  Book appointments on the go, get instant notifications, and manage your bookings with our mobile app.
-                </p>
-                <div className="flex space-x-4">
-                  <Button variant="secondary" className="bg-black hover:bg-gray-900">
-                    <Apple className="w-5 h-5 mr-2" />
-                    App Store
-                  </Button>
-                  <Button variant="secondary" className="bg-black hover:bg-gray-900">
-                    <Smartphone className="w-5 h-5 mr-2" />
-                    Play Store
-                  </Button>
-                </div>
-              </div>
-              <div className="relative">
-                <Image
-                  src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&h=1200&q=80"
-                  alt="Noorlife Mobile App"
-                  width={300}
-                  height={600}
-                  className="mx-auto rounded-3xl shadow-2xl"
-                  priority
-                  onError={(e) => {
-                    // Fallback image if the main one fails to load
-                    const target = e.target as HTMLImageElement;
-                    target.src = "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&h=1200&fit=crop";
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-3xl"></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Newsletter Section */}
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-gradient-to-br from-purple-50 to-indigo-50">
           <div className="max-w-screen-2xl mx-auto px-8">
+            <h2 className="text-3xl font-bold text-center mb-12 text-neutral-900">Stay Updated</h2>
             <div className="max-w-2xl mx-auto text-center">
-              <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
               <p className="text-gray-600 mb-8">
                 Subscribe to our newsletter for the latest beauty trends, wellness tips, and exclusive offers.
               </p>
@@ -654,6 +785,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <FeaturedDeals />
       </main>
       <Footer />
     </div>

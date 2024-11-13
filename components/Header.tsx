@@ -88,7 +88,7 @@ export function Header({ user }: HeaderProps) {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 will-change-height ${isScrolled ? 'bg-white h-20' : 'bg-transparent md:h-28 h-20'}`}>
-      <div className={`max-w-screen-2xl mx-auto px-8 flex justify-between items-center h-full transition-colors duration-300 ${isScrolled ? 'border-b border-gray-200' : ''}`}>
+      <div className={`max-w-screen-2xl mx-auto px-8 flex justify-between items-center h-full transition-colors duration-300 ${isScrolled ? '' : ''}`}>
         <Link href="/" className={`text-3xl font-semibold ${isScrolled ? 'text-black' : 'text-white'}`}>
           Noorlife
         </Link>

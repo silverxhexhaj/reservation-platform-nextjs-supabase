@@ -1,17 +1,18 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { Header } from '@/components/Header';
-import { StarIcon, MapPin, CheckCircle, PlusCircle, X, Calendar as CalendarIcon, Clock, AlertCircle, Camera, ChevronDown, Shuffle } from 'lucide-react';
+import { StarIcon, CheckCircle, PlusCircle, X, Clock, AlertCircle, Camera, ChevronDown, Shuffle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { businesses } from '@/data/businesses';
 import { format } from 'date-fns';
 import { Footer } from '@/components/Footer';
 import { useLoadScript, GoogleMap, MarkerF } from '@react-google-maps/api';
 import Image from 'next/image';
-import { MasonryGallery } from '@/components/MasonryGallery';
 import { ImageGalleryModal } from "@/components/ImageGalleryModal";
+import { ServiceOffer } from "@/components/ServiceOffer";
+import { businessOffers, BusinessOffer } from '@/data/offers';
 
 interface Business {
   id: string;
@@ -360,31 +361,6 @@ interface SelectedService extends Service {
   categoryName: string;
 }
 
-const TimeSelector = ({ selectedTime, setSelectedTime }) => {
-  const times = Array.from({ length: 24 }, (_, i) => i).map(hour => {
-    const time = `${hour.toString().padStart(2, '0')}:00`;
-    return { label: time, value: time };
-  });
-
-  return (
-    <div className="grid grid-cols-4 gap-2">
-      {times.map((time) => (
-        <button
-          key={time.value}
-          onClick={() => setSelectedTime(time.value)}
-          className={`px-2 py-1 text-sm rounded ${
-            selectedTime === time.value
-              ? 'bg-black text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
-        >
-          {time.label}
-        </button>
-      ))}
-    </div>
-  );
-};
-
 const mapContainerStyle = {
   width: '100%',
   height: '400px'
@@ -440,7 +416,11 @@ const openingHours = [
   { day: 'Sunday', hours: 'Closed' },
 ];
 
-export default function BusinessDetailPage({ params }: { params: { id: string } }) {
+function getBusinessOffers(businessId: string): BusinessOffer[] {
+  return businessOffers.filter(offer => offer.businessId === businessId);
+}
+
+export default function BusinessDetailPage() {
   const { id } = useParams();
   const [business, setBusiness] = useState<Business | null>(null);
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -456,42 +436,7 @@ export default function BusinessDetailPage({ params }: { params: { id: string } 
   const [isValidBookingTime, setIsValidBookingTime] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(-1);
 
-  useEffect(() => {
-    const foundBusiness = businesses.find(b => b.id === id);
-    console.log("Found business:", foundBusiness);
-    setBusiness(foundBusiness || null);
-  }, [id]);
-
-  useEffect(() => {
-    checkBusinessOpen();
-    const interval = setInterval(checkBusinessOpen, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    validateBookingTime();
-  }, [selectedDate, selectedTime]);
-
-  const checkBusinessOpen = () => {
-    const now = new Date();
-    const day = now.getDay();
-    const time = now.getHours() * 100 + now.getMinutes();
-
-    const todayHours = openingHours[day === 0 ? 6 : day - 1].hours;
-    if (todayHours === 'Closed') {
-      setIsBusinessOpen(false);
-      return;
-    }
-
-    const [openTime, closeTime] = todayHours.split(' - ').map(t => {
-      const [hours, minutes] = t.split(':').map(Number);
-      return hours * 100 + minutes;
-    });
-
-    setIsBusinessOpen(time >= openTime && time < closeTime);
-  };
-
-  const validateBookingTime = () => {
+  const validateBookingTime = useCallback(() => {
     if (!selectedDate || !selectedTime) {
       setIsValidBookingTime(false);
       return;
@@ -513,6 +458,41 @@ export default function BusinessDetailPage({ params }: { params: { id: string } 
     });
 
     setIsValidBookingTime(timeInMinutes >= openTime && timeInMinutes < closeTime);
+  }, [selectedDate, selectedTime]);
+
+  useEffect(() => {
+    const foundBusiness = businesses.find(b => b.id === id);
+    console.log("Found business:", foundBusiness);
+    setBusiness(foundBusiness || null);
+  }, [id]);
+
+  useEffect(() => {
+    checkBusinessOpen();
+    const interval = setInterval(checkBusinessOpen, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    validateBookingTime();
+  }, [selectedDate, selectedTime, validateBookingTime]);
+
+  const checkBusinessOpen = () => {
+    const now = new Date();
+    const day = now.getDay();
+    const time = now.getHours() * 100 + now.getMinutes();
+
+    const todayHours = openingHours[day === 0 ? 6 : day - 1].hours;
+    if (todayHours === 'Closed') {
+      setIsBusinessOpen(false);
+      return;
+    }
+
+    const [openTime, closeTime] = todayHours.split(' - ').map(t => {
+      const [hours, minutes] = t.split(':').map(Number);
+      return hours * 100 + minutes;
+    });
+
+    setIsBusinessOpen(time >= openTime && time < closeTime);
   };
 
   const { isLoaded } = useLoadScript({
@@ -525,7 +505,6 @@ export default function BusinessDetailPage({ params }: { params: { id: string } 
 
   console.log("Business gallery images:", business.galleryImages);
 
-  const businessServices = categoryServices[business.category] || [];
   const businessTeam = categoryTeams[business.category] || [];
 
   const addToBooking = (service: Service, categoryName: string) => {
@@ -574,6 +553,8 @@ export default function BusinessDetailPage({ params }: { params: { id: string } 
   };
 
   const today = new Date().getDay(); // 0 is Sunday, 1 is Monday, etc.
+
+  const availableOffers = business ? getBusinessOffers(business.id) : [];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -698,6 +679,39 @@ export default function BusinessDetailPage({ params }: { params: { id: string } 
                   </div>
                 </section>
                 
+                {/* Only show Special Offers section if business has offers */}
+                {availableOffers.length > 0 && (
+                  <section className="mt-20">
+                    <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">
+                      Special Offers
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {availableOffers.map((offer) => (
+                        <ServiceOffer
+                          key={offer.id}
+                          {...offer}
+                          onBook={() => {
+                            setSelectedServices(prev => [
+                              ...prev,
+                              { 
+                                name: offer.title, 
+                                price: offer.discountedPrice,
+                                categoryName: offer.category 
+                              }
+                            ]);
+                            setBookingItems(prev => [
+                              ...prev,
+                              { 
+                                name: offer.title, 
+                                price: offer.discountedPrice 
+                              }
+                            ]);
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                )}
 
                 <div className="flex flex-col lg:flex-row space-y-16 lg:space-y-0 lg:space-x-16">
                   {/* Additional Information */}

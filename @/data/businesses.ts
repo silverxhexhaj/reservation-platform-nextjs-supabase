@@ -10,7 +10,6 @@ export interface Business {
   createdAt: string;
 }
 
-// Update your businesses data to include createdAt
 export const businesses: Business[] = [
   {
     id: '1',
@@ -20,8 +19,8 @@ export const businesses: Business[] = [
     rating: 4.8,
     priceRange: '$$$',
     imageUrl: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&h=600&fit=crop',
-    galleryImages: [/* ... */],
-    createdAt: '2024-01-15' // Add dates for all businesses
+    galleryImages: [],
+    createdAt: '2024-01-15'
   },
-  // ... update all other businesses with createdAt
+  // Add more businesses with createdAt property
 ]; 
