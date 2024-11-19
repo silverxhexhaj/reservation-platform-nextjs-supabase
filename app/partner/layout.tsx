@@ -31,10 +31,8 @@ export default function PartnerLayout({ children }: { children: ReactNode }) {
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <PartnerHeader />
-        <main className="flex-1 overflow-y-auto bg-white p-6">
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
+        <main className="flex-1 overflow-y-auto bg-white">
+          {children}
         </main>
       </div>
 

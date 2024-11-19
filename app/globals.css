@@ -63,3 +63,17 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 }
+
+.bg-stripe-pattern {
+  background-image: linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.1) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.1) 50%,
+    rgba(0, 0, 0, 0.1) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 8px 8px;
+}
