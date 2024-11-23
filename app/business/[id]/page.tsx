@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { ImageGalleryModal } from "@/components/ImageGalleryModal";
 import { ServiceOffer } from "@/components/ServiceOffer";
 import { businessOffers, BusinessOffer } from '@/data/offers';
+import { Stories } from './components/Stories';
 
 interface Business {
   id: string;
@@ -594,6 +595,11 @@ export default function BusinessDetailPage() {
                 </div>
               </div>
             </section>
+
+            {/* Add Stories section here */}
+            <div className="max-w-screen-2xl mx-auto px-8">
+              <Stories businessId={business.id} businessName={business.name} />
+            </div>
 
             <div className='max-w-screen-2xl mx-auto flex flex-col lg:flex-row lg:space-x-8 px-8'>
               <div className='flex-1 space-y-20 lg:order-first order-last'>

@@ -2,98 +2,255 @@
 
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+import { 
+  DollarSign, 
+  Calendar as CalendarIcon, 
+  TrendingUp, 
+  Users,
+  Clock,
+  Star,
+  ArrowUpRight,
+  ChevronRight
+} from "lucide-react";
+import { format } from "date-fns";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useRouter } from 'next/navigation';
 
-type TimeFilter = '7days' | '30days';
-
-interface SectionProps {
-  title: string;
-  filter?: TimeFilter;
-  onFilterChange?: (value: TimeFilter) => void;
-  children: React.ReactNode;
+interface Appointment {
+  id: string;
+  clientName: string;
+  clientAvatar?: string;
+  service: string;
+  time: string;
+  duration: number;
+  price: number;
+  status: 'upcoming' | 'completed' | 'cancelled';
 }
 
-function Section({ title, filter, onFilterChange, children }: SectionProps) {
-  return (
-    <Card className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-      <CardHeader className="bg-gray-50 border-b border-gray-200 flex flex-row justify-between items-center p-4">
-        <CardTitle className="text-lg font-semibold text-gray-800">{title}</CardTitle>
-        {filter && onFilterChange && (
-          <Select value={filter} onValueChange={(value) => onFilterChange(value as TimeFilter)}>
-            <SelectTrigger className="w-[130px] h-8 text-sm text-gray-800">
-              <SelectValue placeholder="Select range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7days">Last 7 days</SelectItem>
-              <SelectItem value="30days">Last 30 days</SelectItem>
-            </SelectContent>
-          </Select>
-        )}
-      </CardHeader>
-      <CardContent className="p-4">
-        {children}
-      </CardContent>
-    </Card>
-  );
+interface TopService {
+  name: string;
+  bookings: number;
+  revenue: number;
+  trend: number;
 }
+
+const upcomingAppointments: Appointment[] = [
+  {
+    id: '1',
+    clientName: 'Emma Wilson',
+    clientAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
+    service: 'Haircut & Styling',
+    time: '2024-02-25T10:00:00',
+    duration: 60,
+    price: 80,
+    status: 'upcoming'
+  },
+  {
+    id: '2',
+    clientName: 'Michael Chen',
+    clientAvatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop',
+    service: 'Beard Trim',
+    time: '2024-02-25T11:30:00',
+    duration: 30,
+    price: 40,
+    status: 'upcoming'
+  },
+  {
+    id: '3',
+    clientName: 'Sophie Taylor',
+    clientAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop',
+    service: 'Color Treatment',
+    time: '2024-02-25T14:00:00',
+    duration: 120,
+    price: 150,
+    status: 'upcoming'
+  },
+];
+
+const topServices: TopService[] = [
+  { name: 'Haircut & Styling', bookings: 145, revenue: 11600, trend: 12.5 },
+  { name: 'Color Treatment', bookings: 98, revenue: 14700, trend: 8.2 },
+  { name: 'Beard Trim', bookings: 87, revenue: 3480, trend: -2.4 },
+  { name: 'Hair Treatment', bookings: 76, revenue: 6840, trend: 5.7 },
+];
 
 export default function PartnerDashboard() {
-  const [recentSalesFilter, setRecentSalesFilter] = useState<TimeFilter>('7days');
-  const [upcomingAppointmentsFilter, setUpcomingAppointmentsFilter] = useState<TimeFilter>('7days');
+  const router = useRouter();
+  const [timeRange, setTimeRange] = useState<'7days' | '30days'>('7days');
+
+  const stats = {
+    revenue: 15234.56,
+    appointments: 187,
+    newClients: 45,
+    avgOrderValue: 81.47
+  };
+
+  const handleViewCalendar = () => {
+    localStorage.setItem('upcomingAppointments', JSON.stringify(upcomingAppointments));
+    router.push('/partner/calendar');
+  };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+    <div className="space-y-6 p-6">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-white">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${stats.revenue.toLocaleString()}</div>
+            <div className="text-xs text-muted-foreground">+12.5% from last month</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-white">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Appointments</CardTitle>
+            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.appointments}</div>
+            <div className="text-xs text-muted-foreground">+8.2% from last month</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-white">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">New Clients</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.newClients}</div>
+            <div className="text-xs text-muted-foreground">+15.3% from last month</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-white">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Avg. Order Value</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${stats.avgOrderValue}</div>
+            <div className="text-xs text-muted-foreground">+3.2% from last month</div>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Section 
-          title="Recent Sales" 
-          filter={recentSalesFilter} 
-          onFilterChange={setRecentSalesFilter}
-        >
-          <div className="space-y-2">
-            <p className="text-2xl font-bold text-gray-900">$12,345</p>
-            <p className="text-sm text-gray-500">Total sales for {recentSalesFilter}</p>
-          </div>
-        </Section>
-
-        <Section 
-          title="Upcoming Appointments" 
-          filter={upcomingAppointmentsFilter} 
-          onFilterChange={setUpcomingAppointmentsFilter}
-        >
-          <div className="space-y-2">
-            <p className="text-2xl font-bold text-gray-900">23</p>
-            <p className="text-sm text-gray-500">Appointments for {upcomingAppointmentsFilter}</p>
-          </div>
-        </Section>
-
-        <Section title="Today's Next Appointments">
-          <ul className="space-y-2">
-            <li className="text-sm text-gray-700">10:00 AM - John Doe (Haircut)</li>
-            <li className="text-sm text-gray-700">11:30 AM - Jane Smith (Manicure)</li>
-            <li className="text-sm text-gray-700">2:00 PM - Bob Johnson (Massage)</li>
-          </ul>
-        </Section>
-
-        <Section title="Top Services">
-          <ul className="space-y-2">
-            <li className="text-sm text-gray-700">1. Haircut (45 bookings)</li>
-            <li className="text-sm text-gray-700">2. Manicure (32 bookings)</li>
-            <li className="text-sm text-gray-700">3. Massage (28 bookings)</li>
-          </ul>
-        </Section>
-
-        <Section title="Top Team Member">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-              <span className="text-lg font-semibold text-gray-600">AS</span>
-            </div>
+        {/* Upcoming Appointments */}
+        <Card className="bg-white">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
-              <p className="font-semibold text-gray-800">Alice Smith</p>
-              <p className="text-sm text-gray-500">52 appointments this month</p>
+              <CardTitle className="text-lg font-semibold">Upcoming Appointments</CardTitle>
+              <p className="text-sm text-muted-foreground">Today's schedule</p>
             </div>
-          </div>
-        </Section>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+              onClick={handleViewCalendar}
+            >
+              View Calendar
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </CardHeader>
+          <ScrollArea className="h-[400px]">
+            <CardContent className="p-0">
+              <div className="space-y-4 p-6">
+                {upcomingAppointments.map((appointment) => (
+                  <div
+                    key={appointment.id}
+                    className="flex items-center justify-between p-4 rounded-lg border"
+                  >
+                    <div className="flex items-center gap-4">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={appointment.clientAvatar} alt={appointment.clientName} />
+                        <AvatarFallback>
+                          {appointment.clientName.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium">{appointment.clientName}</div>
+                        <div className="text-sm text-muted-foreground">{appointment.service}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <div className="font-medium">{format(new Date(appointment.time), "h:mm a")}</div>
+                        <div className="text-sm text-muted-foreground">{appointment.duration} min</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-medium">${appointment.price}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </ScrollArea>
+        </Card>
+
+        {/* Top Services */}
+        <Card className="bg-white">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div>
+              <CardTitle className="text-lg font-semibold">Top Services</CardTitle>
+              <p className="text-sm text-muted-foreground">By number of bookings</p>
+            </div>
+            <Select value={timeRange} onValueChange={(value: '7days' | '30days') => setTimeRange(value)}>
+              <SelectTrigger className="w-[130px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7days">Last 7 days</SelectItem>
+                <SelectItem value="30days">Last 30 days</SelectItem>
+              </SelectContent>
+            </Select>
+          </CardHeader>
+          <ScrollArea className="h-[400px]">
+            <CardContent className="p-0">
+              <div className="space-y-4 p-6">
+                {topServices.map((service) => (
+                  <div
+                    key={service.name}
+                    className="flex items-center justify-between p-4 rounded-lg border"
+                  >
+                    <div>
+                      <div className="font-medium">{service.name}</div>
+                      <div className="text-sm text-muted-foreground">{service.bookings} bookings</div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <div className="font-medium">${service.revenue.toLocaleString()}</div>
+                        <div className="flex items-center gap-1 text-sm">
+                          <ArrowUpRight className={cn(
+                            "h-4 w-4",
+                            service.trend > 0 ? "text-green-500" : "text-red-500 rotate-180"
+                          )} />
+                          <span className={cn(
+                            service.trend > 0 ? "text-green-600" : "text-red-600"
+                          )}>
+                            {Math.abs(service.trend)}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </ScrollArea>
+        </Card>
       </div>
     </div>
   );

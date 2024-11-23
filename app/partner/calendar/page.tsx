@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { format, addHours, startOfDay, eachHourOfInterval, isSameDay, addMinutes, subMonths, addMonths } from 'date-fns';
+import { useState, useEffect } from 'react';
+import { format, addHours, startOfDay, eachHourOfInterval, isSameDay, addMinutes, subMonths, addMonths, addDays, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameMonth } from 'date-fns';
 import { Plus, Calendar as CalendarIcon, Settings, Users, Search, PencilIcon, TrashIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ import { CreateEventDialog } from './components/CreateEventDialog';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { useRouter } from 'next/navigation';
 
 function isWithinBusinessHours(time: Date, businessHours: BusinessHours): boolean {
   const dayOfWeek = format(time, 'EEEE').toLowerCase();
@@ -72,6 +73,7 @@ const staffMembers: Staff[] = [
 ];
 
 export default function CalendarPage() {
+  const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [isNewEventDialogOpen, setIsNewEventDialogOpen] = useState(false);
@@ -83,16 +85,58 @@ export default function CalendarPage() {
   const [selectedStaffIds, setSelectedStaffIds] = useState<Set<string>>(
     new Set(staffMembers.map(staff => staff.id))
   );
+  const [isSelectingTimeSlot, setIsSelectingTimeSlot] = useState(false);
 
   const timeSlots = generateDayTimeSlots(
     startOfDay(selectedDate),
     addHours(startOfDay(selectedDate), 24)
   );
 
-  const handleOpenNewEvent = (time: Date, staffId: string) => {
-    setSelectedTime(time);
-    setSelectedStaffId(staffId);
-    setIsNewEventDialogOpen(true);
+  useEffect(() => {
+    // Get the appointments from localStorage when the calendar page loads
+    const storedAppointments = localStorage.getItem('upcomingAppointments');
+    if (storedAppointments) {
+      const appointments = JSON.parse(storedAppointments);
+      // Add these appointments to your events state
+      setEvents(prev => [
+        ...prev,
+        ...appointments.map((apt: any) => ({
+          id: apt.id,
+          title: apt.service,
+          start: new Date(apt.time),
+          end: new Date(new Date(apt.time).getTime() + apt.duration * 60000),
+          clientName: apt.clientName,
+          status: 'confirmed',
+          staffId: '1' // You might want to assign these to specific staff members
+        }))
+      ]);
+      // Clear the localStorage after using the data
+      localStorage.removeItem('upcomingAppointments');
+    }
+  }, []);
+
+  const handleOpenNewEvent = (time?: Date, staffId?: string) => {
+    if (time && staffId) {
+      // Direct time slot click
+      setSelectedTime(time);
+      setSelectedStaffId(staffId);
+      setIsNewEventDialogOpen(true);
+    } else {
+      // New Appointment button click
+      setIsSelectingTimeSlot(true);
+      
+      // Scroll to current time
+      const now = new Date();
+      const currentHour = now.getHours();
+      const scrollTime = currentHour >= 9 && currentHour < 17 
+        ? now 
+        : new Date(now.setHours(9, 0, 0, 0));
+      
+      const timeElement = document.getElementById(`time-${format(scrollTime, 'HH:mm')}`);
+      if (timeElement) {
+        timeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
   };
 
   const handleCloseNewEvent = () => {
@@ -101,22 +145,39 @@ export default function CalendarPage() {
     setSelectedStaffId(undefined);
   };
 
+  const handleTimeSlotSelect = (time: Date, staffId: string) => {
+    if (isSelectingTimeSlot) {
+      setIsSelectingTimeSlot(false);
+      setSelectedTime(time);
+      setSelectedStaffId(staffId);
+      setIsNewEventDialogOpen(true);
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <div className="border-b p-4 sticky top-0 z-10">
+      <div className="border-b p-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-semibold">
-              {format(selectedDate, 'MMMM yyyy')}
-            </h1>
+          <div className="flex items-center gap-4 flex-1">
+            <div className="flex flex-col">
+              <h1 className="text-2xl font-semibold">
+                {format(selectedDate, 'MMMM yyyy')}
+              </h1>
+              <p className="text-sm text-slate-500">
+                {format(selectedDate, 'EEEE, MMMM d')}
+              </p>
+            </div>
             
             <div className="flex items-center gap-1">
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => setSelectedDate(subMonths(selectedDate, 1))}
-                aria-label="Previous month"
+                onClick={() => {
+                  const newDate = addDays(selectedDate, -1);
+                  setSelectedDate(newDate);
+                }}
+                aria-label="Previous day"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -124,7 +185,16 @@ export default function CalendarPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setSelectedDate(new Date())}
+                onClick={() => {
+                  const today = new Date();
+                  setSelectedDate(today);
+                  // Only scroll on "Today" button click
+                  const currentTime = format(today, 'HH:mm');
+                  const timeElement = document.getElementById(`time-${currentTime}`);
+                  if (timeElement) {
+                    timeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }}
               >
                 Today
               </Button>
@@ -132,60 +202,58 @@ export default function CalendarPage() {
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => setSelectedDate(addMonths(selectedDate, 1))}
-                aria-label="Next month"
+                onClick={() => {
+                  const newDate = addDays(selectedDate, 1);
+                  setSelectedDate(newDate);
+                }}
+                aria-label="Next day"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
           </div>
-
-          <div className="flex items-center gap-4">
-            {/* Add Staff Filter Dropdown */}
-            <div className="flex items-center gap-2 border rounded-md p-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedStaffIds(new Set(staffMembers.map(staff => staff.id)))}
-                className={cn(
-                  "text-xs",
-                  selectedStaffIds.size === staffMembers.length && "bg-secondary"
-                )}
-              >
-                All
-              </Button>
+          <div className="flex items-center gap-2 flex-1 justify-center">
+            <div className="flex flex-wrap items-center gap-1.5">
               {staffMembers.map((staff) => (
                 <Button
                   key={staff.id}
-                  variant="ghost"
+                  variant={selectedStaffIds.has(staff.id) ? "secondary" : "ghost"}
                   size="sm"
                   onClick={() => {
-                    const newSelection = new Set(selectedStaffIds);
-                    if (newSelection.has(staff.id)) {
-                      newSelection.delete(staff.id);
-                    } else {
-                      newSelection.add(staff.id);
-                    }
-                    setSelectedStaffIds(newSelection);
+                    setSelectedStaffIds(prev => {
+                      const newSelection = new Set(prev);
+                      if (newSelection.has(staff.id) && newSelection.size > 1) {
+                        newSelection.delete(staff.id);
+                      } else if (!newSelection.has(staff.id)) {
+                        newSelection.add(staff.id);
+                      }
+                      return newSelection;
+                    });
                   }}
                   className={cn(
-                    "text-xs flex items-center gap-1",
-                    selectedStaffIds.has(staff.id) && "bg-secondary"
+                    "text-xs font-medium rounded-full transition-colors",
+                    "flex items-center gap-1.5 min-w-[90px]",
+                    selectedStaffIds.has(staff.id) 
+                      ? "bg-slate-100 hover:bg-slate-200" 
+                      : "hover:bg-slate-50"
                   )}
                 >
-                  <Avatar className="h-4 w-4">
+                  <Avatar className="h-5 w-5 border border-slate-200">
                     <AvatarImage src={staff.avatar} alt={staff.name} />
-                    <AvatarFallback>{staff.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                    <AvatarFallback className="text-[10px] bg-slate-100">
+                      {staff.name.split(' ').map((n: string) => n[0]).join('')}
+                    </AvatarFallback>
                   </Avatar>
-                  {staff.name}
+                  <span className="truncate">{staff.name}</span>
                 </Button>
               ))}
             </div>
-
-            <Button 
-              onClick={() => setIsNewEventDialogOpen(true)}
+          </div>
+          <div className="flex-1 flex justify-end">
+            <Button
+              onClick={() => handleOpenNewEvent()}
               size="sm"
-              className="gap-2"
+              className="gap-2 bg-green-600 hover:bg-green-700 text-white"
             >
               <Plus className="h-4 w-4" />
               New Appointment
@@ -285,6 +353,7 @@ export default function CalendarPage() {
                         return (
                           <div 
                             key={time.toString()}
+                            id={`time-${format(time, 'HH:mm')}`}
                             className={cn(
                               "h-4 relative group transition-all duration-150",
                               isAvailable 
@@ -294,11 +363,16 @@ export default function CalendarPage() {
                               minutes === 0 && "border-t border-gray-200",
                               minutes === 30 && "border-t border-dashed border-gray-200/70",
                               (minutes === 15 || minutes === 45) && "border-t border-dotted border-gray-200/30",
-                              isHovered && "!bg-blue-500/20"
+                              isHovered && "!bg-blue-500/20",
+                              isSelectingTimeSlot && isAvailable && "hover:!bg-green-500/20"
                             )}
                             onClick={() => {
                               if (isAvailable) {
-                                handleOpenNewEvent(time, currentStaff.id);
+                                if (isSelectingTimeSlot) {
+                                  handleTimeSlotSelect(time, currentStaff.id);
+                                } else {
+                                  handleOpenNewEvent(time, currentStaff.id);
+                                }
                               }
                             }}
                             onMouseEnter={() => {
@@ -438,6 +512,20 @@ export default function CalendarPage() {
         initialTime={selectedTime}
         initialStaffId={selectedStaffId}
       />
+
+      {isSelectingTimeSlot && (
+        <div className="sticky top-[73px] z-20 bg-primary text-primary-foreground py-2 px-4 text-sm font-medium text-center shadow-md">
+          Click on a time slot to create a new appointment
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsSelectingTimeSlot(false)}
+            className="ml-2 h-6 hover:bg-primary-foreground/10"
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

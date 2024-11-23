@@ -3,21 +3,42 @@ export interface CalendarEvent {
   title: string;
   start: Date;
   end: Date;
-  type: 'appointment' | 'block' | 'break';
+  type: 'appointment' | 'block';
+  staffId: string;
+  clientId?: string;
   clientName?: string;
+  serviceId?: string;
   notes?: string;
-  status?: 'confirmed' | 'pending' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'cancelled';
   color?: string;
 }
 
-export interface TimeSlot {
-  start: Date;
-  end: Date;
-  isAvailable: boolean;
+export interface BusinessHours {
+  [key: string]: {
+    isOpen: boolean;
+    start: string;
+    end: string;
+  };
 }
 
-export interface BusinessHours {
-  start: string; // Format: "HH:mm"
-  end: string; // Format: "HH:mm"
-  daysOfWeek: number[]; // 0-6, where 0 is Sunday
+export interface Staff {
+  id: string;
+  name: string;
+  role: string;
+  avatar: string;
+}
+
+export interface Client {
+  id: string;
+  name: string;
+  avatar: string;
+  email: string;
+}
+
+export interface Service {
+  id: string;
+  name: string;
+  duration: number;
+  price: number;
+  color: string;
 } 

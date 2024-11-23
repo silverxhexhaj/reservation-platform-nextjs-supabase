@@ -2,8 +2,8 @@ export interface Staff {
   id: string;
   name: string;
   role: string;
-  color: 'blue' | 'green' | 'purple';
   avatar: string;
+  color: 'blue' | 'green' | 'purple';
 }
 
 export interface CalendarEvent {

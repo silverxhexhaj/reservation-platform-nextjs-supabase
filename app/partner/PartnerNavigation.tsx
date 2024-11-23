@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  Home, Calendar, DollarSign, Users, Book, Globe, 
-  TrendingUp, CreditCard, Users as Team, BarChart2, Settings 
+  Home, Calendar, DollarSign, Users, Book, 
+  TrendingUp, CreditCard, Users as Team, Settings 
 } from 'lucide-react';
 
 const menuItems = [
@@ -13,11 +13,9 @@ const menuItems = [
   { name: 'Sales', icon: DollarSign, href: '/partner/sales' },
   { name: 'Clients', icon: Users, href: '/partner/clients' },
   { name: 'Catalog', icon: Book, href: '/partner/catalog' },
-  { name: 'Online Booking', icon: Globe, href: '/partner/online-booking' },
   { name: 'Marketing', icon: TrendingUp, href: '/partner/marketing' },
   { name: 'Payment', icon: CreditCard, href: '/partner/payment' },
   { name: 'Team', icon: Team, href: '/partner/team' },
-  { name: 'Reports', icon: BarChart2, href: '/partner/reports' },
   { name: 'Settings', icon: Settings, href: '/partner/settings' },
 ];
 

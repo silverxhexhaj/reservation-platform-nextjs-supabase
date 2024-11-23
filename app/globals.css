@@ -27,6 +27,27 @@ body {
   .break-inside-avoid {
     break-inside: avoid;
   }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .border-gradient-to-tr {
+    border-image: linear-gradient(to top right, var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to)) 1;
+  }
+  @keyframes gradient-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+  .animate-pulse {
+    animation: gradient-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
 }
 
 /* Add these styles to the end of your globals.css file */

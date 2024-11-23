@@ -22,42 +22,9 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Shield, CheckCircle, Lock } from 'lucide-react';
 import { Instagram, Facebook, Music, Apple, Smartphone } from 'lucide-react';
 import { FeaturedDeals } from "@/components/FeaturedDeals";
-
-const categories = [
-  "Hair Salon",
-  "Nail Salon",
-  "Waxing Salon",
-  "Beauty Salon",
-  "Barbershop",
-  "Eyebrows & Lashes",
-  "Massage",
-  "Spa",
-  "Gym & Fitness",
-  "Personal Trainer",
-  "Therapy Centre",
-  "Tattoo & Piercing",
-  "Tanning Studio",
-  "Aesthetics",
-  "Weight Loss"
-];
-
-const categoryIcons: { [key: string]: ReactElement } = {
-  "Hair Salon": <Scissors className="w-4 h-4" />,
-  "Nail Salon": <Heart className="w-4 h-4" />,
-  "Waxing Salon": <Sun className="w-4 h-4" />,
-  "Beauty Salon": <Heart className="w-4 h-4" />,
-  "Barbershop": <Scissors className="w-4 h-4" />,
-  "Eyebrows & Lashes": <Eye className="w-4 h-4" />,
-  "Massage": <Heart className="w-4 h-4" />,
-  "Spa": <Heart className="w-4 h-4" />,
-  "Gym & Fitness": <Dumbbell className="w-4 h-4" />,
-  "Personal Trainer": <Dumbbell className="w-4 h-4" />,
-  "Therapy Centre": <Heart className="w-4 h-4" />,
-  "Tattoo & Piercing": <Syringe className="w-4 h-4" />,
-  "Tanning Studio": <Sun className="w-4 h-4" />,
-  "Aesthetics": <Syringe className="w-4 h-4" />,
-  "Weight Loss": <Dumbbell className="w-4 h-4" />,
-};
+import { categories, categoryIcons } from "@/lib/constants"
+import { CategoryIcon } from "@/components/CategoryIcon";
+import { categoryToIcon } from "@/lib/constants";
 
 const renderBusinessCard = (business: Business) => (
   <Link 
@@ -530,13 +497,14 @@ export default function Home() {
                 </div>
                 
                 <div className="flex justify-center">
-                  <Button
-                    onClick={() => setIsModalOpen(true)}
-                    variant="outline"
-                    className="bg-white bg-opacity-5 hover:bg-opacity-10 text-white border-white border-opacity-20"
-                  >
-                    <LayoutGrid className="mr-2 h-4 w-4" /> All Categories
-                  </Button>
+                  <Link href="/explore">
+                    <Button
+                      variant="outline"
+                      className="bg-white bg-opacity-5 hover:bg-opacity-10 text-white border-white border-opacity-20"
+                    >
+                      <LayoutGrid className="mr-2 h-4 w-4" /> All Categories
+                    </Button>
+                  </Link>
                 </div>
 
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -569,7 +537,7 @@ export default function Home() {
                               >
                                 <div className="flex items-center space-x-4">
                                   <span className="w-12 h-12 flex items-center justify-center bg-white rounded-xl shadow-sm group-hover:shadow-md transition-all duration-300">
-                                    {categoryIcons[category]}
+                                    <CategoryIcon icon={categoryToIcon[category]} />
                                   </span>
                                   <span className="font-medium text-gray-900">
                                     {category}

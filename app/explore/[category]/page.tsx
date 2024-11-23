@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { businesses } from '@/data/businesses';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, Search, X } from 'lucide-react';
 import Link from 'next/link';
+import { Badge } from "@/components/ui/badge";
 
 interface PageProps {
   params: {
@@ -16,6 +17,7 @@ interface PageProps {
 }
 
 export default function CategoryPage({ params }: PageProps) {
+  const [user, setUser] = useState<{ username: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const categorySlug = params.category;
   const categoryName = categorySlug
@@ -35,10 +37,10 @@ export default function CategoryPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <Header user={user} />
       <main className="flex-grow">
         {/* Hero Section */}
-        <div className="relative h-[400px] bg-gray-500">
+        <div className="relative h-[400px]">
           <div className="absolute inset-0">
             <div className="relative w-full h-full">
               <video 
@@ -53,10 +55,16 @@ export default function CategoryPage({ params }: PageProps) {
               >
                 <track kind="metadata" label="cuepoints" />
               </video>
-              <div className="absolute inset-0 bg-black bg-opacity-40">
-                <div className="h-full flex flex-col items-center justify-center px-4">
-                  <h1 className="text-4xl font-bold text-white mb-8">{categoryName}</h1>
-                  <div className="w-full max-w-2xl">
+              <div 
+                className="absolute inset-0 mix-blend-overlay opacity-40"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-red-700/40 to-pink-700/40 flex items-center justify-center opacity-80">
+                <div className="text-center space-y-4">
+                  <h1 className="text-4xl font-bold text-white mb-4">{categoryName}</h1>
+                  <div className="w-full max-w-2xl mx-auto px-4">
                     <div className="relative flex items-center bg-white rounded-full">
                       <div className="relative flex-grow">
                         <input
@@ -64,7 +72,7 @@ export default function CategoryPage({ params }: PageProps) {
                           placeholder={`Search ${categoryName.toLowerCase()}...`}
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
-                          className="rounded-full w-full px-4 py-3 pl-10 pr-10 text-black bg-white border border-transparent focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                          className="w-full rounded-full px-4 py-3 pl-10 pr-10 text-black bg-white border border-transparent focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                         />
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" size={20} />
                         {searchTerm && (
@@ -90,46 +98,64 @@ export default function CategoryPage({ params }: PageProps) {
         </div>
 
         {/* Business Cards Section */}
-        <div className="px-8 py-12 max-w-screen-2xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <div className="max-w-screen-2xl mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
             {filteredBusinesses.length > 0 ? (
               filteredBusinesses.map((business) => (
-                <Card key={business.id} className="overflow-hidden transition-shadow duration-300 hover:shadow-lg">
-                  <div className="h-48 overflow-hidden relative">
-                    <img src={business.imageUrl} alt={business.name} className="w-full h-full object-cover" />
-                  </div>
-                  <CardContent className="pt-4">
-                    <CardTitle className="text-xl pb-2">{business.name}</CardTitle>
-                    <p className="text-gray-600 mb-4">{business.description}</p>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="flex items-center">
-                        <Star className="w-4 h-4 text-yellow-400 mr-1" />
-                        {business.rating.toFixed(1)}
-                      </span>
-                      <span className="flex items-center space-x-1">
-                        {['$', '$$', '$$$', '$$$$'].map((price, index) => (
-                          <span
-                            key={index}
-                            className={`${
-                              business.priceRange.length > index
-                                ? 'font-bold text-gray-600'
-                                : 'text-gray-400'
-                            }`}
-                          >
-                            $
-                          </span>
-                        ))}
-                      </span>
+                <Link 
+                  href={`/business/${business.id}`} 
+                  key={business.id} 
+                  className="group block h-full"
+                >
+                  <Card className="overflow-hidden h-full transition-all duration-300 hover:shadow-lg border border-gray-100 hover:border-gray-200">
+                    <div className="aspect-[4/3] overflow-hidden relative border-b border-gray-100">
+                      <img 
+                        src={business.imageUrl} 
+                        alt={business.name} 
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute top-4 left-4">
+                        <Badge 
+                          variant="secondary" 
+                          className="bg-white/90 backdrop-blur-sm text-neutral-900 font-medium border border-gray-100/50"
+                        >
+                          {business.category}
+                        </Badge>
+                      </div>
                     </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Link href={`/business/${business.id}`} className="w-full">
-                      <Button className="w-full">
-                        Book Now
-                      </Button>
-                    </Link>
-                  </CardFooter>
-                </Card>
+
+                    <CardContent className="p-4">
+                      <div className="space-y-2">
+                        <h3 className="text-base font-semibold line-clamp-1">
+                          {business.name}
+                        </h3>
+                        <p className="text-sm text-neutral-600 line-clamp-2">
+                          {business.description}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                        <div className="flex items-center space-x-1">
+                          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                          <span className="text-sm font-medium text-neutral-900">
+                            {business.rating.toFixed(1)}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center space-x-0.5">
+                          {Array.from(business.priceRange).map((_, index) => (
+                            <span
+                              key={index}
+                              className="text-sm font-medium text-neutral-900"
+                            >
+                              $
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))
             ) : (
               <div className="col-span-full text-center py-12">

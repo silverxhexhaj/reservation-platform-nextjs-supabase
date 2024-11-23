@@ -9,7 +9,7 @@ export default function PartnerLayout({ children }: { children: ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-white">
       {/* Mobile menu button */}
       <button
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -23,7 +23,7 @@ export default function PartnerLayout({ children }: { children: ReactNode }) {
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:static fixed inset-y-0 left-0 z-10
         transition-transform duration-300 ease-in-out
-        lg:flex lg:flex-shrink-0
+        lg:flex lg:flex-shrink-0 
       `}>
         <PartnerNavigation />
       </div>
@@ -31,7 +31,7 @@ export default function PartnerLayout({ children }: { children: ReactNode }) {
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <PartnerHeader />
-        <main className="flex-1 overflow-y-auto bg-white">
+        <main className="flex-1 bg-white overflow-y-scroll px-0 md:px-8 lg:px-10">
           {children}
         </main>
       </div>
