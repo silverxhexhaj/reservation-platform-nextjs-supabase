@@ -1,25 +1,34 @@
-import Image from 'next/image'
-import { cn } from "@/lib/utils"
+import React from 'react';
 
 interface MasonryGalleryProps {
-  images: { src: string; alt: string }[]
-  className?: string
+  images: string[];
+  businessName: string;
 }
 
-export function MasonryGallery({ images, className }: MasonryGalleryProps) {
+export const MasonryGallery: React.FC<MasonryGalleryProps> = ({ images, businessName }) => {
+  console.log("MasonryGallery images:", images);
+
+  // Function to get a random span value for each image
+  const getRandomSpan = () => Math.floor(Math.random() * 2) + 1;
+
   return (
-    <div className={cn("columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4", className)}>
+    <div className="masonry-gallery">
       {images.map((image, index) => (
-        <div key={index} className="break-inside-avoid mb-4">
-          <Image
-            src={image.src}
-            alt={image.alt}
-            width={500}
-            height={300}
-            className="w-full h-auto rounded-lg"
+        <div 
+          key={index} 
+          className="masonry-item"
+          style={{
+            gridRowEnd: `span ${getRandomSpan()}`
+          }}
+        >
+          <img
+            src={image}
+            alt={`${businessName} gallery image ${index + 1}`}
+            className="w-full h-full object-cover rounded-lg"
+            loading="lazy"
           />
         </div>
       ))}
     </div>
-  )
-}
+  );
+};

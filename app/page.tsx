@@ -1,15 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef, ReactElement } from 'react';
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect, useRef, ReactElement, Suspense } from 'react';
+import { Header } from './components/Header';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "./components/ui/card";
+import { Button } from "./components/ui/button";
 import { supabase } from '@/lib/supabase';
 import { Search, Star, X, Scissors, Dumbbell, Heart, Syringe, Eye, Sun, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
-import { businesses, Business } from '@/data/businesses';
+import { Business, Category, categories, categoryToIcon } from '@/data';
+import { businesses } from '@/data/mock';
 import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import {
@@ -17,18 +16,16 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge";
+} from "./components/ui/dialog"
+import { Badge } from "./components/ui/badge";
 import { Calendar, Shield, CheckCircle, Lock } from 'lucide-react';
 import { Instagram, Facebook, Music, Apple, Smartphone } from 'lucide-react';
-import { FeaturedDeals } from "@/components/FeaturedDeals";
-import { categories, categoryIcons } from "@/lib/constants"
-import { CategoryIcon } from "@/components/CategoryIcon";
-import { categoryToIcon } from "@/lib/constants";
+import { FeaturedDeals } from "./components/FeaturedDeals";
+import { CategoryIcon } from './components/CategoryIcon';
 
-const renderBusinessCard = (business: Business) => (
+const renderBusinessCard = (business: Business): ReactElement => (
   <Link 
-    href={`/business/${business.id}`} 
+    href={`/pages/private/business/dashboard/${business.id}`} 
     key={business.id} 
     className="group block h-full"
   >
@@ -225,12 +222,12 @@ const businessOffers: BusinessOffer[] = [
 ];
 
 // Add the render function for offer cards
-const renderOfferCard = (offer: BusinessOffer) => {
+const renderOfferCard = (offer: BusinessOffer): ReactElement => {
   const business = businesses.find(b => b.id === offer.businessId);
   
   return (
     <Link 
-      href={`/business/${offer.businessId}?offer=${offer.id}`}
+      href={`/pages/private/business/dashboard/${offer.businessId}?offer=${offer.id}`}
       key={offer.id}
       className="group block"
     >
@@ -291,14 +288,15 @@ const renderOfferCard = (offer: BusinessOffer) => {
   );
 };
 
-// Replace the existing formatDate function with this one at the top level
+// Move the formatDate function to use UTC consistently
 function formatDate(dateString: string) {
-  // Create a UTC date to ensure consistent formatting between server and client
-  const date = new Date(dateString);
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(date.getUTCDate()).padStart(2, '0');
-  return `${month}/${day}/${year}`;
+  const date = new Date(dateString + 'T00:00:00Z'); // Force UTC
+  return new Intl.DateTimeFormat('en-US', {
+    month: '2-digit',
+    day: '2-digit',
+    year: 'numeric',
+    timeZone: 'UTC'
+  }).format(date);
 }
 
 // Update the FALLBACK_IMAGES with reliable URLs
@@ -323,7 +321,14 @@ function getFallbackImage(category?: string) {
   return FALLBACK_IMAGES.default;
 }
 
-export default function Home() {
+const NoResultsMessage = (): ReactElement => (
+  <div className="text-center py-10">
+    <h3 className="text-xl font-semibold text-gray-600 mb-2">No results found</h3>
+    <p className="text-gray-500">Try adjusting your search or filter to find what you&apos;re looking for.</p>
+  </div>
+);
+
+export default function HomePage() {
   const [user, setUser] = useState<{ username: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredBusinesses, setFilteredBusinesses] = useState<Business[]>(businesses);
@@ -333,8 +338,40 @@ export default function Home() {
   const placeholderTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
+  const [isClientSide, setIsClientSide] = useState(false);
   const displayedCategories = showAllCategories ? categories : categories.slice(0, 6);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Add this effect to handle client-side initialization
+  useEffect(() => {
+    setIsClientSide(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClientSide) return;
+
+    const changePlaceholder = () => {
+      if (!isInputFocused) {
+        setFadeOut(true);
+        placeholderTimeoutRef.current = setTimeout(() => {
+          setPlaceholderIndex((prevIndex) => (prevIndex + 1) % categories.length);
+          setPlaceholder(`Search for ${categories[(placeholderIndex + 1) % categories.length]}...`);
+          setFadeOut(false);
+        }, 200);
+      }
+    };
+
+    const intervalId = setInterval(changePlaceholder, 1500);
+
+    return () => {
+      clearInterval(intervalId);
+      if (placeholderTimeoutRef.current) {
+        clearTimeout(placeholderTimeoutRef.current);
+      }
+    };
+  }, [placeholderIndex, isInputFocused, isClientSide]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -358,28 +395,6 @@ export default function Home() {
       authListener.subscription.unsubscribe();
     };
   }, []);
-
-  useEffect(() => {
-    const changePlaceholder = () => {
-      if (!isInputFocused) {
-        setFadeOut(true);
-        placeholderTimeoutRef.current = setTimeout(() => {
-          setPlaceholderIndex((prevIndex) => (prevIndex + 1) % categories.length);
-          setPlaceholder(`Search for ${categories[(placeholderIndex + 1) % categories.length]}...`);
-          setFadeOut(false);
-        }, 200);
-      }
-    };
-
-    const intervalId = setInterval(changePlaceholder, 1500);
-
-    return () => {
-      clearInterval(intervalId);
-      if (placeholderTimeoutRef.current) {
-        clearTimeout(placeholderTimeoutRef.current);
-      }
-    };
-  }, [placeholderIndex, isInputFocused]);
 
   const handleSearch = () => {
     const filtered = businesses.filter(business => 
@@ -406,13 +421,6 @@ export default function Home() {
   const healthyBodyBusinesses = filteredBusinesses.filter(b => ['Gym & Fitness', 'Personal Trainer'].includes(b.category));
   const womenSectionBusinesses = filteredBusinesses.filter(b => ['Hair Salon', 'Nail Salon', 'Waxing Salon'].includes(b.category));
 
-  const NoResultsMessage = () => (
-    <div className="text-center py-10">
-      <h3 className="text-xl font-semibold text-gray-600 mb-2">No results found</h3>
-      <p className="text-gray-500">Try adjusting your search or filter to find what you&apos;re looking for.</p>
-    </div>
-  );
-
   const clearSearch = () => {
     setSearchTerm('');
     setFilteredBusinesses(businesses);
@@ -425,6 +433,15 @@ export default function Home() {
   const handleInputBlur = () => {
     setIsInputFocused(false);
   };
+
+  useEffect(() => {
+    // Ensure video loads and plays
+    if (videoRef.current) {
+      videoRef.current.play().catch(error => {
+        console.log("Video autoplay failed:", error);
+      });
+    }
+  }, []);
 
   return (
     <div className="min-h-screen font-sans bg-white flex flex-col">
@@ -448,13 +465,13 @@ export default function Home() {
                   <div className="relative w-full">
                     <input
                       type="text"
-                      placeholder={placeholder}
+                      placeholder={isClientSide ? placeholder : 'Search businesses...'}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       onKeyPress={handleKeyPress}
                       onFocus={handleInputFocus}
                       onBlur={handleInputBlur}
-                      className={`w-full rounded-full px-4 py-3 pl-10 pr-10 text-black bg-white border border-transparent focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-opacity duration-200 ${fadeOut && !isInputFocused ? 'opacity-0' : 'opacity-100'}`}
+                      className={`w-full rounded-full px-4 py-3 pl-10 pr-10 text-black bg-white border border-transparent focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-opacity duration-200 ${isClientSide && fadeOut && !isInputFocused ? 'opacity-0' : 'opacity-100'}`}
                     />
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                     {searchTerm && (
@@ -497,7 +514,7 @@ export default function Home() {
                 </div>
                 
                 <div className="flex justify-center">
-                  <Link href="/explore">
+                  <Link href="/pages/public/explore">
                     <Button
                       variant="outline"
                       className="bg-white bg-opacity-5 hover:bg-opacity-10 text-white border-white border-opacity-20"
@@ -556,18 +573,25 @@ export default function Home() {
           </div>
           <div className='absolute inset-0'>
             <div className="relative w-full h-full">
-              <video 
-                className="absolute inset-0 w-full h-full object-cover" 
-                crossOrigin="" 
-                playsInline 
-                muted 
-                autoPlay
-                loop
-                src="https://videos.pexels.com/video-files/3753716/3753716-uhd_2560_1440_25fps.mp4" 
-                preload="metadata"
-              >
-                <track kind="metadata" label="cuepoints" />
-              </video>
+              <Suspense fallback={
+                <div className="absolute inset-0 bg-gradient-to-b from-red-700/40 to-pink-700/40" />
+              }>
+                <video 
+                  ref={videoRef}
+                  className="absolute inset-0 w-full h-full object-cover" 
+                  crossOrigin="" 
+                  playsInline 
+                  muted 
+                  autoPlay
+                  loop
+                  onLoadedData={() => setIsVideoLoaded(true)}
+                  style={{ opacity: isVideoLoaded ? 1 : 0 }}
+                  src="https://videos.pexels.com/video-files/3753716/3753716-uhd_2560_1440_25fps.mp4" 
+                  preload="metadata"
+                >
+                  <track kind="metadata" label="cuepoints" />
+                </video>
+              </Suspense>
               <div 
                 className="absolute inset-0 mix-blend-overlay opacity-40"
                 style={{
@@ -756,7 +780,6 @@ export default function Home() {
 
         <FeaturedDeals />
       </main>
-      <Footer />
     </div>
   );
 }
