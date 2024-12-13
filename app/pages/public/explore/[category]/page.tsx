@@ -8,6 +8,7 @@ import { Button } from "@/app/components/ui/button";
 import { Star, Search, X } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from "@/app/components/ui/badge";
+import Image from 'next/image';
 
 interface PageProps {
   params: {
@@ -108,10 +109,11 @@ export default function CategoryPage({ params }: PageProps) {
                 >
                   <Card className="overflow-hidden h-full transition-all duration-300 hover:shadow-lg border border-gray-100 hover:border-gray-200">
                     <div className="aspect-[4/3] overflow-hidden relative border-b border-gray-100">
-                      <img 
+                      <Image 
                         src={business.imageUrl} 
                         alt={business.name} 
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                       <div className="absolute top-4 left-4">
                         <Badge 
@@ -159,7 +161,9 @@ export default function CategoryPage({ params }: PageProps) {
             ) : (
               <div className="col-span-full text-center py-12">
                 <h3 className="text-xl font-semibold text-gray-600 mb-2">No results found</h3>
-                <p className="text-gray-500">Try adjusting your search to find what you're looking for.</p>
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                  Can&apos;t find what you&apos;re looking for? Try adjusting your filters or search terms.
+                </p>
               </div>
             )}
           </div>

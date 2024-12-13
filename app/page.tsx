@@ -32,10 +32,11 @@ const renderBusinessCard = (business: Business): ReactElement => (
     <Card className="overflow-hidden h-full transition-all duration-300 hover:shadow-lg border border-gray-100 hover:border-gray-200">
       {/* Image Container */}
       <div className="aspect-[4/3] overflow-hidden relative border-b border-gray-100">
-        <img 
+        <Image 
           src={business.imageUrl} 
           alt={business.name} 
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          fill
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
         {/* Category Badge */}
         <div className="absolute top-4 left-4">
@@ -234,10 +235,11 @@ const renderOfferCard = (offer: BusinessOffer): ReactElement => {
       <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-white hover:shadow-lg transition-all duration-300">
         {/* Image and Discount Badge */}
         <div className="relative aspect-[16/9] overflow-hidden">
-          <img 
+          <Image 
             src={offer.imageUrl}
             alt={offer.title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
           <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
             {offer.discountPercentage}% OFF

@@ -66,11 +66,11 @@ export default function WhoWeAre() {
         <div className="mt-16 text-center">
           <h2 className="text-3xl font-semibold mb-4">Our Values</h2>
           <ul className="list-disc list-inside text-left max-w-2xl mx-auto">
-            <li className="mb-2">Innovation: We constantly push the boundaries of what's possible.</li>
+            <li className="mb-2">Innovation: We constantly push the boundaries of what&apos;s possible.</li>
             <li className="mb-2">User-Centric Design: Our users are at the heart of everything we do.</li>
             <li className="mb-2">Collaboration: We believe in the power of teamwork and open communication.</li>
             <li className="mb-2">Integrity: We uphold the highest standards of honesty and ethical behavior.</li>
-            <li>Continuous Learning: We're always striving to improve and grow.</li>
+            <li>Continuous Learning: We&apos;re always striving to improve and grow.</li>
           </ul>
         </div>
       </div>

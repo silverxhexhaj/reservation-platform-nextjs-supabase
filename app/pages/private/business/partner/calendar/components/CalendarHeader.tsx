@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import { format, addMonths, subMonths } from 'date-fns';
 
 interface CalendarHeaderProps {

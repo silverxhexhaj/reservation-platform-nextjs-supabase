@@ -19,7 +19,7 @@ import { Textarea } from "@/app/components/ui/textarea";
 import { Label } from "@/app/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import { format } from "date-fns";
-import { CalendarEvent, BusinessHours, Staff } from "@/types/calendar";
+import { CalendarEvent, BusinessHours, Staff } from "@/app/types/calendar";
 import { useState } from "react";
 
 interface CreateEventDialogProps {

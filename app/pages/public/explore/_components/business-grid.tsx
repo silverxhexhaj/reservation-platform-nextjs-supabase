@@ -1,4 +1,4 @@
-import { type Business } from "@/lib/types/business";
+import { type Business } from "@/app/lib/types/business";
 import { BusinessCard } from "./business-card";
 
 interface BusinessGridProps {

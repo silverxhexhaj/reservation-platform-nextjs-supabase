@@ -35,7 +35,7 @@ import {
 interface CreateTeamMemberDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onMemberCreate: (member: TeamMember) => void;
+  onTeamMemberCreate: (member: TeamMember) => void;
 }
 
 const roles = [
@@ -47,14 +47,21 @@ const roles = [
 export function CreateTeamMemberDialog({
   open,
   onOpenChange,
-  onMemberCreate,
+  onTeamMemberCreate,
 }: CreateTeamMemberDialogProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    email: string;
+    role: string;
+    avatar: string;
+    status: 'active' | 'inactive';
+    joinedDate: Date;
+  }>({
     name: '',
     email: '',
     role: '',
-    avatar: '',
-    status: 'active' as const,
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + Math.random(),
+    status: 'active',
     joinedDate: new Date(),
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,13 +80,13 @@ export function CreateTeamMemberDialog({
         appointments: 0,
       };
 
-      onMemberCreate(newMember);
+      onTeamMemberCreate(newMember);
       onOpenChange(false);
       setFormData({
         name: '',
         email: '',
         role: '',
-        avatar: '',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + Math.random(),
         status: 'active',
         joinedDate: new Date(),
       });

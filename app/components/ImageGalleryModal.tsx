@@ -4,6 +4,8 @@ import { Dialog, DialogContent } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react";
 import { useState, useEffect } from "react";
+import Image from 'next/image';
+import { KeyboardEvent as ReactKeyboardEvent } from 'react';
 
 interface ImageGalleryModalProps {
   images: string[];
@@ -34,7 +36,7 @@ export function ImageGalleryModal({
     setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
 
-  const handleKeyDown = (e: KeyboardEvent) => {
+  const handleKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
     if (e.key === "ArrowLeft") handlePrevious();
     if (e.key === "ArrowRight") handleNext();
     if (e.key === "Escape") onClose();
@@ -104,15 +106,12 @@ export function ImageGalleryModal({
             }`}
             onClick={() => setIsZoomed(!isZoomed)}
           >
-            <img
+            <Image
               src={images[currentIndex]}
               alt={`Gallery image ${currentIndex + 1}`}
-              className={`${
-                isZoomed 
-                  ? 'max-w-none max-h-none w-auto h-auto scale-150' 
-                  : 'max-h-[85vh] max-w-[85vw] w-auto h-auto'
-              } transition-transform duration-300`}
-              style={{ objectFit: 'contain' }}
+              fill
+              className="object-contain"
+              priority
             />
           </div>
 
@@ -129,10 +128,15 @@ export function ImageGalleryModal({
                       : 'opacity-50 hover:opacity-100'
                   }`}
                 >
-                  <img
+                  <Image
                     src={image}
                     alt={`Thumbnail ${index + 1}`}
-                    className="w-full h-full object-cover"
+                    width={100}
+                    height={100}
+                    className={`object-cover rounded-lg cursor-pointer transition-opacity duration-200 ${
+                      index === currentIndex ? 'opacity-100' : 'opacity-50 hover:opacity-75'
+                    }`}
+                    onClick={() => setCurrentIndex(index)}
                   />
                 </button>
               ))}

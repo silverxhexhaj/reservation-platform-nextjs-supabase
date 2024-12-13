@@ -241,7 +241,7 @@ export default function Team() {
       <CreateTeamMemberDialog
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
-        onMemberCreate={(newMember) => {
+        onTeamMemberCreate={(newMember) => {
           setMembers(prev => [...prev, newMember]);
         }}
       />

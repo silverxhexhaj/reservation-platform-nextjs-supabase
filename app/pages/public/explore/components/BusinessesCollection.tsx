@@ -45,10 +45,11 @@ export async function BusinessesCollection({ searchParams }: BusinessesCollectio
         >
           <Card className="overflow-hidden h-full transition-all duration-300 hover:shadow-lg border border-gray-100 hover:border-gray-200">
             <div className="aspect-[4/3] overflow-hidden relative border-b border-gray-100">
-              <img 
+              <Image 
                 src={business.imageUrl} 
                 alt={business.name} 
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute top-4 left-4">
                 <Badge 

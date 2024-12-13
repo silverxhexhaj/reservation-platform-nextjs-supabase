@@ -28,6 +28,13 @@ interface Business {
 interface Service {
   name: string;
   price: number;
+  description?: string;
+  id?: string;
+  duration?: number;
+  categoryId?: string;
+  businessId?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 interface ServiceCategory {

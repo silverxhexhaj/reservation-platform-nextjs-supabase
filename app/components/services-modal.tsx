@@ -1,15 +1,15 @@
 "use client"
 
-import { Service } from "@/lib/services"
-import { Button } from "@/components/ui/button"
+import { Service } from "../lib/services"
+import { Button } from "./ui/button"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { ServiceCard } from "@/components/service-card"
+} from "./ui/dialog"
+import { ServiceCard } from "./service-card"
 
 interface ServicesModalProps {
   services: Service[]

@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface MasonryGalleryProps {
   images: string[];
@@ -21,11 +22,12 @@ export const MasonryGallery: React.FC<MasonryGalleryProps> = ({ images, business
             gridRowEnd: `span ${getRandomSpan()}`
           }}
         >
-          <img
+          <Image
             src={image}
-            alt={`${businessName} gallery image ${index + 1}`}
-            className="w-full h-full object-cover rounded-lg"
-            loading="lazy"
+            alt={`Gallery image ${index + 1}`}
+            width={300}
+            height={300}
+            className="w-full h-full object-cover rounded-lg cursor-pointer transition-transform duration-300 hover:scale-105"
           />
         </div>
       ))}

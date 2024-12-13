@@ -19,19 +19,6 @@ import { format } from "date-fns";
 import { CreateClientDialog } from './components/CreateClientDialog';
 import type { Client } from './types';
 
-interface Client {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  avatar?: string;
-  status: 'active' | 'inactive';
-  totalAppointments: number;
-  lastVisit: string;
-  totalSpent: number;
-  preferredService: string;
-}
-
 const clients: Client[] = [
   {
     id: '1',

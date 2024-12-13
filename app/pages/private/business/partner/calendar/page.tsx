@@ -14,11 +14,11 @@ import {
 } from "@/app/components/ui/select";
 import { CalendarHeader } from "./components/CalendarHeader";
 import { cn } from "@/lib/utils";
-import type { CalendarEvent, TimeSlot, BusinessHours, Staff } from '@/types/calendar';
+import type { CalendarEvent, TimeSlot, BusinessHours, Staff } from '@/app/types/calendar';
 import { 
   generateTimeSlots, 
-  getDefaultBusinessHours 
-} from '@/lib/calendar-utils';
+  getDefaultBusinessHours
+} from '@/app/lib/calendar-utils';
 import { CreateEventDialog } from './components/CreateEventDialog';
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
@@ -54,6 +54,7 @@ const staffMembers: Staff[] = [
     name: 'Silver Xhexhaj', 
     role: 'Stylist', 
     color: 'blue', 
+    email: 'silver@example.com',
     avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop' 
   },
   { 
@@ -61,6 +62,7 @@ const staffMembers: Staff[] = [
     name: 'John Doe', 
     role: 'Barber', 
     color: 'green', 
+    email: 'john@example.com',
     avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&h=100&fit=crop' 
   },
   { 
@@ -68,8 +70,9 @@ const staffMembers: Staff[] = [
     name: 'Jane Smith', 
     role: 'Colorist', 
     color: 'purple', 
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop' 
-  },
+    email: 'jane@example.com',
+    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop' 
+  }
 ];
 
 export default function CalendarPage() {

@@ -1,9 +1,7 @@
-export interface Staff {
-  id: string;
-  name: string;
-  role: string;
-  avatar: string;
-  color: 'blue' | 'green' | 'purple';
+export interface TimeSlot {
+  time: Date;
+  isAvailable: boolean;
+  events?: CalendarEvent[];
 }
 
 export interface CalendarEvent {
@@ -11,9 +9,13 @@ export interface CalendarEvent {
   title: string;
   start: Date;
   end: Date;
+  type?: 'appointment' | 'break' | 'meeting';
+  staffId?: string;
+  clientId?: string;
   clientName?: string;
+  serviceId?: string;
   status: 'confirmed' | 'pending' | 'cancelled';
-  staffId: string;
+  notes?: string;
 }
 
 export interface BusinessHours {
@@ -22,4 +24,16 @@ export interface BusinessHours {
     start: string;
     end: string;
   };
+}
+
+export interface Staff {
+  id: string;
+  name: string;
+  role: string;
+  avatar?: string;
+  email: string;
+  color?: 'blue' | 'green' | 'purple' | 'red' | 'yellow' | 'pink';
+  schedule?: BusinessHours;
+  specialties?: string[];
+  isAvailable?: boolean;
 } 

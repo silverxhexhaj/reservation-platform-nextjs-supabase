@@ -1,8 +1,8 @@
 "use client"
 
-import { Service } from "@/lib/services"
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
-import { Button } from "../components/ui/button"
+import { Service } from "../lib/services"
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
+import { Button } from "./ui/button"
 
 interface ServiceCardProps {
   service: Service

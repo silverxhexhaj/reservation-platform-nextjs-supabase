@@ -152,7 +152,7 @@ export default function PartnerDashboard() {
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
               <CardTitle className="text-lg font-semibold">Upcoming Appointments</CardTitle>
-              <p className="text-sm text-muted-foreground">Today's schedule</p>
+              <p className="text-sm text-muted-foreground">Today&apos;s schedule</p>
             </div>
             <Button 
               variant="outline" 

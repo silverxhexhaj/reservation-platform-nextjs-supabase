@@ -49,12 +49,19 @@ export function CreateClientDialog({
   onOpenChange,
   onClientCreate,
 }: CreateClientDialogProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    email: string;
+    phone: string;
+    avatar: string;
+    status: 'active' | 'inactive';
+    preferredService: string;
+  }>({
     name: '',
     email: '',
     phone: '',
-    avatar: '',
-    status: 'active' as const,
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + Math.random(),
+    status: 'active',
     preferredService: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -79,7 +86,7 @@ export function CreateClientDialog({
         name: '',
         email: '',
         phone: '',
-        avatar: '',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + Math.random(),
         status: 'active',
         preferredService: '',
       });

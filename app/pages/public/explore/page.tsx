@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { Header } from "@/app/components/Header"
 import { BusinessesCollection } from "./components/BusinessesCollection"
 import { ExploreFilters } from "./components/ExploreFilters"
@@ -51,15 +51,19 @@ export default function ExplorePage() {
         <div className="max-w-screen-2xl mx-auto px-4 py-12 space-y-8">
           {/* Filters */}
           <div className="w-full">
-            <ExploreFilters categories={[...categories]} />
+            <Suspense fallback={<div>Loading filters...</div>}>
+              <ExploreFilters categories={[...categories]} />
+            </Suspense>
           </div>
 
           {/* Business Collection */}
           <div className="w-full">
-            <BusinessesCollection searchParams={{
-              category: typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('category') ?? undefined : undefined,
-              search: typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('search') ?? undefined : undefined
-            }} />
+            <Suspense fallback={<div>Loading businesses...</div>}>
+              <BusinessesCollection searchParams={{
+                category: typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('category') ?? undefined : undefined,
+                search: typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('search') ?? undefined : undefined
+              }} />
+            </Suspense>
           </div>
         </div>
       </main>
