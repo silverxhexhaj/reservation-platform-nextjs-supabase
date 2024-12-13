@@ -1,9 +1,9 @@
 "use client";
 
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
+import { Button } from "@/app/components/ui/button";
+import { Header } from '@/app/components/Header';
+import { Footer } from '@/app/components/Footer';
 
 const pricingPlans = [
   {

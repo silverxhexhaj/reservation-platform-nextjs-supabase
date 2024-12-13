@@ -1,17 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
+import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from "@/app/components/ui/select";
+import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { 
   Search, 
   DollarSign, 
@@ -22,7 +22,7 @@ import {
   Calendar
 } from "lucide-react";
 import { format } from "date-fns";
-import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import { DatePickerWithRange } from "@/app/components/ui/date-range-picker";
 import { cn } from "@/lib/utils";
 
 interface Payment {

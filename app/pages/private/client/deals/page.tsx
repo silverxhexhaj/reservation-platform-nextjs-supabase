@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
+import { Header } from "@/app/components/Header";
+import { Footer } from "@/app/components/Footer";
 import { businesses, businessOffers } from "@/data/mock";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/app/components/ui/input";
+import { Button } from "@/app/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/app/components/ui/select";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import {
   Sheet,
@@ -20,10 +20,10 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
-import { FeaturedDealCard } from "@/components/FeaturedDealCard";
+} from "@/app/components/ui/sheet";
+import { Slider } from "@/app/components/ui/slider";
+import { Badge } from "@/app/components/ui/badge";
+import { FeaturedDealCard } from "@/app/components/FeaturedDealCard";
 
 // Get unique categories from businesses
 const categories = Array.from(new Set(businesses.map(b => b.category)));
