@@ -22,6 +22,28 @@ import { Calendar, Shield, CheckCircle, Lock } from 'lucide-react';
 import { Instagram, Facebook, Music, Apple, Smartphone } from 'lucide-react';
 import { FeaturedDeals } from "./components/FeaturedDeals";
 import { CategoryIcon } from './components/CategoryIcon';
+import { motion } from 'framer-motion'
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2
+    }
+  }
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5
+    }
+  }
+}
 
 const renderBusinessCard = (business: Business): ReactElement => (
   <Link 
@@ -449,73 +471,93 @@ export default function HomePage() {
     <div className="min-h-screen font-sans bg-white flex flex-col">
       <Header user={user} />
       <main className="relative">
+        {/* Hero Section */}
         <div className="p-8 flex relative h-screen">
-          <div className='relative z-10 flex flex-col space-y-6 max-w-screen-2xl mx-auto'>
+          <motion.div 
+            className='relative z-10 flex flex-col space-y-6 max-w-screen-2xl mx-auto'
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             <div className='flex flex-col justify-end items-center mx-auto space-y-4 flex-1'>
-              <div className="flex justify-center">
+              <motion.div 
+                variants={itemVariants}
+                className="flex justify-center"
+              >
                 <span className="px-4 py-1.5 bg-white bg-opacity-10 backdrop-blur-xs rounded-full text-white text-sm font-medium transition-all duration-300 hover:bg-opacity-20">
                   1# Choice in Albania
                 </span>
-              </div>
-              <div className=''>
+              </motion.div>
+              <motion.div variants={itemVariants} className=''>
                 <h1 className="text-3xl md:text-5xl font-bold mb-4 text-center text-white flex flex-col">
                   <span>Discover Local Beauty & Wellness </span>
                   <span>Book Your Perfect Service!</span>
                 </h1>
-              </div>
-                <div className="relative flex items-center bg-white rounded-full w-full md:w-[500px]">
-                  <div className="relative w-full">
-                    <input
-                      type="text"
-                      placeholder={isClientSide ? placeholder : 'Search businesses...'}
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      onFocus={handleInputFocus}
-                      onBlur={handleInputBlur}
-                      className={`w-full rounded-full px-4 py-3 pl-10 pr-10 text-black bg-white border border-transparent focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-opacity duration-200 ${isClientSide && fadeOut && !isInputFocused ? 'opacity-0' : 'opacity-100'}`}
-                    />
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                    {searchTerm && (
-                      <button
-                        onClick={clearSearch}
-                        className="absolute right-24 top-1/2 transform -translate-y-1/2 text-gray-400"
-                      >
-                        <X size={20} />
-                      </button>
-                    )}
-                  </div>
-                  <Button 
-                    onClick={handleSearch}
-                    className="absolute right-1.5 bg-black hover:bg-gray-900 text-white font-medium px-5 rounded-full"
-                  >
-                    Search
-                  </Button>
+              </motion.div>
+              <motion.div variants={itemVariants} className="relative flex items-center bg-white rounded-full w-full md:w-[500px]">
+                <div className="relative w-full">
+                  <input
+                    type="text"
+                    placeholder={isClientSide ? placeholder : 'Search businesses...'}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    onFocus={handleInputFocus}
+                    onBlur={handleInputBlur}
+                    className={`w-full rounded-full px-4 py-3 pl-10 pr-10 text-black bg-white border border-transparent focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-opacity duration-200 ${isClientSide && fadeOut && !isInputFocused ? 'opacity-0' : 'opacity-100'}`}
+                  />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  {searchTerm && (
+                    <button
+                      onClick={clearSearch}
+                      className="absolute right-24 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    >
+                      <X size={20} />
+                    </button>
+                  )}
                 </div>
+                <Button 
+                  onClick={handleSearch}
+                  className="absolute right-1.5 bg-black hover:bg-gray-900 text-white font-medium px-5 rounded-full"
+                >
+                  Search
+                </Button>
+              </motion.div>
             </div>
             {/* Categories Section */}
-            <div className="max-w-screen-2xl mx-auto flex-1 pt-16 w-full flex justify-center items-end md:items-start">
+            <motion.div 
+              variants={itemVariants}
+              className="max-w-screen-2xl mx-auto flex-1 pt-16 w-full flex justify-center items-end md:items-start"
+            >
               <div className="space-y-6 w-full">
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4 max-w-2xl mx-auto">
-                  {categories.slice(0, 8).map(category => {
+                  {categories.slice(0, 8).map((category, index) => {
                     const slug = category.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-');
                     return (
-                      <Link 
+                      <motion.div
                         key={category}
-                        href={`/explore/${slug}`}
-                        className="w-full h-[60px] flex items-center justify-center group bg-white bg-opacity-10 backdrop-blur-xs hover:bg-opacity-20 border border-white border-opacity-20 rounded-lg p-4 transition-all duration-300 hover:scale-105"
+                        variants={itemVariants}
+                        custom={index}
                       >
-                        <div className="flex flex-col items-center text-center space-y-3">
-                          <span className="text-white font-medium text-sm truncate">
-                            {category}
-                          </span>
-                        </div>
-                      </Link>
+                        <Link 
+                          href={`/explore/${slug}`}
+                          className="w-full h-[60px] flex items-center justify-center group bg-white bg-opacity-10 backdrop-blur-xs hover:bg-opacity-20 border border-white border-opacity-20 rounded-lg p-4 transition-all duration-300 hover:scale-105"
+                        >
+                          <div className="flex flex-col items-center text-center space-y-3">
+                            <span className="text-white font-medium text-sm truncate">
+                              {category}
+                            </span>
+                          </div>
+                        </Link>
+                      </motion.div>
                     );
                   })}
                 </div>
                 
-                <div className="flex justify-center">
+                <motion.div 
+                  variants={itemVariants}
+                  className="flex justify-center"
+                >
                   <Link href="/pages/public/explore">
                     <Button
                       variant="outline"
@@ -524,7 +566,7 @@ export default function HomePage() {
                       <LayoutGrid className="mr-2 h-4 w-4" /> All Categories
                     </Button>
                   </Link>
-                </div>
+                </motion.div>
 
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                   <DialogContent className="max-w-4xl w-full h-[100dvh] p-0 md:h-auto md:max-h-[80vh] md:p-6 overflow-y-auto bg-white">
@@ -571,8 +613,8 @@ export default function HomePage() {
                   </DialogContent>
                 </Dialog>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
           <div className='absolute inset-0'>
             <div className="relative w-full h-full">
               <Suspense fallback={
@@ -607,28 +649,51 @@ export default function HomePage() {
         </div>
 
         {/* Platform Statistics Section */}
-        <section className="bg-gradient-to-r from-pink-600 to-red-600 py-16">
+        <motion.section 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="bg-gradient-to-r from-pink-600 to-red-600 py-16"
+        >
           <div className="max-w-screen-2xl mx-auto px-8">
-            <h2 className="text-3xl font-bold text-center mb-12 text-white">Platform Statistics</h2>
+            <motion.h2 
+              variants={itemVariants}
+              className="text-3xl font-bold text-center mb-12 text-white"
+            >
+              Platform Statistics
+            </motion.h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {platformStats.map((stat, index) => (
-                <div key={index} className="text-center">
+                <motion.div key={index} variants={itemVariants} className="text-center">
                   <h3 className="text-4xl font-bold text-white mb-2">{stat.value}</h3>
                   <p className="text-white/80">{stat.label}</p>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Platform Features Section */}
-        <section className="py-16 bg-white">
+        <motion.section 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="py-16 bg-white"
+        >
           <div className="max-w-screen-2xl mx-auto px-8">
-            <h2 className="text-3xl font-bold text-center mb-12 text-neutral-900">Why Choose Noorlife</h2>
+            <motion.h2 
+              variants={itemVariants}
+              className="text-3xl font-bold text-center mb-12 text-neutral-900"
+            >
+              Why Choose Noorlife
+            </motion.h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {platformFeatures.map((feature, index) => (
-                <div 
+                <motion.div 
                   key={index} 
+                  variants={itemVariants}
                   className="p-6 hover:bg-gray-50 transition-colors duration-200 rounded-lg border border-gray-100"
                 >
                   <div className="text-gray-900 mb-4">
@@ -640,66 +705,138 @@ export default function HomePage() {
                   <p className="text-gray-600 text-sm leading-relaxed">
                     {feature.description}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Business Sections */}
         <div className="px-8 py-16 max-w-screen-2xl mx-auto">
           <div className="space-y-12">
-            <section>
+            <motion.section
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
               <div className="">
-                <h2 className="text-3xl font-bold mb-6 text-neutral-900">Our Top Businesses</h2>
+                <motion.h2 
+                  variants={itemVariants}
+                  className="text-3xl font-bold mb-6 text-neutral-900"
+                >
+                  Our Top Businesses
+                </motion.h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                  {topBusinesses.map(renderBusinessCard)}
+                  {topBusinesses.map((business, index) => (
+                    <motion.div key={business.id} variants={itemVariants}>
+                      {renderBusinessCard(business)}
+                    </motion.div>
+                  ))}
                 </div>
               </div>
-            </section>
+            </motion.section>
 
-            <section>
+            <motion.section
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
               <div className="">
-                <h2 className="text-3xl font-bold mb-6 text-neutral-900">Special Offers</h2>
+                <motion.h2 
+                  variants={itemVariants}
+                  className="text-3xl font-bold mb-6 text-neutral-900"
+                >
+                  Special Offers
+                </motion.h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {businessOffers.map(renderOfferCard)}
+                  {businessOffers.map((offer, index) => (
+                    <motion.div key={offer.id} variants={itemVariants}>
+                      {renderOfferCard(offer)}
+                    </motion.div>
+                  ))}
                 </div>
               </div>
-            </section>
-            <section>
+            </motion.section>
+
+            <motion.section
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
               <div className="">
-                <h2 className="text-3xl font-bold mb-6 text-neutral-900">New on Platform</h2>
+                <motion.h2 
+                  variants={itemVariants}
+                  className="text-3xl font-bold mb-6 text-neutral-900"
+                >
+                  New on Platform
+                </motion.h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                   {filteredBusinesses
                     .sort((a, b) => b.id.localeCompare(a.id))
                     .slice(0, 5)
-                    .map(renderBusinessCard)}
+                    .map((business, index) => (
+                      <motion.div key={business.id} variants={itemVariants}>
+                        {renderBusinessCard(business)}
+                      </motion.div>
+                    ))}
                 </div>
               </div>
-            </section>
+            </motion.section>
 
-            <section>
+            <motion.section
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
               <div className="">
-                <h2 className="text-3xl font-bold mb-6 text-neutral-900">Best Rated</h2>
+                <motion.h2 
+                  variants={itemVariants}
+                  className="text-3xl font-bold mb-6 text-neutral-900"
+                >
+                  Best Rated
+                </motion.h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                   {filteredBusinesses
                     .filter(business => business.rating >= 4.5)
                     .slice(0, 5)
-                    .map(renderBusinessCard)}
+                    .map((business, index) => (
+                      <motion.div key={business.id} variants={itemVariants}>
+                        {renderBusinessCard(business)}
+                      </motion.div>
+                    ))}
                 </div>
               </div>
-            </section>
+            </motion.section>
 
           </div>
         </div>
 
         {/* Testimonials Section */}
-        <section className="py-16 bg-gradient-to-br from-purple-50 to-indigo-50">
+        <motion.section 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="py-16 bg-gradient-to-br from-purple-50 to-indigo-50"
+        >
           <div className="max-w-screen-2xl mx-auto px-8">
-            <h2 className="text-3xl font-bold text-center mb-12 text-neutral-900">What Our Users Say</h2>
+            <motion.h2 
+              variants={itemVariants}
+              className="text-3xl font-bold text-center mb-12 text-neutral-900"
+            >
+              What Our Users Say
+            </motion.h2>
             <div className="grid md:grid-cols-3 gap-8">
               {testimonials.map((testimonial, index) => (
-                <div key={index} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all">
+                <motion.div 
+                  key={index} 
+                  variants={itemVariants}
+                  className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all"
+                >
                   <div className="flex items-center mb-4">
                     <Image
                       src={testimonial.image}
@@ -719,19 +856,34 @@ export default function HomePage() {
                     ))}
                   </div>
                   <p className="text-gray-700">{testimonial.content}</p>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Social Proof Section */}
-        <section className="py-16 bg-white">
+        <motion.section 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="py-16 bg-white"
+        >
           <div className="max-w-screen-2xl mx-auto px-8">
-            <h2 className="text-3xl font-bold text-center mb-12 text-neutral-900">Join Our Community</h2>
+            <motion.h2 
+              variants={itemVariants}
+              className="text-3xl font-bold text-center mb-12 text-neutral-900"
+            >
+              Join Our Community
+            </motion.h2>
             <div className="grid md:grid-cols-3 gap-8">
               {socialProof.map((social, index) => (
-                <div key={index} className="text-center p-6 rounded-xl border border-gray-200 hover:border-red-500 transition-colors">
+                <motion.div 
+                  key={index} 
+                  variants={itemVariants}
+                  className="text-center p-6 rounded-xl border border-gray-200 hover:border-red-500 transition-colors"
+                >
                   <div className="mb-4">
                     {social.platform === "Instagram" && <Instagram className="w-8 h-8 mx-auto text-pink-500" />}
                     {social.platform === "Facebook" && <Facebook className="w-8 h-8 mx-auto text-blue-600" />}
@@ -740,10 +892,13 @@ export default function HomePage() {
                   <h3 className="font-semibold text-xl mb-2">{social.followers}</h3>
                   <p className="text-gray-600 mb-4">{social.platform} Followers</p>
                   <p className="text-sm font-medium text-gray-800">{social.handle}</p>
-                </div>
+                </motion.div>
               ))}
             </div>
-            <div className="mt-12 text-center">
+            <motion.div 
+              variants={itemVariants}
+              className="mt-12 text-center"
+            >
               <Button variant="outline" className="mr-4">
                 <Instagram className="w-4 h-4 mr-2" />
                 Follow on Instagram
@@ -756,15 +911,29 @@ export default function HomePage() {
                 <Music className="w-4 h-4 mr-2" />
                 Follow on TikTok
               </Button>
-            </div>
+            </motion.div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Newsletter Section */}
-        <section className="py-16 bg-gradient-to-br from-purple-50 to-indigo-50">
+        <motion.section 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="py-16 bg-gradient-to-br from-purple-50 to-indigo-50"
+        >
           <div className="max-w-screen-2xl mx-auto px-8">
-            <h2 className="text-3xl font-bold text-center mb-12 text-neutral-900">Stay Updated</h2>
-            <div className="max-w-2xl mx-auto text-center">
+            <motion.h2 
+              variants={itemVariants}
+              className="text-3xl font-bold text-center mb-12 text-neutral-900"
+            >
+              Stay Updated
+            </motion.h2>
+            <motion.div 
+              variants={itemVariants}
+              className="max-w-2xl mx-auto text-center"
+            >
               <p className="text-gray-600 mb-8">
                 Subscribe to our newsletter for the latest beauty trends, wellness tips, and exclusive offers.
               </p>
@@ -776,9 +945,9 @@ export default function HomePage() {
                 />
                 <Button>Subscribe</Button>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </section>
+        </motion.section>
 
         <FeaturedDeals />
       </main>

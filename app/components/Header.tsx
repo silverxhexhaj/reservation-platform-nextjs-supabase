@@ -5,7 +5,17 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from "./ui/button";
 import { supabase } from '@/lib/supabase';
-import { PlusCircle, Menu, X } from 'lucide-react';
+import { PlusCircle, Menu, X, User, Settings, HelpCircle, LogOut } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 interface HeaderProps {
   user?: { username: string } | null;
@@ -30,59 +40,92 @@ export function Header({ user }: HeaderProps) {
     router.push('/');
   };
 
+  const handleAuth = (mode: 'signin' | 'register') => {
+    const currentPath = window.location.pathname;
+    const encodedPath = encodeURIComponent(currentPath);
+    router.push(`/pages/public/signin?mode=${mode}&returnTo=${encodedPath}`);
+    setIsMenuOpen(false);
+  };
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   const menuItems = (
     <>
+      <Link href="/" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
+        Home
+      </Link>
       <Link href="/pages/public/who-we-are" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
         Who We Are?
       </Link>
       
       {user ? (
-        <>
-          <span className={`block md:inline ${isScrolled ? 'text-gray-700' : 'text-white'}`}>Hello, {user.username}!</span>
-          <Button 
-            onClick={() => {
-              handleSignOut();
-              setIsMenuOpen(false);
-            }}
-            className={`${isScrolled ? 'bg-black text-white hover:bg-gray-800' : 'bg-white text-black hover:bg-gray-200'} w-full md:w-auto`}
-          >
-            Sign Out
-          </Button>
-        </>
+        <div className="flex items-center gap-4">
+          <Link href="/pages/private/business/partner">
+            <Button 
+              className={`${isScrolled ? 'border-gray-900 text-gray-900  hover:bg-black/10' : ' border-white text-white  hover:bg-white/10'} font-semibold border hidden md:block`}
+            >
+              For businesses
+            </Button>
+          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                <Avatar className="h-9 w-9">
+                  <AvatarImage src="/avatars/01.png" alt={user.username} />
+                  <AvatarFallback className="bg-slate-100 text-slate-600">
+                    {user.username.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white" align="end" forceMount>
+              <DropdownMenuLabel>
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium">{user.username}</p>
+                  <p className="text-xs text-muted-foreground">john@example.com</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <HelpCircle className="mr-2 h-4 w-4" />
+                  <span>Help Center</span>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-red-600" onClick={handleSignOut}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       ) : (
         <>
           <Button 
-            onClick={() => {
-              router.push('/pages/public/signin?mode=signin');
-              setIsMenuOpen(false);
-            }}
+            onClick={() => handleAuth('signin')}
             className={`${isScrolled ? 'bg-black text-white hover:bg-gray-800' : 'bg-white text-black hover:bg-gray-200'} w-full md:w-auto uppercase`}
           >
             Login
           </Button>
           <Button 
-            onClick={() => {
-              router.push('/pages/public/signin?mode=register');
-              setIsMenuOpen(false);
-            }}
+            onClick={() => handleAuth('register')}
             className={`${isScrolled ? 'bg-white text-black border border-black hover:bg-gray-100' : 'bg-black text-white hover:bg-gray-800'} w-full md:w-auto uppercase`}
           >
             Register
           </Button>
         </>
       )}
-      
-      <Link href="/pages/private/business/partner">
-        <Button 
-          className={`${isScrolled ? 'border-gray-900 text-gray-900  hover:bg-black/10' : ' border-white text-white  hover:bg-white/10'} font-semibold border w-full md:w-auto`}
-        >
-          For businesses
-        </Button>
-      </Link>
     </>
   );
 
