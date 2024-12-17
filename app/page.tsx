@@ -490,8 +490,8 @@ export default function HomePage() {
               </motion.div>
               <motion.div variants={itemVariants} className=''>
                 <h1 className="text-3xl md:text-5xl font-bold mb-4 text-center text-white flex flex-col">
-                  <span>Discover Local Beauty & Wellness </span>
-                  <span>Book Your Perfect Service!</span>
+                  <span>NOOR Lighting the Path </span>
+                  <span>to Beauty and Balance.</span>
                 </h1>
               </motion.div>
               <motion.div variants={itemVariants} className="relative flex items-center bg-white rounded-full w-full md:w-[500px]">

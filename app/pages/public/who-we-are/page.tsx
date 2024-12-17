@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/app/components/ui/card'
 import { Header } from '@/app/components/Header'
 import { motion } from 'framer-motion'
 import { Button } from '@/app/components/ui/button'
-import { ArrowRight, Star, Users, Building2, Trophy } from 'lucide-react'
+import { ArrowRight, Star, Users, Building2, Trophy, CheckCircle, Calendar, Shield } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 const teamMembers = [
@@ -76,6 +76,65 @@ const itemVariants = {
   }
 }
 
+const AnimatedGradient = () => {
+  return (
+    <motion.div
+      className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-800 to-pink-600"
+      animate={{
+        backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+      }}
+      transition={{
+        duration: 10,
+        repeat: Infinity,
+        ease: "linear"
+      }}
+      style={{
+        backgroundSize: '200% 200%',
+      }}
+    />
+  );
+};
+
+const FloatingShapes = () => {
+  return (
+    <motion.div
+      className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1 }}
+    >
+      <motion.div
+        className="absolute w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-3xl"
+        animate={{
+          x: ['-25%', '25%', '-25%'],
+          y: ['-25%', '25%', '-25%'],
+          scale: [1, 1.2, 1],
+          rotate: [0, 180, 360],
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+      />
+      <motion.div
+        className="absolute right-0 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-3xl"
+        animate={{
+          x: ['25%', '-25%', '25%'],
+          y: ['25%', '-25%', '25%'],
+          scale: [1.2, 1, 1.2],
+          rotate: [360, 180, 0],
+        }}
+        transition={{
+          duration: 15,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+      />
+    </motion.div>
+  );
+};
+
 export default function WhoWeAre() {
   const [user, setUser] = useState<{ username: string } | null>(null);
 
@@ -128,7 +187,15 @@ export default function WhoWeAre() {
       <Header user={user} />
       
       {/* Hero Section with Gradient Background */}
-      <div className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-to-r from-purple-900 via-blue-900 to-purple-900">
+      <div className="relative h-screen flex items-center justify-center overflow-hidden">
+        <AnimatedGradient />
+        <div 
+          className="absolute inset-0 mix-blend-overlay opacity-40"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+          }}
+        />
+        <FloatingShapes />
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -143,10 +210,58 @@ export default function WhoWeAre() {
           </p>
           <Button 
             size="lg"
-            className="bg-white text-purple-900 hover:bg-gray-100"
+            className="bg-white text-purple-900 hover:bg-gray-100 mb-16"
           >
             Join Our Platform <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
+
+          {/* Platform Features */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6 hover:bg-white/15 transition-all duration-300 flex flex-col items-center text-center"
+            >
+              <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center mb-6">
+                <Calendar className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-white text-lg font-semibold mb-2">Smart Scheduling</h3>
+              <p className="text-gray-200 text-sm">
+                Intelligent booking system with automated reminders and real-time availability updates.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6 hover:bg-white/15 transition-all duration-300 flex flex-col items-center text-center"
+            >
+              <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center mb-6">
+                <Shield className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-white text-lg font-semibold mb-2">Secure Payments</h3>
+              <p className="text-gray-200 text-sm">
+                Safe and seamless payment processing with multiple payment options and instant confirmations.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6 hover:bg-white/15 transition-all duration-300 flex flex-col items-center text-center"
+            >
+              <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center mb-6">
+                <Star className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-white text-lg font-semibold mb-2">Client Reviews</h3>
+              <p className="text-gray-200 text-sm">
+                Build trust with verified reviews and ratings from real customers to grow your business.
+              </p>
+            </motion.div>
+          </div>
         </motion.div>
       </div>
 
