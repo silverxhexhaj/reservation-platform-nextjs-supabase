@@ -448,8 +448,8 @@ export default function CalendarPage() {
                               )}
                             </div>
                             
-                            <div className="mt-auto flex items-center justify-between text-[10px] text-gray-500 dark:text-gray-400">
-                              <div className="group-hover:text-gray-700 dark:group-hover:text-gray-300">
+                            <div className="mt-auto flex items-center justify-between text-[10px] text-gray-500">
+                              <div className="group-hover:text-gray-700">
                                 {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
                               </div>
                               <div className={cn(
