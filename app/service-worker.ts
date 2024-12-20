@@ -3,7 +3,7 @@
 export type {};
 declare const self: ServiceWorkerGlobalScope;
 
-const CACHE_NAME = 'noorlife-cache-v1';
+const CACHE_NAME = 'nooor-cache-v1';
 
 // Assets to cache
 const PRECACHE_ASSETS = [

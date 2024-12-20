@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Noorlife',
-    short_name: 'Noorlife',
+    name: 'Nooor',
+    short_name: 'Nooor',
     description: 'Book your beauty and wellness appointments',
     start_url: '/',
     display: 'standalone',

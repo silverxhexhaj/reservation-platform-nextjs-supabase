@@ -16,6 +16,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { Bebas_Neue } from 'next/font/google';
+
+const bebasNeue = Bebas_Neue({
+  weight: '400',
+  subsets: ['latin'],
+});
 
 interface HeaderProps {
   user?: { username: string } | null;
@@ -140,11 +146,22 @@ export function Header({ user }: HeaderProps) {
     </>
   );
 
+  const logoStyles = {
+    position: 'relative',
+    display: 'inline-block',
+  } as const;
+
+  const oStyles = {
+    position: 'relative',
+    display: 'inline-block',
+    animation: 'emerge 3s infinite',
+  } as const;
+
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 will-change-height ${isScrolled ? 'bg-white h-20' : 'bg-transparent h-20'}`}>
       <div className={`max-w-screen-2xl mx-auto px-8 flex justify-between items-center h-full transition-colors duration-300 ${isScrolled ? '' : ''}`}>
-        <Link href="/" className={`text-3xl font-semibold md:w-80 ${isScrolled ? 'text-black' : 'text-white'}`}>
-          NOOR
+        <Link href="/" className={`text-4xl font-semibold md:w-80 ${bebasNeue.className} ${isScrolled ? 'text-black' : 'text-white'}`}>
+          NOOOR
         </Link>
         
         <div className="hidden md:flex flex-1 justify-center items-center space-x-8">
@@ -326,6 +343,18 @@ export function Header({ user }: HeaderProps) {
           )}
         </div>
       )}
+      <style jsx global>{`
+        @keyframes emerge {
+          0%, 100% {
+            transform: scaleX(1) translateX(0);
+            opacity: 1;
+          }
+          50% {
+            transform: scaleX(2) translateX(0);
+            opacity: 0.8;
+          }
+        }
+      `}</style>
     </header>
   );
 }

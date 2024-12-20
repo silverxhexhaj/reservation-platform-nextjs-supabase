@@ -1,0 +1,76 @@
+@import '@fullcalendar/common/main.css';
+@import '@fullcalendar/daygrid/main.css';
+@import '@fullcalendar/timegrid/main.css';
+
+.fc {
+  font-family: inherit;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.fc .fc-button {
+  background-color: black;
+  color: white;
+  border: 0;
+  box-shadow: none;
+  font-weight: 500;
+}
+
+.fc .fc-button:hover {
+  background-color: #1f2937;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background-color: #1f2937;
+}
+
+.fc .fc-button-primary:disabled {
+  background-color: #9ca3af;
+}
+
+.fc .fc-timegrid-slot {
+  height: 3rem;
+}
+
+.fc .fc-timegrid-slot-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.fc .fc-event {
+  background-color: #2563eb;
+  border-color: #1d4ed8;
+  cursor: pointer;
+}
+
+.fc .fc-event:hover {
+  background-color: #1d4ed8;
+}
+
+.fc .fc-highlight {
+  background-color: #dbeafe;
+}
+
+.fc .fc-day-today {
+  background-color: #f9fafb;
+}
+
+.fc .fc-timegrid-now-indicator-line {
+  border-color: #ef4444;
+}
+
+.fc .fc-timegrid-now-indicator-arrow {
+  border-color: #ef4444;
+}
+
+.fc .fc-col-header-cell {
+  padding: 0.5rem 0;
+}
+
+.fc .fc-scrollgrid {
+  border-color: #e5e7eb;
+} 

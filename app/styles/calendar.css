@@ -1,0 +1,68 @@
+@import '@fullcalendar/core/main.css';
+@import '@fullcalendar/daygrid/main.css';
+@import '@fullcalendar/timegrid/main.css';
+
+.fc {
+  /* Override font */
+  font-family: inherit;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.fc .fc-button {
+  @apply bg-black text-white hover:bg-gray-800 border-0 shadow-none;
+  font-weight: 500;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  @apply bg-gray-800;
+}
+
+.fc .fc-button-primary:disabled {
+  @apply bg-gray-400;
+}
+
+.fc .fc-timegrid-slot {
+  height: 3rem;
+}
+
+.fc .fc-timegrid-slot-label {
+  @apply text-sm text-gray-500;
+}
+
+.fc .fc-event {
+  @apply bg-blue-600 border-blue-700;
+  cursor: pointer;
+}
+
+.fc .fc-event:hover {
+  @apply bg-blue-700;
+}
+
+.fc .fc-highlight {
+  @apply bg-blue-100;
+}
+
+.fc .fc-day-today {
+  @apply bg-gray-50;
+}
+
+.fc .fc-timegrid-now-indicator-line {
+  @apply border-red-500;
+}
+
+.fc .fc-timegrid-now-indicator-arrow {
+  @apply border-red-500;
+}
+
+.fc .fc-col-header-cell {
+  @apply py-2;
+}
+
+.fc .fc-scrollgrid {
+  @apply border-gray-200;
+} 

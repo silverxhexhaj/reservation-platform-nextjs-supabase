@@ -10,6 +10,7 @@ import {
 const menuItems = [
   { name: 'Home', icon: Home, href: '/pages/private/business/partner' },
   { name: 'Calendar', icon: Calendar, href: '/pages/private/business/partner/calendar' },
+  { name: 'Calendar Beta', icon: Calendar, href: '/pages/private/business/partner/calendar-beta' },
   { name: 'Sales', icon: DollarSign, href: '/pages/private/business/partner/sales' },
   { name: 'Clients', icon: Users, href: '/pages/private/business/partner/clients' },
   { name: 'Catalog', icon: Book, href: '/pages/private/business/partner/catalog' },

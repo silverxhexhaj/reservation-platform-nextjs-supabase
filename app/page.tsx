@@ -23,6 +23,17 @@ import { Instagram, Facebook, Music, Apple, Smartphone } from 'lucide-react';
 import { FeaturedDeals } from "./components/FeaturedDeals";
 import { CategoryIcon } from './components/CategoryIcon';
 import { motion } from 'framer-motion'
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "@/app/components/ui/command"
+import { cn } from '@/lib/utils';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -169,29 +180,29 @@ const testimonials = [
     name: "Sarah Johnson",
     role: "Regular Customer",
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=faces",
-    content: "Noorlife has transformed how I book my beauty appointments. The platform is so intuitive and reliable!",
+    content: "Nooor has transformed how I book my beauty appointments. The platform is so intuitive and reliable!",
     rating: 5
   },
   {
     name: "Mark Davis",
     role: "Fitness Enthusiast",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=faces",
-    content: "Finding the right personal trainer was super easy with Noorlife. The booking process is seamless.",
+    content: "Finding the right personal trainer was super easy with Nooor. The booking process is seamless.",
     rating: 5
   },
   {
     name: "Emma Wilson",
     role: "Beauty Professional",
     image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=faces",
-    content: "As a salon owner, Noorlife has helped me reach more clients and manage my bookings efficiently.",
+    content: "As a salon owner, Nooor has helped me reach more clients and manage my bookings efficiently.",
     rating: 5
   }
 ];
 
 const socialProof = [
-  { platform: "Instagram", followers: "50K+", handle: "@noorlife" },
-  { platform: "Facebook", followers: "35K+", handle: "NoorlifeOfficial" },
-  { platform: "TikTok", followers: "25K+", handle: "@noorlife" }
+  { platform: "Instagram", followers: "50K+", handle: "@nooor" },
+  { platform: "Facebook", followers: "35K+", handle: "NooorOfficial" },
+  { platform: "TikTok", followers: "25K+", handle: "@nooor" }
 ];
 
 // Add this new interface for offers
@@ -367,6 +378,23 @@ export default function HomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [showCategorySearch, setShowCategorySearch] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  // Add click outside handler
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setShowCategorySearch(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Add this effect to handle client-side initialization
   useEffect(() => {
@@ -424,7 +452,7 @@ export default function HomePage() {
     const filtered = businesses.filter(business => 
       business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       business.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      business.category.toLowerCase().includes(searchTerm.toLowerCase())
+      (selectedCategory && business.category.toLowerCase() === selectedCategory.toLowerCase())
     );
     setFilteredBusinesses(filtered);
   };
@@ -433,6 +461,21 @@ export default function HomePage() {
     if (e.key === 'Enter') {
       handleSearch();
     }
+  };
+
+  const clearSearch = () => {
+    setSearchTerm('');
+    setSelectedCategory(null);
+    setFilteredBusinesses(businesses);
+  };
+
+  const handleInputFocus = () => {
+    setIsInputFocused(true);
+    setShowCategorySearch(true);
+  };
+
+  const handleInputBlur = () => {
+    setIsInputFocused(false);
   };
 
   useEffect(() => {
@@ -444,19 +487,6 @@ export default function HomePage() {
   const topBusinesses = filteredBusinesses.sort((a, b) => b.rating - a.rating).slice(0, 5);
   const healthyBodyBusinesses = filteredBusinesses.filter(b => ['Gym & Fitness', 'Personal Trainer'].includes(b.category));
   const womenSectionBusinesses = filteredBusinesses.filter(b => ['Hair Salon', 'Nail Salon', 'Waxing Salon'].includes(b.category));
-
-  const clearSearch = () => {
-    setSearchTerm('');
-    setFilteredBusinesses(businesses);
-  };
-
-  const handleInputFocus = () => {
-    setIsInputFocused(true);
-  };
-
-  const handleInputBlur = () => {
-    setIsInputFocused(false);
-  };
 
   useEffect(() => {
     // Ensure video loads and plays
@@ -489,39 +519,69 @@ export default function HomePage() {
                 </span>
               </motion.div>
               <motion.div variants={itemVariants} className=''>
-                <h1 className="text-3xl md:text-5xl font-bold mb-4 text-center text-white flex flex-col">
-                  <span>NOOR Lighting the Path </span>
-                  <span>to Beauty and Balance.</span>
+                <h1 className="text-3xl md:text-5xl font-bold mb-6 text-center text-white flex flex-col space-y-2">
+                  <span>Discover, Book, Relax</span>
+                  <span>Beauty and Wellness Made Easy.</span>
                 </h1>
               </motion.div>
-              <motion.div variants={itemVariants} className="relative flex items-center bg-white rounded-full w-full md:w-[500px]">
-                <div className="relative w-full">
-                  <input
-                    type="text"
-                    placeholder={isClientSide ? placeholder : 'Search businesses...'}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    onFocus={handleInputFocus}
-                    onBlur={handleInputBlur}
-                    className={`w-full rounded-full px-4 py-3 pl-10 pr-10 text-black bg-white border border-transparent focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-opacity duration-200 ${isClientSide && fadeOut && !isInputFocused ? 'opacity-0' : 'opacity-100'}`}
-                  />
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                  {searchTerm && (
-                    <button
-                      onClick={clearSearch}
-                      className="absolute right-24 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    >
-                      <X size={20} />
-                    </button>
-                  )}
+              <motion.div variants={itemVariants} className="relative w-full md:w-[500px]">
+                <div className="relative w-full flex items-center justify-center" ref={searchContainerRef}>
+                  <Command className="rounded-full border bg-white shadow-md">
+                    <div className="flex items-center px-3 space-x-2">
+                      <Search className="h-4 w-4 shrink-0 opacity-50" />
+                      <input
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        onFocus={handleInputFocus}
+                        onBlur={handleInputBlur}
+                        className="flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                        placeholder={isClientSide ? placeholder : 'Search businesses...'}
+                      />
+                      {(searchTerm || selectedCategory) && (
+                        <button
+                          onClick={clearSearch}
+                          className="text-muted-foreground"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                    {showCategorySearch && (
+                      <div className="absolute top-[calc(100%+4px)] left-0 right-0 rounded-2xl border bg-white shadow-md z-50 overflow-hidden">
+                        <CommandList className="max-h-[300px] overflow-auto py-1">
+                          <CommandEmpty>No results found.</CommandEmpty>
+                          <CommandGroup heading="Categories">
+                            {categories.map((category, index) => (
+                              <CommandItem
+                                key={category}
+                                value={category}
+                                onSelect={(value) => {
+                                  setSelectedCategory(value);
+                                  setShowCategorySearch(false);
+                                  handleSearch();
+                                }}
+                                className="flex items-center gap-2 cursor-pointer px-2 py-2 hover:bg-gray-50 border-b last:border-b-0 border-gray-200"
+                              >
+                                <CategoryIcon icon={categoryToIcon[category]} className="h-4 w-4" />
+                                <span>{category}</span>
+                                {selectedCategory === category && (
+                                  <CheckCircle className="h-4 w-4 ml-auto text-green-500" />
+                                )}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </div>
+                    )}
+                  </Command>
+                  <Button 
+                    onClick={handleSearch}
+                    className="absolute right-1.5 bg-black hover:bg-gray-900 text-white font-medium px-5 rounded-full"
+                  >
+                    Search
+                  </Button>
                 </div>
-                <Button 
-                  onClick={handleSearch}
-                  className="absolute right-1.5 bg-black hover:bg-gray-900 text-white font-medium px-5 rounded-full"
-                >
-                  Search
-                </Button>
               </motion.div>
             </div>
             {/* Categories Section */}
@@ -540,7 +600,7 @@ export default function HomePage() {
                         custom={index}
                       >
                         <Link 
-                          href={`/explore/${slug}`}
+                          href={`/pages/public/explore?category=${slug}`}
                           className="w-full h-[60px] flex items-center justify-center group bg-white bg-opacity-10 backdrop-blur-xs hover:bg-opacity-20 border border-white border-opacity-20 rounded-lg p-4 transition-all duration-300 hover:scale-105"
                         >
                           <div className="flex flex-col items-center text-center space-y-3">
@@ -687,7 +747,7 @@ export default function HomePage() {
               variants={itemVariants}
               className="text-3xl font-bold text-center mb-12 text-neutral-900"
             >
-              Why Choose Noorlife
+              Why Choose Nooor
             </motion.h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {platformFeatures.map((feature, index) => (

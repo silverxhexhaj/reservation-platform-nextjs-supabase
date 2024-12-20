@@ -9,6 +9,6 @@ export const sharedViewport: Viewport = {
 }
 
 export const sharedMetadata = {
-  title: 'Noorlife',
+  title: 'Nooor',
   description: 'Book your beauty and wellness appointments',
 } 
