@@ -746,7 +746,7 @@ export default function BusinessDetailPage() {
               </div>
 
               {/* Booking Section */}
-              <section className="lg:order-last order-first lg:w-96 sticky top-20 inset-0">
+              <section className="lg:order-last order-first lg:w-96 md:sticky top-20 inset-0 mb-20 md:mb-0">
                 <div className="lg:sticky lg:top-24 bg-white p-6 rounded-lg shadow-lg space-y-6 flex flex-col border border-gray-200">
                   <h2 className="text-lg lg:text-2xl font-semibold text-gray-800">Your Booking</h2>
                   <div className="flex flex-row lg:flex-col lg:space-y-6 space-x-6 lg:space-x-0">

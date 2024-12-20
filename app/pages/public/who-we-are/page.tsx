@@ -95,46 +95,6 @@ const AnimatedGradient = () => {
   );
 };
 
-const FloatingShapes = () => {
-  return (
-    <motion.div
-      className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-    >
-      <motion.div
-        className="absolute w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-3xl"
-        animate={{
-          x: ['-25%', '25%', '-25%'],
-          y: ['-25%', '25%', '-25%'],
-          scale: [1, 1.2, 1],
-          rotate: [0, 180, 360],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "linear"
-        }}
-      />
-      <motion.div
-        className="absolute right-0 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-3xl"
-        animate={{
-          x: ['25%', '-25%', '25%'],
-          y: ['25%', '-25%', '25%'],
-          scale: [1.2, 1, 1.2],
-          rotate: [360, 180, 0],
-        }}
-        transition={{
-          duration: 15,
-          repeat: Infinity,
-          ease: "linear"
-        }}
-      />
-    </motion.div>
-  );
-};
-
 export default function WhoWeAre() {
   const [user, setUser] = useState<{ username: string } | null>(null);
 
@@ -187,7 +147,7 @@ export default function WhoWeAre() {
       <Header user={user} />
       
       {/* Hero Section with Gradient Background */}
-      <div className="relative h-screen flex items-center justify-center overflow-hidden">
+      <div className="relative h-full md:h-screen flex items-center justify-center overflow-hidden">
         <AnimatedGradient />
         <div 
           className="absolute inset-0 mix-blend-overlay opacity-40"
@@ -195,12 +155,11 @@ export default function WhoWeAre() {
             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
           }}
         />
-        <FloatingShapes />
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="relative z-10 text-center px-4"
+          className="relative z-10 text-center px-4 mt-20 md:mt-0 py-20 md:py-0"
         >
           <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white">
             Transforming Beauty & Wellness
