@@ -161,7 +161,7 @@ export default function WhoWeAre() {
           transition={{ duration: 0.8 }}
           className="relative z-10 text-center px-4 mt-20 md:mt-0 py-20 md:py-0"
         >
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white">
+          <h1 className="text-3xl md:text-5xl font-bold mb-6 text-white">
             Transforming Beauty & Wellness
           </h1>
           <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto mb-8">

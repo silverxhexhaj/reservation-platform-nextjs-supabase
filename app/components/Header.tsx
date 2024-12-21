@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Button } from "./ui/button";
 import { supabase } from '@/lib/supabase';
 import { PlusCircle, Menu, X, User, Settings, HelpCircle, LogOut } from 'lucide-react';
@@ -29,17 +29,24 @@ interface HeaderProps {
 
 export function Header({ user }: HeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
+      if (pathname?.includes('/explore')) {
+        setIsScrolled(true);
+        return;
+      }
       setIsScrolled(window.scrollY > 0);
     };
 
+    handleScroll();
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [pathname]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -62,6 +69,9 @@ export function Header({ user }: HeaderProps) {
       <div className="flex items-center justify-center space-x-8 flex-1">
         <Link href="/" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
           Home
+        </Link>
+        <Link href="/pages/public/explore" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
+          Discover
         </Link>
         <Link href="/pages/public/who-we-are" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
           Who We Are?
@@ -168,6 +178,9 @@ export function Header({ user }: HeaderProps) {
           <Link href="/" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
             Home
           </Link>
+          <Link href="/pages/public/explore" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
+            Discover
+          </Link>
           <Link href="/pages/public/who-we-are" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
             Who We Are?
           </Link>
@@ -268,6 +281,9 @@ export function Header({ user }: HeaderProps) {
         <div className="flex flex-col space-y-8 pb-8 justify-center items-center flex-1">
           <Link href="/" className="text-2xl text-center text-gray-600 hover:text-gray-900">
             Home
+          </Link>
+          <Link href="/pages/public/explore" className="text-2xl text-center text-gray-600 hover:text-gray-900">
+            Discover
           </Link>
           <Link href="/pages/public/who-we-are" className="text-2xl text-center text-gray-600 hover:text-gray-900">
             Who We Are?

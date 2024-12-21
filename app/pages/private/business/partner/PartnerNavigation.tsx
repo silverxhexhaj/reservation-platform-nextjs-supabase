@@ -26,7 +26,7 @@ export default function PartnerNavigation() {
   return (
     <aside className="w-80 bg-black text-white">
       <div className="p-6">
-        <h2 className="text-2xl font-bold">Look <span className="text-blue-600 font-light italic">Partner</span></h2>
+        <h2 className="text-2xl font-bold">Nooor <span className="text-blue-500 font-light">Partner</span></h2>
       </div>
       <nav className="mt-4 px-3">
         <ul>

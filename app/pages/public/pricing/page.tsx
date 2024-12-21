@@ -6,6 +6,12 @@ import { motion } from 'framer-motion'
 import { Button } from '@/app/components/ui/button'
 import { ArrowRight, CheckCircle } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/app/components/ui/accordion"
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -112,7 +118,7 @@ export default function PricingPage() {
           transition={{ duration: 0.8 }}
           className="relative z-10 text-center px-4 mt-20 md:mt-0 py-20 md:py-0"
         >
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white">
+          <h1 className="text-3xl md:text-5xl font-bold mb-6 text-white">
             Simple, Transparent Pricing
           </h1>
           <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto mb-16">
@@ -157,9 +163,9 @@ export default function PricingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl p-6 transform scale-105 hover:bg-white/25 transition-all duration-300"
+              className="relative flex flex-col items-center bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl p-6 transform scale-105 hover:bg-white/25 transition-all duration-300"
             >
-              <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-semibold px-3 py-1 rounded-full w-fit mb-4">
+              <div className="absolute -top-3 border border-white/30 bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-semibold px-3 py-1 rounded-full mb-4">
                 Most Popular
               </div>
               <h3 className="text-white text-xl font-semibold mb-2">Pro</h3>
@@ -237,26 +243,69 @@ export default function PricingPage() {
         className="py-20 bg-white"
       >
         <div className="container mx-auto px-4">
-          <motion.h2 
+          <motion.div 
             variants={itemVariants}
-            className="text-3xl md:text-4xl font-bold text-center mb-12"
+            className="text-center max-w-3xl mx-auto mb-12"
           >
-            Frequently Asked Questions
-          </motion.h2>
-          <div className="max-w-3xl mx-auto space-y-6">
-            <motion.div variants={itemVariants} className="space-y-4">
-              <h3 className="text-xl font-semibold">Can I switch plans later?</h3>
-              <p className="text-gray-600">Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.</p>
-            </motion.div>
-            <motion.div variants={itemVariants} className="space-y-4">
-              <h3 className="text-xl font-semibold">What payment methods do you accept?</h3>
-              <p className="text-gray-600">We accept all major credit cards, PayPal, and bank transfers for Enterprise plans.</p>
-            </motion.div>
-            <motion.div variants={itemVariants} className="space-y-4">
-              <h3 className="text-xl font-semibold">Is there a free trial?</h3>
-              <p className="text-gray-600">Yes, all plans come with a 14-day free trial. No credit card required to start.</p>
-            </motion.div>
-          </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-gray-600">
+              Everything you need to know about our pricing and products
+            </p>
+          </motion.div>
+          
+          <motion.div 
+            variants={itemVariants} 
+            className="max-w-3xl mx-auto rounded-lg border border-gray-200 bg-white/50 backdrop-blur-sm"
+          >
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="item-1">
+                <AccordionTrigger className="px-4 hover:no-underline">
+                  <span className="text-left">Can I switch plans later?</span>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 text-gray-600">
+                  Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle. We&apos;ll automatically prorate any payments for your convenience.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-2">
+                <AccordionTrigger className="px-4 hover:no-underline">
+                  <span className="text-left">What payment methods do you accept?</span>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 text-gray-600">
+                  We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and bank transfers for Enterprise plans. All payments are processed securely through Stripe.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-3">
+                <AccordionTrigger className="px-4 hover:no-underline">
+                  <span className="text-left">Is there a free trial?</span>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 text-gray-600">
+                  Yes, all plans come with a 14-day free trial. No credit card required to start. You&apos;ll have full access to all features during your trial period.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-4">
+                <AccordionTrigger className="px-4 hover:no-underline">
+                  <span className="text-left">What happens after my trial ends?</span>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 text-gray-600">
+                  After your trial ends, you can choose to subscribe to any of our plans to continue using the service. If you don&apos;t subscribe, your account will be automatically downgraded to a limited free version.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-5">
+                <AccordionTrigger className="px-4 hover:no-underline">
+                  <span className="text-left">Do you offer refunds?</span>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 text-gray-600">
+                  Yes, we offer a 30-day money-back guarantee for all plans. If you&apos;re not satisfied with our service, contact our support team for a full refund.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </motion.div>
         </div>
       </motion.section>
 

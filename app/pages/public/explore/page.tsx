@@ -4,68 +4,108 @@ import { useState, Suspense } from "react"
 import { Header } from "@/app/components/Header"
 import { BusinessesCollection } from "./components/BusinessesCollection"
 import { ExploreFilters } from "./components/ExploreFilters"
-import { categories } from "@/data";
+import { categories, categoryToIcon, Category } from "@/data";
+import { Button } from "@/app/components/ui/button";
+import { CategoryIcon } from "@/app/components/CategoryIcon";
+import Link from "next/link";
+import { motion } from "framer-motion";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2
+    }
+  }
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5
+    }
+  }
+}
 
 export default function ExplorePage() {
   const [user, setUser] = useState<{ username: string } | null>(null);
 
+  // Select some popular categories to display
+  const popularCategories: Category[] = [
+    "Gym & Fitness",
+    "Spa",
+    "Hair Salon",
+    "Beauty Salon",
+    "Massage",
+    "Nail Salon"
+  ];
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header user={user} />
-      <main className="flex-grow">
-        {/* Hero Section */}
-        <div className="relative h-[400px]">
-          <div className="absolute inset-0">
-            <div className="relative w-full h-full">
-              <video 
-                className="absolute inset-0 w-full h-full object-cover" 
-                crossOrigin="" 
-                playsInline 
-                muted 
-                autoPlay
-                loop
-                src="https://videos.pexels.com/video-files/3753716/3753716-uhd_2560_1440_25fps.mp4" 
-                preload="metadata"
-              >
-                <track kind="metadata" label="cuepoints" />
-              </video>
-              <div 
-                className="absolute inset-0 mix-blend-overlay opacity-40"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-red-700/40 to-pink-700/40 flex items-center justify-center opacity-80">
-                <div className="text-center space-y-4">
-                  <h1 className="text-4xl font-bold text-white mb-4">Explore Businesses</h1>
-                  <p className="text-xl text-white/90 max-w-2xl mx-auto px-4">
-                    Discover and book services from local businesses
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
+      <main className="flex-grow pt-20">
         {/* Main Content */}
-        <div className="max-w-screen-2xl mx-auto px-4 py-12 space-y-8">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="max-w-screen-2xl mx-auto px-4 py-4 md:py-8 space-y-4 md:space-y-6"
+        >
+          <motion.div variants={itemVariants}>
+            <h2 className="text-2xl md:text-3xl font-bold text-center text-neutral-900">Discover all services</h2>
+          </motion.div>
+          
           {/* Filters */}
-          <div className="w-full">
+          <motion.div variants={itemVariants} className="w-full">
             <Suspense fallback={<div>Loading filters...</div>}>
               <ExploreFilters categories={[...categories]} />
             </Suspense>
-          </div>
+          </motion.div>
+
+          {/* Quick Categories */}
+          <motion.div variants={itemVariants} className="w-full">
+            <div className="flex overflow-x-auto md:overflow-x-visible pb-2 -mb-2 scrollbar-hide space-x-4 md:space-x-6">
+              {popularCategories.map((category, index) => {
+                const slug = category.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-');
+                return (
+                  <motion.div
+                    key={category}
+                    variants={itemVariants}
+                    custom={index}
+                    className="flex-shrink-0"
+                  >
+                    <Link 
+                      href={`/pages/public/explore/${slug}`}
+                      className="block w-[120px]"
+                    >
+                      <Button
+                        variant="outline"
+                        className="w-full h-[80px] flex flex-col items-center justify-center p-2 space-y-2 hover:bg-gray-50 border-gray-200 transition-all duration-300 hover:scale-105"
+                      >
+                        <CategoryIcon icon={categoryToIcon[category]} className="w-5 h-5" />
+                        <span className="text-xs font-medium text-gray-700 text-center truncate w-full">{category}</span>
+                      </Button>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
 
           {/* Business Collection */}
-          <div className="w-full">
+          <motion.div variants={itemVariants} className="w-full">
             <Suspense fallback={<div>Loading businesses...</div>}>
               <BusinessesCollection searchParams={{
                 category: typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('category') ?? undefined : undefined,
                 search: typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('search') ?? undefined : undefined
               }} />
             </Suspense>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </main>
     </div>
   )
