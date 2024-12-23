@@ -4,23 +4,34 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/app/components/Header';
 import { Button } from '@/app/components/ui/button';
+import { Input } from '@/app/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
-import { motion } from 'framer-motion';
-import { Store, User } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
-export default function SignUpPage() {
+export default function CustomerSignUpPage() {
   const router = useRouter();
   const [user, setUser] = useState<{ username: string } | null>(null);
-  const [selectedType, setSelectedType] = useState<'customer' | 'business' | null>(null);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    phone: ''
+  });
 
-  const handleTypeSelection = (type: 'customer' | 'business') => {
-    setSelectedType(type);
-    if (type === 'customer') {
-      router.push('/pages/public/signup/customer');
-    } else {
-      router.push('/pages/public/signup/business');
-    }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Add customer registration logic here
+    console.log('Customer signup form submitted:', formData);
   };
 
   return (
@@ -33,10 +44,10 @@ export default function SignUpPage() {
             <div className="hidden lg:flex flex-col space-y-8">
               <div className="space-y-4 text-white">
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-white">
-                  Join Our Platform
+                  Join as a Customer
                 </h1>
                 <p className="max-w-[600px] md:text-xl dark:text-gray-400">
-                  Create an account and discover a world of beauty and wellness services. Choose how you want to be part of our community.
+                  Create your customer account to discover and book amazing beauty and wellness services.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm text-white">
@@ -55,7 +66,7 @@ export default function SignUpPage() {
                       strokeLinejoin="round"
                     />
                   </svg>
-                  <span>Easy Registration</span>
+                  <span>Easy Booking</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <svg
@@ -111,68 +122,110 @@ export default function SignUpPage() {
               </div>
             </div>
 
-            {/* Right side - Sign up options */}
+            {/* Right side - Sign up form */}
             <Card className="w-full max-w-md mx-auto lg:ml-auto shadow-lg border-0 bg-white">
               <CardHeader className="space-y-2 text-center pb-8">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-4 top-4 text-gray-600 hover:text-gray-900"
+                    onClick={() => router.push('/pages/public/signup')}
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                  </Button>
+                </div>
                 <CardTitle className="text-3xl font-bold tracking-tight">
-                  Create an Account
+                  Create Customer Account
                 </CardTitle>
                 <CardDescription className="text-base text-muted-foreground">
-                  Choose how you want to use Nooor
+                  Enter your details to create your account
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-6">
-                  {/* Customer and Business Options in a row */}
-                  <div className="flex gap-4">
-                    {/* Customer Option */}
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex-1"
-                    >
-                      <Button
-                        variant="outline"
-                        className="w-full h-auto p-6 flex flex-col items-center gap-4 hover:border-blue-500 hover:bg-blue-50"
-                        onClick={() => handleTypeSelection('customer')}
-                      >
-                        <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                          <User className="h-6 w-6 text-blue-600" />
-                        </div>
-                        <div className="space-y-2 text-center">
-                          <h3 className="font-semibold text-xl">Customer</h3>
-                          <p className="text-sm text-gray-500">
-                            Book appointments and services
-                          </p>
-                        </div>
-                      </Button>
-                    </motion.div>
-
-                    {/* Business Option */}
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex-1"
-                    >
-                      <Button
-                        variant="outline"
-                        className="w-full h-auto p-6 flex flex-col items-center gap-4 hover:border-purple-500 hover:bg-purple-50"
-                        onClick={() => handleTypeSelection('business')}
-                      >
-                        <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
-                          <Store className="h-6 w-6 text-purple-600" />
-                        </div>
-                        <div className="space-y-2 text-center">
-                          <h3 className="font-semibold text-xl">Business</h3>
-                          <p className="text-sm text-gray-500">
-                            Manage and grow your client base
-                          </p>
-                        </div>
-                      </Button>
-                    </motion.div>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <label htmlFor="fullName" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      Full Name
+                    </label>
+                    <Input
+                      id="fullName"
+                      name="fullName"
+                      type="text"
+                      placeholder="Enter your full name"
+                      value={formData.fullName}
+                      onChange={handleInputChange}
+                      required
+                      className="h-11"
+                    />
                   </div>
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      Email
+                    </label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="name@example.com"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="h-11"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="phone" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      Phone Number
+                    </label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      placeholder="Enter your phone number"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      required
+                      className="h-11"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="password" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      Password
+                    </label>
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      placeholder="Create a password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      required
+                      className="h-11"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="confirmPassword" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      Confirm Password
+                    </label>
+                    <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                      placeholder="Confirm your password"
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
+                      required
+                      className="h-11"
+                    />
+                  </div>
+                  <Button type="submit" className="w-full h-11 text-base font-medium bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white hover:opacity-90 transition-opacity mt-6">
+                    Create Account
+                  </Button>
+                </form>
 
-                  <div className="relative mt-4">
+                <div className="mt-6 space-y-4">
+                  <div className="relative">
                     <div className="absolute inset-0 flex items-center">
                       <div className="w-full border-t border-muted" />
                     </div>

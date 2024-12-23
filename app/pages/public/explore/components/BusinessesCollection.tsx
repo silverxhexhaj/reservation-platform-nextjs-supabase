@@ -103,7 +103,7 @@ export function BusinessesCollection({ searchParams }: BusinessesCollectionProps
                   <h3 className="text-sm md:text-base font-semibold line-clamp-1">
                     {business.name}
                   </h3>
-                  <p className="text-xs md:text-sm text-neutral-600 line-clamp-2">
+                  <p className="text-xs md:text-sm text-neutral-600 line-clamp-2 min-h-[2.5rem] md:min-h-[3rem] leading-[1.25rem] md:leading-[1.5rem]">
                     {business.description}
                   </p>
                 </div>

@@ -220,7 +220,7 @@ function SignInContent() {
                   <p className="text-sm text-muted-foreground">
                     New to our platform?{' '}
                     <Link 
-                      href={`/pages/public/signin?mode=register&returnTo=${returnTo}`} 
+                      href="/pages/public/signup"
                       className="font-medium text-gray-900 hover:underline underline-offset-4"
                     >
                       Create an account

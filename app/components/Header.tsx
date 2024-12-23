@@ -55,8 +55,11 @@ export function Header({ user }: HeaderProps) {
 
   const handleAuth = (mode: 'signin' | 'register', returnTo?: string) => {
     const currentPath = returnTo || window.location.pathname;
-    const encodedPath = encodeURIComponent(currentPath);
-    router.push(`/pages/public/signin?mode=${mode}&returnTo=${encodedPath}`);
+    if (mode === 'register') {
+      router.push('/pages/public/signup');
+    } else {
+      router.push('/pages/public/signin');
+    }
     setIsMenuOpen(false);
   };
 
@@ -134,7 +137,7 @@ export function Header({ user }: HeaderProps) {
       ) : (
         <>
           <Button 
-            onClick={() => handleAuth('signin', '/pages/private/business/partner')}
+            onClick={() => router.push('/pages/public/signup/business')}
             className={`${isScrolled ? 'border-gray-900 text-gray-900  hover:bg-black/10' : ' border-white text-white  hover:bg-white/10'} font-semibold border hidden md:block mr-4`}
           >
             For business
@@ -196,7 +199,7 @@ export function Header({ user }: HeaderProps) {
                 <Button 
                   className={`${isScrolled ? 'border-gray-900 text-gray-900  hover:bg-black/10' : ' border-white text-white  hover:bg-white/10'} font-semibold border hidden md:block`}
                 >
-                  For business
+                  For businesses
                 </Button>
               </Link>
               <DropdownMenu>
@@ -243,7 +246,7 @@ export function Header({ user }: HeaderProps) {
           ) : (
             <>
               <Button 
-                onClick={() => handleAuth('signin', '/pages/private/business/partner')}
+                onClick={() => router.push('/pages/public/signup/business')}
                 className={`${isScrolled ? 'border-gray-900 text-gray-900  hover:bg-black/10' : ' border-white text-white  hover:bg-white/10'} font-semibold border hidden md:block mr-4`}
               >
                 For business
@@ -343,7 +346,7 @@ export function Header({ user }: HeaderProps) {
         ) : (
           <div className="flex flex-col space-y-4">
             <Button 
-              onClick={() => handleAuth('signin', '/pages/private/business/partner')}
+              onClick={() => router.push('/pages/public/signup/business')}
               className="w-full border border-gray-900 text-gray-900 hover:bg-black/10 font-semibold"
             >
               For businesses
