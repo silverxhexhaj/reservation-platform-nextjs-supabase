@@ -91,7 +91,7 @@ export function BusinessesCollection({ searchParams }: BusinessesCollectionProps
                 <div className="absolute top-2 md:top-4 left-2 md:left-4">
                   <Badge 
                     variant="secondary" 
-                    className="bg-white/90 backdrop-blur-sm text-neutral-900 font-medium border border-gray-100/50 text-xs md:text-sm"
+                    className="bg-white/90 backdrop-blur-sm text-neutral-900 font-medium border border-gray-100/50 text-xs"
                   >
                     {business.category}
                   </Badge>

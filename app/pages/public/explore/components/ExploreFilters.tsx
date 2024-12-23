@@ -4,6 +4,8 @@ import { useSearchParams, useRouter } from "next/navigation"
 import { useCallback } from "react"
 import { Input } from "@/app/components/ui/input"
 import { motion } from "framer-motion"
+import { Search } from "lucide-react"
+import { FilterModal } from "./FilterModal"
 
 interface ExploreFiltersProps {
   categories: string[]
@@ -31,23 +33,31 @@ export function ExploreFilters({ categories }: ExploreFiltersProps) {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="flex flex-col sm:flex-row gap-4"
+      className="flex gap-3 w-full"
     >
       <motion.div 
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="flex-1"
+        className="flex-1 relative"
       >
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
         <Input
           placeholder="Search businesses..."
-          className="w-full"
+          className="w-full pl-10 pr-4"
           defaultValue={searchParams.get("search") ?? ""}
           onChange={(e) => {
             const newQs = createQueryString("search", e.target.value)
             router.push(`/explore${newQs ? `?${newQs}` : ""}`)
           }}
         />
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
+        <FilterModal categories={categories} />
       </motion.div>
     </motion.div>
   )

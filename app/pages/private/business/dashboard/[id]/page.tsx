@@ -1,18 +1,44 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { Header } from '@/app/components/Header';
-import { StarIcon, CheckCircle, PlusCircle, X, Clock, AlertCircle, Camera, ChevronDown, Shuffle } from 'lucide-react';
-import { Button } from "@/app/components/ui/button";
-import { businesses, businessOffers } from '@/data/mock';
-import { format } from 'date-fns';
+import { format, addMonths, eachDayOfInterval, startOfMonth, endOfMonth, isToday, isSameDay } from 'date-fns';
 import { useLoadScript, GoogleMap, MarkerF } from '@react-google-maps/api';
 import Image from 'next/image';
-import { ImageGalleryModal } from "@/app/components/ImageGalleryModal";
-import { ServiceOffer } from "@/app/components/ServiceOffer";
+import { Button } from "@/app/components/ui/button";
+import { businesses, businessOffers } from '@/data/mock';
+import { Calendar } from "@/app/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/app/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { StarIcon, CheckCircle, PlusCircle, X, Clock, AlertCircle, Camera, ChevronDown, Shuffle, CalendarIcon } from "lucide-react";
+import { Label } from "@/app/components/ui/label";
 import { BusinessOffer } from '@/data';
 import { Stories } from './components/Stories';
+import { ImageGalleryModal } from "@/app/components/ImageGalleryModal";
+import { ServiceOffer } from "@/app/components/ServiceOffer";
+import { ScrollArea, ScrollBar } from "@/app/components/ui/scroll-area";
+import { motion } from "framer-motion";
+
+const scrollbarHideStyles = `
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+  }
+`;
+
+const openingHours = [
+  { day: 'Monday', hours: '09:00 - 20:00' },
+  { day: 'Tuesday', hours: '09:00 - 20:00' },
+  { day: 'Wednesday', hours: '09:00 - 20:00' },
+  { day: 'Thursday', hours: '09:00 - 20:00' },
+  { day: 'Friday', hours: '09:00 - 20:00' },
+  { day: 'Saturday', hours: '10:00 - 18:00' },
+  { day: 'Sunday', hours: 'Closed' },
+];
 
 interface Business {
   id: string;
@@ -413,16 +439,6 @@ const mapOptions = {
   zoomControl: true,
 };
 
-const openingHours = [
-  { day: 'Monday', hours: '9:00 - 20:00' },
-  { day: 'Tuesday', hours: '9:00 - 20:00' },
-  { day: 'Wednesday', hours: '9:00 - 20:00' },
-  { day: 'Thursday', hours: '9:00 - 20:00' },
-  { day: 'Friday', hours: '9:00 - 20:00' },
-  { day: 'Saturday', hours: '10:00 - 18:00' },
-  { day: 'Sunday', hours: 'Closed' },
-];
-
 function getBusinessOffers(businessId: string): BusinessOffer[] {
   return businessOffers.filter(offer => offer.businessId === businessId);
 }
@@ -430,7 +446,7 @@ function getBusinessOffers(businessId: string): BusinessOffer[] {
 export default function BusinessDetailPage() {
   const { id } = useParams();
   const [business, setBusiness] = useState<Business | null>(null);
-  const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState('');
   const [bookingItems, setBookingItems] = useState<BookingItem[]>([]);
   const [selectedServices, setSelectedServices] = useState<SelectedService[]>([]);
@@ -442,6 +458,60 @@ export default function BusinessDetailPage() {
   const [isBusinessOpen, setIsBusinessOpen] = useState(false);
   const [isValidBookingTime, setIsValidBookingTime] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(-1);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const timeSlotContainerRef = useRef<HTMLDivElement>(null);
+  const dateContainerRef = useRef<HTMLDivElement>(null);
+  const [dateDragging, setDateDragging] = useState(false);
+  const [dateStartX, setDateStartX] = useState(0);
+  const [dateScrollLeft, setDateScrollLeft] = useState(0);
+  const teamContainerRef = useRef<HTMLDivElement>(null);
+  const [teamDragging, setTeamDragging] = useState(false);
+  const [teamStartX, setTeamStartX] = useState(0);
+  const [teamScrollLeft, setTeamScrollLeft] = useState(0);
+
+  const availableDates = useMemo(() => {
+    const today = new Date();
+    const twoMonthsFromNow = addMonths(today, 2);
+    const dates = eachDayOfInterval({
+      start: today,
+      end: twoMonthsFromNow,
+    });
+    return dates;
+  }, []);
+
+  const availableTimeSlots = useMemo(() => {
+    if (!selectedDate) return [];
+
+    const dayOfWeek = selectedDate.getDay();
+    const todayHours = openingHours[dayOfWeek === 0 ? 6 : dayOfWeek - 1].hours;
+    
+    if (todayHours === 'Closed') return [];
+
+    const [openTime, closeTime] = todayHours.split(' - ').map(t => {
+      const [hours, minutes] = t.split(':').map(Number);
+      return hours * 60 + minutes;
+    });
+
+    const slots = [];
+    const currentDate = new Date();
+    const isToday = selectedDate.toDateString() === currentDate.toDateString();
+    const currentTime = isToday ? currentDate.getHours() * 60 + currentDate.getMinutes() : 0;
+
+    for (let time = openTime; time < closeTime; time += 30) {
+      const hour = Math.floor(time / 60);
+      const minute = time % 60;
+      const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      
+      // Skip past times for today
+      if (isToday && time <= currentTime) continue;
+      
+      slots.push(timeString);
+    }
+
+    return slots;
+  }, [selectedDate]);
 
   const validateBookingTime = useCallback(() => {
     if (!selectedDate || !selectedTime) {
@@ -449,9 +519,8 @@ export default function BusinessDetailPage() {
       return;
     }
 
-    const selectedDateTime = new Date(`${selectedDate}T${selectedTime}`);
-    const dayOfWeek = selectedDateTime.getDay();
-    const timeInMinutes = selectedDateTime.getHours() * 60 + selectedDateTime.getMinutes();
+    const dayOfWeek = selectedDate.getDay();
+    const timeInMinutes = parseInt(selectedTime.split(':')[0]) * 60 + parseInt(selectedTime.split(':')[1]);
 
     const todayHours = openingHours[dayOfWeek === 0 ? 6 : dayOfWeek - 1].hours;
     if (todayHours === 'Closed') {
@@ -563,8 +632,81 @@ export default function BusinessDetailPage() {
 
   const availableOffers = business ? getBusinessOffers(business.id) : [];
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setStartX(e.pageX - (timeSlotContainerRef.current?.offsetLeft || 0));
+    setScrollLeft(timeSlotContainerRef.current?.scrollLeft || 0);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    if (!timeSlotContainerRef.current) return;
+    
+    const x = e.pageX - (timeSlotContainerRef.current.offsetLeft || 0);
+    const walk = (x - startX) * 2;
+    timeSlotContainerRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleDateMouseDown = (e: React.MouseEvent) => {
+    setDateDragging(true);
+    setDateStartX(e.pageX - (dateContainerRef.current?.offsetLeft || 0));
+    setDateScrollLeft(dateContainerRef.current?.scrollLeft || 0);
+  };
+
+  const handleDateMouseLeave = () => {
+    setDateDragging(false);
+  };
+
+  const handleDateMouseUp = () => {
+    setDateDragging(false);
+  };
+
+  const handleDateMouseMove = (e: React.MouseEvent) => {
+    if (!dateDragging) return;
+    e.preventDefault();
+    if (!dateContainerRef.current) return;
+    
+    const x = e.pageX - (dateContainerRef.current.offsetLeft || 0);
+    const walk = (x - dateStartX) * 2;
+    dateContainerRef.current.scrollLeft = dateScrollLeft - walk;
+  };
+
+  const handleTeamMouseDown = (e: React.MouseEvent) => {
+    setTeamDragging(true);
+    setTeamStartX(e.pageX - (teamContainerRef.current?.offsetLeft || 0));
+    setTeamScrollLeft(teamContainerRef.current?.scrollLeft || 0);
+  };
+
+  const handleTeamMouseLeave = () => {
+    setTeamDragging(false);
+  };
+
+  const handleTeamMouseUp = () => {
+    setTeamDragging(false);
+  };
+
+  const handleTeamMouseMove = (e: React.MouseEvent) => {
+    if (!teamDragging) return;
+    e.preventDefault();
+    if (!teamContainerRef.current) return;
+    
+    const x = e.pageX - (teamContainerRef.current.offsetLeft || 0);
+    const walk = (x - teamStartX) * 2;
+    teamContainerRef.current.scrollLeft = teamScrollLeft - walk;
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
+      <style jsx global>{scrollbarHideStyles}</style>
       <Header />
       <main className="flex-grow">
         <div className="bg-white">
@@ -691,6 +833,36 @@ export default function BusinessDetailPage() {
                     ))}
                   </div>
                 </section>
+
+                {/* Opening Hours Section */}
+                <section className="mt-10">
+                  <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">Opening Hours</h2>
+                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <div className="space-y-2">
+                      {openingHours.map((item, index) => {
+                        const isToday = index === (today === 0 ? 6 : today - 1);
+                        const isSunday = index === 6;
+                        return (
+                          <div 
+                            key={item.day} 
+                            className={`flex justify-between items-center py-2 ${
+                              isSunday ? 'text-gray-400' : ''
+                            }`}
+                          >
+                            <span className={`${isToday ? 'font-bold' : ''} ${isSunday ? '' : 'text-gray-600'}`}>
+                              {item.day}
+                            </span>
+                            <span className={`${isToday ? 'font-bold' : ''} ${
+                              item.hours === 'Closed' ? 'text-red-500' : (isSunday ? '' : 'text-gray-800')
+                            }`}>
+                              {item.hours}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </section>
                 
                 {/* Only show Special Offers section if business has offers */}
                 {availableOffers.length > 0 && (
@@ -749,54 +921,135 @@ export default function BusinessDetailPage() {
               <section className="lg:order-last order-first lg:w-96 md:sticky top-20 inset-0 mb-20 md:mb-0">
                 <div className="lg:sticky lg:top-24 bg-white p-6 rounded-lg shadow-lg space-y-6 flex flex-col border border-gray-200">
                   <h2 className="text-lg lg:text-2xl font-semibold text-gray-800">Your Booking</h2>
-                  <div className="flex flex-row lg:flex-col lg:space-y-6 space-x-6 lg:space-x-0">
-                    {/* Date Selection */}
-                    <div className='flex-1'>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
-                      <div className="relative">
-                        <input
-                          type="date"
-                          value={selectedDate}
-                          onChange={(e) => setSelectedDate(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black text-sm text-gray-700 appearance-none"
-                        />
+                  <div className="space-y-6">
+                    <div className="flex flex-col space-y-2">
+                      <Label className="text-gray-700">Select Date</Label>
+                      <div 
+                        ref={dateContainerRef}
+                        className={cn(
+                          "overflow-x-scroll scrollbar-hide cursor-grab active:cursor-grabbing rounded-md",
+                          dateDragging && "select-none"
+                        )}
+                        onMouseDown={handleDateMouseDown}
+                        onMouseLeave={handleDateMouseLeave}
+                        onMouseUp={handleDateMouseUp}
+                        onMouseMove={handleDateMouseMove}
+                      >
+                        <div className="flex space-x-2 w-max">
+                          {availableDates.map((date) => (
+                            <Button
+                              key={date.toISOString()}
+                              variant="outline"
+                              className={cn(
+                                "flex-none px-4 py-6 flex flex-col items-center gap-1 select-none min-w-[100px] h-auto",
+                                isSameDay(selectedDate, date) && "bg-black text-white hover:bg-gray-800",
+                                isToday(date) && "border-black",
+                              )}
+                              onClick={() => !dateDragging && setSelectedDate(date)}
+                            >
+                              <span className="text-xs font-medium">
+                                {format(date, 'EEE')}
+                              </span>
+                              <span className="text-lg">
+                                {format(date, 'd')}
+                              </span>
+                              <span className="text-xs">
+                                {format(date, 'MMM')}
+                              </span>
+                            </Button>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                    
-                    {/* Time Selection */}
-                    <div className='flex-1'>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Select Time</label>
-                      <div className="relative">
-                        <select
-                          value={selectedTime}
-                          onChange={(e) => setSelectedTime(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black text-sm appearance-none text-gray-700"
-                        >
-                          <option value="">Select a time</option>
-                          {Array.from({ length: 24 }, (_, i) => i).map(hour => {
-                            const time = `${hour.toString().padStart(2, '0')}:00`;
-                            return <option key={time} value={time}>{time}</option>
-                          })}
-                        </select>
-                        <Clock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
+
+                    <div className="flex flex-col space-y-2">
+                      <Label className="text-gray-700">Select Time</Label>
+                      <div 
+                        ref={timeSlotContainerRef}
+                        className={cn(
+                          "overflow-x-scroll scrollbar-hide cursor-grab active:cursor-grabbing rounded-md",
+                          isDragging && "select-none"
+                        )}
+                        onMouseDown={handleMouseDown}
+                        onMouseLeave={handleMouseLeave}
+                        onMouseUp={handleMouseUp}
+                        onMouseMove={handleMouseMove}
+                      >
+                        <div className="flex space-x-2 w-max">
+                          {availableTimeSlots.length > 0 ? (
+                            availableTimeSlots.map((time) => (
+                              <Button
+                                key={time}
+                                variant="outline"
+                                className={cn(
+                                  "flex-none px-4 select-none",
+                                  selectedTime === time && "bg-black text-white hover:bg-gray-800"
+                                )}
+                                onClick={() => !isDragging && setSelectedTime(time)}
+                              >
+                                {time}
+                              </Button>
+                            ))
+                          ) : (
+                            <div className="px-4 py-3 text-sm text-gray-500">
+                              No available time slots for this date
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Team Member Selection */}
-                  <div className='lg:flex lg:flex-col hidden'>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Select Team Member</label>
-                    <select
-                      value={selectedTeamMember}
-                      onChange={(e) => setSelectedTeamMember(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-black text-sm appearance-none text-gray-700"
+                  <div className="flex flex-col space-y-2">
+                    <Label className="text-gray-700">Select Team Member</Label>
+                    <div 
+                      ref={teamContainerRef}
+                      className={cn(
+                        "overflow-x-scroll scrollbar-hide cursor-grab active:cursor-grabbing rounded-md",
+                        teamDragging && "select-none"
+                      )}
+                      onMouseDown={handleTeamMouseDown}
+                      onMouseLeave={handleTeamMouseLeave}
+                      onMouseUp={handleTeamMouseUp}
+                      onMouseMove={handleTeamMouseMove}
                     >
-                      <option value="">Select a team member</option>
-                      <option value="Random">Random</option>
-                      {businessTeam.map(member => (
-                        <option key={member.name} value={member.name}>{member.name}</option>
-                      ))}
-                    </select>
+                      <div className="flex space-x-2 w-max p-2">
+                        <Button
+                          key="random"
+                          variant="outline"
+                          className={cn(
+                            "flex-none px-4 py-6 flex flex-col items-center gap-1 select-none min-w-[100px] h-auto",
+                            selectedTeamMember === 'Random' && "bg-black text-white hover:bg-gray-800"
+                          )}
+                          onClick={() => !teamDragging && setSelectedTeamMember('Random')}
+                        >
+                          <Shuffle className="h-6 w-6 mb-1" />
+                          <span className="text-sm font-medium">Random</span>
+                          <span className="text-xs">Any available</span>
+                        </Button>
+
+                        {businessTeam.map((member) => (
+                          <Button
+                            key={member.name}
+                            variant="outline"
+                            className={cn(
+                              "flex-none px-4 py-6 flex flex-col items-center gap-1 select-none min-w-[100px] h-auto",
+                              selectedTeamMember === member.name && "bg-black text-white hover:bg-gray-800"
+                            )}
+                            onClick={() => !teamDragging && setSelectedTeamMember(member.name)}
+                          >
+                            <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center mb-1">
+                              <span className="text-sm font-bold text-white">
+                                {member.name.split(' ').map(n => n[0]).join('')}
+                              </span>
+                            </div>
+                            <span className="text-sm font-medium text-center line-clamp-1">{member.name}</span>
+                            <span className="text-xs text-center line-clamp-1">{member.profession}</span>
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Selected Services - Togglable on mobile */}
@@ -863,47 +1116,6 @@ export default function BusinessDetailPage() {
                   >
                     Book Now
                   </Button>
-
-                  {/* Opening Hours - Toggleable */}
-                  <div className="border-t pt-4">
-                    <button
-                      onClick={() => setIsOpeningHoursOpen(!isOpeningHoursOpen)}
-                      className="flex justify-between items-center w-full text-left"
-                    >
-                      <span className="text-sm font-medium text-gray-700">Opening Hours</span>
-                      <ChevronDown
-                        size={20}
-                        className={`text-gray-500 transition-transform duration-300 ${
-                          isOpeningHoursOpen ? 'rotate-180' : ''
-                        }`}
-                      />
-                    </button>
-                    {isOpeningHoursOpen && (
-                      <div className="mt-2 space-y-1">
-                        {openingHours.map((item, index) => {
-                          const isToday = index === (today === 0 ? 6 : today - 1); // Adjust for Sunday
-                          const isSunday = index === 6;
-                          return (
-                            <div 
-                              key={item.day} 
-                              className={`flex justify-between items-center py-1 text-sm ${
-                                isSunday ? 'text-gray-400' : ''
-                              }`}
-                            >
-                              <span className={`${isToday ? 'font-bold' : ''} ${isSunday ? '' : 'text-gray-600'}`}>
-                                {item.day}
-                              </span>
-                              <span className={`${isToday ? 'font-bold' : ''} ${
-                                item.hours === 'Closed' ? 'text-red-500' : (isSunday ? '' : 'text-gray-800')
-                              }`}>
-                                {item.hours}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
                 </div>
               </section>
             </div>
