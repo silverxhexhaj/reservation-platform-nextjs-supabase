@@ -1,7 +1,7 @@
 "use client";
 
 import { FeaturedDealCard } from "./FeaturedDealCard";
-import { businesses, businessOffers } from "@/data/mock";
+import { businesses } from "@/data/mock";
 import { motion } from 'framer-motion';
 
 const containerVariants = {

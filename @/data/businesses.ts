@@ -22,5 +22,4 @@ export const businesses: Business[] = [
     galleryImages: [],
     createdAt: '2024-01-15'
   },
-  // Add more businesses with createdAt property
 ]; 

@@ -374,7 +374,6 @@ export default function HomePage() {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
   const [isClientSide, setIsClientSide] = useState(false);
-  const displayedCategories = showAllCategories ? categories : categories.slice(0, 6);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
