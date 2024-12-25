@@ -1014,7 +1014,7 @@ export default function BusinessDetailPage() {
                       onMouseUp={handleTeamMouseUp}
                       onMouseMove={handleTeamMouseMove}
                     >
-                      <div className="flex space-x-2 w-max p-2">
+                      <div className="flex space-x-2 w-max">
                         <Button
                           key="random"
                           variant="outline"

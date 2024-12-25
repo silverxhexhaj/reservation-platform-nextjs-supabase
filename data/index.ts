@@ -36,13 +36,41 @@ export interface Business {
   description: string;
   category: Category;
   rating: number;
+  reviewCount: number;
   priceRange: string;
   imageUrl: string;
-  galleryImages: string[];
+  isPremium?: boolean;
   createdAt: string;
-  services: ServiceCategory[];
-  team: TeamMember[];
-  offers?: BusinessOffer[];
+  location: {
+    address: string;
+    city: string;
+    state: string;
+    zip: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+  };
+  hours?: {
+    [key: string]: {
+      open: string;
+      close: string;
+    };
+  };
+  services?: {
+    id: string;
+    name: string;
+    price: number;
+    duration: number;
+  }[];
+  amenities?: string[];
+  tags?: string[];
+  galleryImages?: string[];
+  socialMedia?: {
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
+  };
 }
 
 // Categories

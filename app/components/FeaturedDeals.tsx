@@ -26,8 +26,11 @@ const itemVariants = {
 }
 
 export function FeaturedDeals() {
-  // Get businesses with offers
-  const businessesWithOffers = businesses.filter(business => business.offers && business.offers.length > 0);
+  // Get businesses with offers and their corresponding offers
+  const dealsWithBusinesses = businessOffers.map(offer => ({
+    business: businesses.find(b => b.id === offer.businessId)!,
+    offer
+  }));
 
   return (
     <motion.section 
@@ -45,18 +48,16 @@ export function FeaturedDeals() {
           Featured Deals
         </motion.h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {businessesWithOffers.map((business) => (
-            business.offers?.map((offer) => (
-              <motion.div 
-                key={`${business.id}-${offer.id}`}
-                variants={itemVariants}
-              >
-                <FeaturedDealCard 
-                  business={business} 
-                  offer={offer}
-                />
-              </motion.div>
-            ))
+          {dealsWithBusinesses.map(({ business, offer }) => (
+            <motion.div 
+              key={`${business.id}-${offer.id}`}
+              variants={itemVariants}
+            >
+              <FeaturedDealCard 
+                business={business} 
+                offer={offer}
+              />
+            </motion.div>
           ))}
         </div>
       </div>

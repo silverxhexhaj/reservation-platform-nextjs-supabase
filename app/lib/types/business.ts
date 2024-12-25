@@ -4,10 +4,12 @@ export interface Business {
   description: string;
   category: string;
   rating: number;
-  reviewCount?: number;
+  reviewCount: number;
   priceRange: string;
   imageUrl: string;
   coverImage?: string;
+  isPremium?: boolean;
+  createdAt: string; // ISO date string
   location: {
     address: string;
     city: string;
