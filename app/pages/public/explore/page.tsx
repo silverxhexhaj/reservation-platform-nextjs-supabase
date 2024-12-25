@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react"
+import { useState, Suspense, useEffect } from "react"
 import { Header } from "@/app/components/Header"
 import { BusinessesCollection } from "./components/BusinessesCollection"
 import { ExploreFilters } from "./components/ExploreFilters"
@@ -12,8 +12,17 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { BusinessCategory, businessCategories } from "@/app/models/supabase.models";
 import { containerVariants, itemVariants } from "@/app/models/transitionEffects.models";
-export default function ExplorePage() {
+
+
+export default function ExplorePage({
+  searchParams,
+}: {
+  searchParams: { category?: string; search?: string }
+}) {
   const [user, setUser] = useState<{ username: string } | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string | null>(null);
+
   // Select some popular categories to display
   const popularCategories: BusinessCategory[] = [
     "gym_and_fitness",
@@ -24,12 +33,17 @@ export default function ExplorePage() {
     "nail_salon"
   ];
 
+  useEffect(() => {
+    setSelectedCategory(searchParams.category || null);
+    setSearchTerm(searchParams.search || null);
+  }, [searchParams.category, searchParams.search]);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header user={user} />
       <main className="flex-grow pt-20">
-        {/* Main Content */}
-        <motion.div 
+      
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -38,15 +52,14 @@ export default function ExplorePage() {
           <motion.div variants={itemVariants}>
             <h2 className="text-2xl md:text-3xl font-bold text-center text-neutral-900">Discover all services</h2>
           </motion.div>
-          
-          {/* Filters */}
+        
           <motion.div variants={itemVariants} className="w-full">
             <Suspense fallback={<div>Loading filters...</div>}>
               <ExploreFilters categories={[...businessCategories]} />
             </Suspense>
           </motion.div>
 
-          {/* Quick Categories */}
+        
           <motion.div variants={itemVariants} className="w-full">
             <div className="flex overflow-x-auto md:overflow-x-visible pb-2 -mb-2 scrollbar-hide space-x-4 md:space-x-6">
               {popularCategories.map((category, index) => {
@@ -58,8 +71,8 @@ export default function ExplorePage() {
                     custom={index}
                     className="flex-shrink-0"
                   >
-                    <Link 
-                      href={`/pages/public/explore/${slug}`}
+                    <Link
+                      href={`/pages/public/explore?category=${slug}`}
                       className="block w-[120px]"
                     >
                       <Button
@@ -76,12 +89,12 @@ export default function ExplorePage() {
             </div>
           </motion.div>
 
-          {/* Business Collection */}
+    
           <motion.div variants={itemVariants} className="w-full">
             <Suspense fallback={<div>Loading businesses...</div>}>
               <BusinessesCollection searchParams={{
-                category: typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('category') ?? undefined : undefined,
-                search: typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('search') ?? undefined : undefined
+                category: selectedCategory,
+                search: searchTerm
               }} />
             </Suspense>
           </motion.div>

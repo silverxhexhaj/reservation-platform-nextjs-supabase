@@ -7,55 +7,44 @@ import { Star, Crown, Sparkles, Percent, Users, Clock, User, Heart, MapPin } fro
 import Image from "next/image"
 import Link from "next/link"
 import { motion } from "framer-motion";
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { itemVariants, containerVariants } from "@/app/models/transitionEffects.models";
+import { BusinessCard } from "@/app/components/BusinessCard";
 
 
 interface BusinessesCollectionProps {
   searchParams?: {
-    category?: string
-    search?: string
+    category: string | null
+    search: string | null
   }
 }
 
-// Helper function to check if a business is new (less than 30 days old)
 function isNewBusiness(createdAt: Date): boolean {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   return createdAt > thirtyDaysAgo;
 }
 
-const tiranaLocations = [
-  "Rruga Myslym Shyri",
-  "Blloku",
-  "Rruga e Kavajës",
-  "Rruga e Durrësit",
-  "Rruga Ibrahim Rugova",
-  "Rruga Sami Frashëri",
-  "21 Dhjetori",
-  "Selita",
-  "Kombinat",
-  "Rruga e Elbasanit",
-  "Tirana e Re",
-  "Kodra e Diellit",
-  "Porcelan",
-  "Xhamlliku",
-  "Ali Demi"
-];
-
 export function BusinessesCollection({ searchParams }: BusinessesCollectionProps) {
-  // Filter businesses based on search params
-  const filteredBusinesses = businesses.filter(business => {
-    const matchesCategory = !searchParams?.category || 
-      searchParams.category === 'all' || 
-      business.category.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-') === searchParams.category
 
-    const matchesSearch = !searchParams?.search ||
-      business.name.toLowerCase().includes(searchParams.search.toLowerCase()) ||
-      business.description?.toLowerCase().includes(searchParams.search.toLowerCase())
+  const [filteredBusinesses, setFilteredBusinesses] = useState(businesses);
 
-    return matchesCategory && matchesSearch
-  })
+  useEffect(() => {
+    const filtered = businesses.filter(business => {
+      const matchesCategory = !searchParams?.category ||
+        searchParams.category === 'all' ||
+        business.category.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-') === searchParams.category;
+
+      const matchesSearch = !searchParams?.search ||
+        business.name.toLowerCase().includes(searchParams.search.toLowerCase()) ||
+        business.description?.toLowerCase().includes(searchParams.search.toLowerCase());
+
+      return matchesCategory && matchesSearch;
+    });
+
+    setFilteredBusinesses(filtered);
+  }, [searchParams?.category, searchParams?.search]);
+
 
   // Get businesses with offers
   const businessesWithOffers = filteredBusinesses
@@ -84,8 +73,8 @@ export function BusinessesCollection({ searchParams }: BusinessesCollectionProps
 
   // Get services for men
   const menServices = filteredBusinesses
-    .filter(business => 
-      business.category === "barbershop" || 
+    .filter(business =>
+      business.category === "barbershop" ||
       business.tags?.includes("For Men") ||
       business.category === "personal_trainer"
     )
@@ -93,8 +82,8 @@ export function BusinessesCollection({ searchParams }: BusinessesCollectionProps
 
   // Get services for women
   const womenServices = filteredBusinesses
-    .filter(business => 
-      business.category === "beauty_salon" || 
+    .filter(business =>
+      business.category === "beauty_salon" ||
       business.tags?.includes("for_women") ||
       business.category === "nail_salon"
     )
@@ -105,7 +94,7 @@ export function BusinessesCollection({ searchParams }: BusinessesCollectionProps
 
   if (filteredBusinesses.length === 0) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -117,373 +106,273 @@ export function BusinessesCollection({ searchParams }: BusinessesCollectionProps
     )
   }
 
-  const BusinessCard = ({ business }: { business: typeof businesses[0] }) => {
-    const [isSaved, setIsSaved] = useState(false);
-
-    const handleSave = (e: React.MouseEvent) => {
-      e.preventDefault(); // Prevent Link navigation
-      setIsSaved(!isSaved);
-    };
-
-    return (
-    <motion.div variants={itemVariants}>
-      <Link 
-        href={`/pages/private/business/dashboard/${business.id}`} 
-        className="group block h-full"
-      >
-        <Card className={`overflow-hidden h-full transition-all duration-300 hover:shadow-lg border ${
-          business.is_premium ? 'border-amber-200 hover:border-amber-300' : 'border-gray-100 hover:border-gray-200'
-        }`}>
-          <div className="aspect-[4/3] overflow-hidden relative border-b border-gray-100">
-            <Image 
-              src={business.cover_picture ?? ''} 
-              alt={business.name} 
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-            />
-            <div className="absolute top-3 right-3 z-10">
-              <Badge 
-                variant="secondary"
-                onClick={handleSave}
-                className={`w-6 h-6 rounded-full p-0 justify-center bg-white/40 hover:bg-white/80 backdrop-blur-sm font-medium text-xs flex items-center cursor-pointer transition-colors ${
-                  isSaved ? 'text-rose-600' : 'text-neutral-900 hover:text-rose-600'
-                }`}
-              >
-                <Heart className="w-3.5 h-3.5" fill={isSaved ? "currentColor" : "none"} />
-              </Badge>
-            </div>
-            <div className="absolute bottom-3 left-3 z-10">
-              <Badge 
-                variant="secondary"
-                className="bg-white/90 backdrop-blur-sm text-neutral-900 border-neutral-200/50 font-medium text-xs flex items-center px-2 py-1"
-              >
-                {business.category}
-              </Badge>
-            </div>
-            <div className="absolute bottom-3 right-3 z-10 flex flex-row gap-2">
-              {isNewBusiness(new Date(business.created_at)) && (
-                <Badge 
-                  variant="secondary"
-                  className="bg-emerald-100/90 backdrop-blur-sm text-emerald-800 border-emerald-200/50 font-medium text-xs flex items-center gap-1"
-                >
-                  <Sparkles className="w-3 h-3" /> New
-                </Badge>
-              )}
-              {!business.is_premium && businessOffers.some(offer => offer.business_id === business.id) && (
-                <Badge 
-                  variant="secondary"
-                  className="w-6 h-6 rounded-full px-1 justify-center bg-blue-100/90 backdrop-blur-sm text-blue-800 border-blue-200/50 font-medium text-xs flex items-center"
-                >
-                  <Percent className="w-3 h-3" />
-                </Badge>
-              )}
-              {business.is_premium && (
-                <Badge 
-                  variant="secondary"
-                  className="w-6 h-6 rounded-full px-1 justify-center bg-amber-100/90 backdrop-blur-sm text-amber-800 border-amber-200/50 font-medium text-xs flex items-center"
-                >
-                  <Crown className="w-3 h-3" />
-                </Badge>
-              )}
-            </div>
-          </div>
-
-          <CardContent className={`p-3 ${business.is_premium ? 'bg-gradient-to-b from-amber-50/50 to-transparent' : ''}`}>
-            <div className="space-y-3">
-              <div className="space-y-2">
-                <h3 className="text-sm md:text-base font-semibold line-clamp-1">
-                  {business.name}
-                </h3>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center space-x-1 text-neutral-500 max-w-[200px]">
-                    <MapPin className="w-3 h-3 flex-shrink-0" />
-                    <span className="text-xs truncate">{business?.location?.city}</span>
-                  </div>
-                </div>
-                <p className="text-xs md:text-sm text-neutral-600 line-clamp-2 min-h-[2.5rem] md:min-h-[3rem] leading-[1.25rem] md:leading-[1.5rem]">
-                  {business?.description ?? ''}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between mt-3 pt-3">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center space-x-1">
-                  <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                  <span className="text-xs font-medium text-neutral-900">
-                    {business?.rating?.toFixed(1) ?? '0.0'}
-                  </span>
-                </div>
-                <div className="flex items-center space-x-1 text-neutral-500">
-                  <Users className="w-3 h-3" />
-                  <span className="text-xs">{business.reviewCount}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-0.5">
-                {Array.from(business?.price_range ?? '').map((_, index) => (
-                  <span
-                    key={index}
-                    className={`text-[10px] font-medium ${
-                      business.is_premium ? 'text-amber-600' : 'text-neutral-900'
-                    }`}
-                  >
-                    $
-                  </span>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </Link>
-    </motion.div>
-  );
-};
 
   return (
     <div className="space-y-8">
-      {premiumBusinesses.length > 0 && (
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold">Premium Businesses</h2>
-              <Badge variant="secondary" className="bg-amber-100 text-amber-800">
-                <Crown className="w-3 h-3 mr-1" /> 
-                {filteredBusinesses.filter(b => b.is_premium).length} Premium
-              </Badge>
+
+
+      {(searchParams?.category == null && searchParams?.search == null) && (
+        <>
+
+
+          {premiumBusinesses.length > 0 && (
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-semibold">Premium Businesses</h2>
+                  <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+                    <Crown className="w-3 h-3 mr-1" />
+                    {filteredBusinesses.filter(b => b.is_premium).length} Premium
+                  </Badge>
+                </div>
+                <Link
+                  href="/pages/public/explore/premium"
+                  className="text-sm text-amber-600 hover:text-amber-700 font-medium flex items-center gap-1 transition-colors"
+                >
+                  View all
+                  <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+                </Link>
+              </div>
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
+              >
+                {premiumBusinesses.map((business) => (
+                  <BusinessCard key={business.id} business={business} />
+                ))}
+              </motion.div>
+            </section>
+          )}
+
+          {businessesWithOffers.length > 0 && (
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-semibold">Special Offers</h2>
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                    <Percent className="w-3 h-3 mr-1" />
+                    {businessesWithOffers.length} Offers
+                  </Badge>
+                </div>
+                <Link
+                  href="/pages/public/explore/offers"
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition-colors"
+                >
+                  View all
+                  <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+                </Link>
+              </div>
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
+              >
+                {businessesWithOffers.map((business) => (
+                  <BusinessCard key={business.id} business={business} />
+                ))}
+              </motion.div>
+            </section>
+          )}
+
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-semibold">Most Popular</h2>
+                <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                  <Users className="w-3 h-3 mr-1" />
+                  {filteredBusinesses.length} Total
+                </Badge>
+              </div>
+              <Link
+                href="/pages/public/explore/popular"
+                className="text-sm text-purple-600 hover:text-purple-700 font-medium flex items-center gap-1 transition-colors"
+              >
+                View all
+                <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+              </Link>
             </div>
-            <Link 
-              href="/pages/public/explore/premium" 
-              className="text-sm text-amber-600 hover:text-amber-700 font-medium flex items-center gap-1 transition-colors"
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
             >
-              View all
-              <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
-            </Link>
-          </div>
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
-          >
-            {premiumBusinesses.map((business) => (
-              <BusinessCard key={business.id} business={business} />
-            ))}
-          </motion.div>
-        </section>
+              {mostPopularBusinesses.map((business) => (
+                <BusinessCard key={business.id} business={business} />
+              ))}
+            </motion.div>
+          </section>
+
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-semibold">All Businesses</h2>
+                <Badge variant="secondary" className="bg-neutral-100 text-neutral-800">
+                  {filteredBusinesses.length} Total
+                </Badge>
+              </div>
+              <Link
+                href="/pages/public/explore/all"
+                className="text-sm text-neutral-600 hover:text-neutral-700 font-medium flex items-center gap-1 transition-colors"
+              >
+                View all
+                <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+              </Link>
+            </div>
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
+            >
+              {previewBusinesses.map((business) => (
+                <BusinessCard key={business.id} business={business} />
+              ))}
+            </motion.div>
+          </section>
+
+          {luxuryBusinesses.length > 0 && (
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-semibold">Luxury Experiences</h2>
+                  <Badge variant="secondary" className="bg-rose-100 text-rose-800">
+                    <Star className="w-3 h-3 mr-1 fill-rose-800" />
+                    Premium Services
+                  </Badge>
+                </div>
+                <Link
+                  href="/pages/public/explore/luxury"
+                  className="text-sm text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1 transition-colors"
+                >
+                  View all
+                  <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+                </Link>
+              </div>
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
+              >
+                {luxuryBusinesses.map((business) => (
+                  <BusinessCard key={business.id} business={business} />
+                ))}
+              </motion.div>
+            </section>
+          )}
+
+          {alwaysOpenBusinesses.length > 0 && (
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-semibold">24/7 Services</h2>
+                  <Badge variant="secondary" className="bg-indigo-100 text-indigo-800">
+                    <Clock className="w-3 h-3 mr-1" />
+                    Always Open
+                  </Badge>
+                </div>
+                <Link
+                  href="/pages/public/explore/24-7"
+                  className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1 transition-colors"
+                >
+                  View all
+                  <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+                </Link>
+              </div>
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
+              >
+                {alwaysOpenBusinesses.map((business) => (
+                  <BusinessCard key={business.id} business={business} />
+                ))}
+              </motion.div>
+            </section>
+          )}
+
+          {menServices.length > 0 && (
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-semibold">For Men</h2>
+                  <Badge variant="secondary" className="bg-slate-100 text-slate-800">
+                    <User className="w-3 h-3 mr-1" />
+                    Men&apos;s Services
+                  </Badge>
+                </div>
+                <Link
+                  href="/pages/public/explore/men"
+                  className="text-sm text-slate-600 hover:text-slate-700 font-medium flex items-center gap-1 transition-colors"
+                >
+                  View all
+                  <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+                </Link>
+              </div>
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
+              >
+                {menServices.map((business) => (
+                  <BusinessCard key={business.id} business={business} />
+                ))}
+              </motion.div>
+            </section>
+          )}
+
+          {womenServices.length > 0 && (
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-semibold">For Women</h2>
+                  <Badge variant="secondary" className="bg-pink-100 text-pink-800">
+                    <User className="w-3 h-3 mr-1" />
+                    Women&apos;s Services
+                  </Badge>
+                </div>
+                <Link
+                  href="/pages/public/explore/women"
+                  className="text-sm text-pink-600 hover:text-pink-700 font-medium flex items-center gap-1 transition-colors"
+                >
+                  View all
+                  <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+                </Link>
+              </div>
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
+              >
+                {womenServices.map((business) => (
+                  <BusinessCard key={business.id} business={business} />
+                ))}
+              </motion.div>
+            </section>
+          )}
+        </>
       )}
 
-      {businessesWithOffers.length > 0 && (
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold">Special Offers</h2>
-              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                <Percent className="w-3 h-3 mr-1" /> 
-                {filteredBusinesses.filter(b => businessOffers.some(o => o.business_id === b.id)).length} Offers
-              </Badge>
-            </div>
-            <Link 
-              href="/pages/public/explore/offers" 
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition-colors"
-            >
-              View all
-              <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
-            </Link>
-          </div>
-          <motion.div 
+      {(searchParams?.category != null || searchParams?.search != null) && (
+        <>
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
             className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
           >
-            {businessesWithOffers.map((business) => (
+            {filteredBusinesses.map((business) => (
               <BusinessCard key={business.id} business={business} />
             ))}
           </motion.div>
-        </section>
-      )}
-
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold">Most Popular</h2>
-            <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-              <Users className="w-3 h-3 mr-1" /> 
-              {filteredBusinesses.length} Total
-            </Badge>
-          </div>
-          <Link 
-            href="/pages/public/explore/popular" 
-            className="text-sm text-purple-600 hover:text-purple-700 font-medium flex items-center gap-1 transition-colors"
-          >
-            View all
-            <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
-          </Link>
-        </div>
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
-        >
-          {mostPopularBusinesses.map((business) => (
-            <BusinessCard key={business.id} business={business} />
-          ))}
-        </motion.div>
-      </section>
-
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold">All Businesses</h2>
-            <Badge variant="secondary" className="bg-neutral-100 text-neutral-800">
-              {filteredBusinesses.length} Total
-            </Badge>
-          </div>
-          <Link 
-            href="/pages/public/explore/all" 
-            className="text-sm text-neutral-600 hover:text-neutral-700 font-medium flex items-center gap-1 transition-colors"
-          >
-            View all
-            <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
-          </Link>
-        </div>
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
-        >
-          {previewBusinesses.map((business) => (
-            <BusinessCard key={business.id} business={business} />
-          ))}
-        </motion.div>
-      </section>
-
-      {luxuryBusinesses.length > 0 && (
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold">Luxury Experiences</h2>
-              <Badge variant="secondary" className="bg-rose-100 text-rose-800">
-                <Star className="w-3 h-3 mr-1 fill-rose-800" /> 
-                Premium Services
-              </Badge>
-            </div>
-            <Link 
-              href="/pages/public/explore/luxury" 
-              className="text-sm text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1 transition-colors"
-            >
-              View all
-              <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
-            </Link>
-          </div>
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
-          >
-            {luxuryBusinesses.map((business) => (
-              <BusinessCard key={business.id} business={business} />
-            ))}
-          </motion.div>
-        </section>
-      )}
-
-      {alwaysOpenBusinesses.length > 0 && (
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold">24/7 Services</h2>
-              <Badge variant="secondary" className="bg-indigo-100 text-indigo-800">
-                <Clock className="w-3 h-3 mr-1" /> 
-                Always Open
-              </Badge>
-            </div>
-            <Link 
-              href="/pages/public/explore/24-7" 
-              className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1 transition-colors"
-            >
-              View all
-              <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
-            </Link>
-          </div>
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
-          >
-            {alwaysOpenBusinesses.map((business) => (
-              <BusinessCard key={business.id} business={business} />
-            ))}
-          </motion.div>
-        </section>
-      )}
-
-      {menServices.length > 0 && (
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold">For Men</h2>
-              <Badge variant="secondary" className="bg-slate-100 text-slate-800">
-                <User className="w-3 h-3 mr-1" /> 
-                Men&apos;s Services
-              </Badge>
-            </div>
-            <Link 
-              href="/pages/public/explore/men" 
-              className="text-sm text-slate-600 hover:text-slate-700 font-medium flex items-center gap-1 transition-colors"
-            >
-              View all
-              <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
-            </Link>
-          </div>
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
-          >
-            {menServices.map((business) => (
-              <BusinessCard key={business.id} business={business} />
-            ))}
-          </motion.div>
-        </section>
-      )}
-
-      {womenServices.length > 0 && (
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold">For Women</h2>
-              <Badge variant="secondary" className="bg-pink-100 text-pink-800">
-                <User className="w-3 h-3 mr-1" /> 
-                Women&apos;s Services
-              </Badge>
-            </div>
-            <Link 
-              href="/pages/public/explore/women" 
-              className="text-sm text-pink-600 hover:text-pink-700 font-medium flex items-center gap-1 transition-colors"
-            >
-              View all
-              <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
-            </Link>
-          </div>
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
-          >
-            {womenServices.map((business) => (
-              <BusinessCard key={business.id} business={business} />
-            ))}
-          </motion.div>
-        </section>
+        </>
       )}
     </div>
   )

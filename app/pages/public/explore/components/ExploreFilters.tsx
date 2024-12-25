@@ -47,8 +47,7 @@ export function ExploreFilters({ categories }: ExploreFiltersProps) {
           className="w-full pl-10 pr-4"
           defaultValue={searchParams.get("search") ?? ""}
           onChange={(e) => {
-            const newQs = createQueryString("search", e.target.value)
-            router.push(`/explore${newQs ? `?${newQs}` : ""}`)
+            router.push(`/pages/public/explore?search=${e.target.value}`)
           }}
         />
       </motion.div>

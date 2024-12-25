@@ -2,10 +2,8 @@
 
 import { useState, useEffect, useRef, ReactElement, Suspense } from 'react';
 import { Header } from './components/Header';
-import { Card, CardContent,  CardTitle } from "./components/ui/card";
 import { Button } from "./components/ui/button";
-import { supabase } from '@/lib/supabase';
-import { Search, Star, X,  LayoutGrid } from 'lucide-react';
+import { Search, Star, X,  LayoutGrid, Music, Instagram, Facebook } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image'
 import { businesses } from '@/data/mock';
@@ -15,26 +13,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./components/ui/dialog"
-import { Badge } from "./components/ui/badge";
 import { Calendar, Shield, CheckCircle, Lock } from 'lucide-react';
-import { Instagram, Facebook, Music, } from 'lucide-react';
 import { CategoryIcon } from './components/CategoryIcon';
 import { motion } from 'framer-motion'
 import {
   Command,
-  CommandDialog,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
 } from "@/app/components/ui/command"
 import { Business, BusinessCategory, businessCategories } from '@/app/models/supabase.models';
 import { categoryToIcon } from '@/data';
-import { BusinessCard } from './components/BusinessCar';
+import { BusinessCard } from './components/BusinessCard';
 import { OfferCard } from './components/OfferCard';
 import { containerVariants, itemVariants } from '@/app/models/transitionEffects.models';
+import { supabase } from '@/lib/supabase';
 
 // Add these statistics
 const platformStats = [
