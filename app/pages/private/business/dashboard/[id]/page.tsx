@@ -3,22 +3,18 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { Header } from '@/app/components/Header';
-import { format, addMonths, eachDayOfInterval, startOfMonth, endOfMonth, isToday, isSameDay } from 'date-fns';
+import { format, addMonths, eachDayOfInterval, isToday, isSameDay } from 'date-fns';
 import { useLoadScript, GoogleMap, MarkerF } from '@react-google-maps/api';
 import Image from 'next/image';
 import { Button } from "@/app/components/ui/button";
 import { businesses, businessOffers } from '@/data/mock';
-import { Calendar } from "@/app/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/app/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { StarIcon, CheckCircle, PlusCircle, X, Clock, AlertCircle, Camera, ChevronDown, Shuffle, CalendarIcon } from "lucide-react";
+import { StarIcon, CheckCircle, PlusCircle, X, Clock, AlertCircle, Camera, ChevronDown, Shuffle } from "lucide-react";
 import { Label } from "@/app/components/ui/label";
 import { BusinessOffer } from '@/data';
 import { Stories } from './components/Stories';
 import { ImageGalleryModal } from "@/app/components/ImageGalleryModal";
 import { ServiceOffer } from "@/app/components/ServiceOffer";
-import { ScrollArea, ScrollBar } from "@/app/components/ui/scroll-area";
-import { motion } from "framer-motion";
 
 const scrollbarHideStyles = `
   .scrollbar-hide {
@@ -73,7 +69,7 @@ interface CategoryServices {
 }
 
 const categoryServices: CategoryServices = {
-  "Hair Salon": [
+  "hair_salon": [
     {
       name: "Haircuts",
       services: [
@@ -99,7 +95,7 @@ const categoryServices: CategoryServices = {
       ]
     }
   ],
-  "Nail Salon": [
+  "nail_salon": [
     {
       name: "Manicures",
       services: [
@@ -117,7 +113,7 @@ const categoryServices: CategoryServices = {
       ]
     }
   ],
-  "Waxing Salon": [
+  "waxing_salon": [
     {
       name: "Facial Waxing",
       services: [
@@ -135,7 +131,7 @@ const categoryServices: CategoryServices = {
       ]
     }
   ],
-  "Beauty Salon": [
+  "beauty_salon": [
     {
       name: "Facial Treatments",
       services: [
@@ -161,7 +157,7 @@ const categoryServices: CategoryServices = {
       ]
     }
   ],
-  "Barbershop": [
+  "barbershop": [
     {
       name: "Haircuts",
       services: [
@@ -179,7 +175,7 @@ const categoryServices: CategoryServices = {
       ]
     }
   ],
-  "Eyebrows & Lashes": [
+  "eyebrows_and_lashes": [
     {
       name: "Eyebrow Services",
       services: [
@@ -197,7 +193,7 @@ const categoryServices: CategoryServices = {
       ]
     }
   ],
-  "Massage": [
+  "massage": [
     {
       name: "Massage Services",
       services: [
@@ -208,7 +204,7 @@ const categoryServices: CategoryServices = {
       ]
     }
   ],
-  "Spa": [
+  "spa": [
     {
       name: "Spa Services",
       services: [
@@ -219,7 +215,7 @@ const categoryServices: CategoryServices = {
       ]
     }
   ],
-  "Gym & Fitness": [
+  "gym_and_fitness": [
     {
       name: "Fitness Services",
       services: [
@@ -230,7 +226,7 @@ const categoryServices: CategoryServices = {
       ]
     }
   ],
-  "Personal Trainer": [
+  "personal_trainer": [
     {
       name: "Personal Training Services",
       services: [
@@ -241,7 +237,7 @@ const categoryServices: CategoryServices = {
       ]
     }
   ],
-  "Therapy Centre": [
+  "therapy_centre": [
     {
       name: "Therapy Services",
       services: [
@@ -252,7 +248,7 @@ const categoryServices: CategoryServices = {
       ]
     }
   ],
-  "Tattoo & Piercing": [
+  "tattoo_and_piercing": [
     {
       name: "Tattoo & Piercing Services",
       services: [
@@ -263,7 +259,7 @@ const categoryServices: CategoryServices = {
       ]
     }
   ],
-  "Tanning Studio": [
+  "tanning_studio": [
     {
       name: "Tanning Services",
       services: [
@@ -274,7 +270,7 @@ const categoryServices: CategoryServices = {
       ]
     }
   ],
-  "Aesthetics": [
+  "aesthetics": [
     {
       name: "Aesthetic Services",
       services: [
@@ -285,7 +281,7 @@ const categoryServices: CategoryServices = {
       ]
     }
   ],
-  "Weight Loss": [
+  "weight_loss": [
     {
       name: "Weight Loss Services",
       services: [
@@ -308,77 +304,77 @@ interface CategoryTeam {
 }
 
 const categoryTeams: CategoryTeam = {
-  "Hair Salon": [
+  "hair_salon": [
     { name: "Emma Styles", profession: "Senior Stylist" },
     { name: "Liam Cuts", profession: "Color Specialist" },
     { name: "Olivia Shears", profession: "Junior Stylist" },
   ],
-  "Nail Salon": [
+  "nail_salon": [
     { name: "Sophia Nails", profession: "Nail Technician" },
     { name: "Ava Polish", profession: "Nail Artist" },
     { name: "Mia Manicure", profession: "Pedicure Specialist" },
   ],
-  "Waxing Salon": [
+  "waxing_salon": [
     { name: "Isabella Smooth", profession: "Waxing Specialist" },
     { name: "Ethan Strip", profession: "Body Waxing Expert" },
     { name: "Charlotte Gentle", profession: "Facial Waxing Specialist" },
   ],
-  "Beauty Salon": [
+  "beauty_salon": [
     { name: "Amelia Glow", profession: "Makeup Artist" },
     { name: "Harper Beauty", profession: "Skincare Specialist" },
     { name: "Evelyn Lash", profession: "Lash Technician" },
   ],
-  "Barbershop": [
+  "barbershop": [
     { name: "Noah Razor", profession: "Master Barber" },
     { name: "William Trim", profession: "Beard Specialist" },
     { name: "James Clipper", profession: "Junior Barber" },
   ],
-  "Eyebrows & Lashes": [
+  "eyebrows_and_lashes": [
     { name: "Sophia Arch", profession: "Brow Artist" },
     { name: "Ava Lash", profession: "Lash Extension Specialist" },
     { name: "Mia Tint", profession: "Brow and Lash Tinting Expert" },
   ],
-  "Massage": [
+  "massage": [
     { name: "Oliver Knead", profession: "Massage Therapist" },
     { name: "Elijah Relax", profession: "Sports Massage Specialist" },
     { name: "Charlotte Zen", profession: "Hot Stone Massage Expert" },
   ],
-  "Spa": [
+  "spa": [
     { name: "Amelia Tranquil", profession: "Spa Manager" },
     { name: "Harper Serene", profession: "Facial Specialist" },
     { name: "Abigail Calm", profession: "Body Treatment Expert" },
   ],
-  "Gym & Fitness": [
+  "gym_and_fitness": [
     { name: "Lucas Muscle", profession: "Personal Trainer" },
     { name: "Henry Cardio", profession: "Group Fitness Instructor" },
     { name: "Evelyn Flex", profession: "Yoga Instructor" },
   ],
-  "Personal Trainer": [
+  "personal_trainer": [
     { name: "Alexander Fit", profession: "Strength Coach" },
     { name: "Daniel Nutrition", profession: "Nutritionist" },
     { name: "Sophia Endurance", profession: "Cardio Specialist" },
   ],
-  "Therapy Centre": [
+  "therapy_centre": [
     { name: "Benjamin Mind", profession: "Psychotherapist" },
     { name: "Emily Counsel", profession: "Marriage Counselor" },
     { name: "Michael Heal", profession: "Art Therapist" },
   ],
-  "Tattoo & Piercing": [
+  "tattoo_and_piercing": [
     { name: "Liam Ink", profession: "Tattoo Artist" },
     { name: "Olivia Pierce", profession: "Body Piercing Specialist" },
     { name: "Noah Design", profession: "Custom Tattoo Designer" },
   ],
-  "Tanning Studio": [
+  "tanning_studio": [
     { name: "Ava Bronze", profession: "Spray Tan Specialist" },
     { name: "Ethan Sun", profession: "Tanning Consultant" },
     { name: "Isabella Glow", profession: "Airbrush Technician" },
   ],
-  "Aesthetics": [
+  "aesthetics": [
     { name: "Sophia Botox", profession: "Aesthetic Nurse" },
     { name: "William Filler", profession: "Dermal Filler Specialist" },
     { name: "Emma Laser", profession: "Laser Treatment Expert" },
   ],
-  "Weight Loss": [
+  "weight_loss": [
     { name: "Oliver Slim", profession: "Weight Loss Consultant" },
     { name: "Charlotte Diet", profession: "Nutritionist" },
     { name: "James Active", profession: "Fitness Coach" },
@@ -440,7 +436,7 @@ const mapOptions = {
 };
 
 function getBusinessOffers(businessId: string): BusinessOffer[] {
-  return businessOffers.filter(offer => offer.businessId === businessId);
+  return businessOffers.filter(offer => offer.business_id === businessId);
 }
 
 export default function BusinessDetailPage() {
@@ -486,7 +482,7 @@ export default function BusinessDetailPage() {
 
     const dayOfWeek = selectedDate.getDay();
     const todayHours = openingHours[dayOfWeek === 0 ? 6 : dayOfWeek - 1].hours;
-    
+
     if (todayHours === 'Closed') return [];
 
     const [openTime, closeTime] = todayHours.split(' - ').map(t => {
@@ -503,10 +499,10 @@ export default function BusinessDetailPage() {
       const hour = Math.floor(time / 60);
       const minute = time % 60;
       const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-      
+
       // Skip past times for today
       if (isToday && time <= currentTime) continue;
-      
+
       slots.push(timeString);
     }
 
@@ -650,7 +646,7 @@ export default function BusinessDetailPage() {
     if (!isDragging) return;
     e.preventDefault();
     if (!timeSlotContainerRef.current) return;
-    
+
     const x = e.pageX - (timeSlotContainerRef.current.offsetLeft || 0);
     const walk = (x - startX) * 2;
     timeSlotContainerRef.current.scrollLeft = scrollLeft - walk;
@@ -674,7 +670,7 @@ export default function BusinessDetailPage() {
     if (!dateDragging) return;
     e.preventDefault();
     if (!dateContainerRef.current) return;
-    
+
     const x = e.pageX - (dateContainerRef.current.offsetLeft || 0);
     const walk = (x - dateStartX) * 2;
     dateContainerRef.current.scrollLeft = dateScrollLeft - walk;
@@ -698,7 +694,7 @@ export default function BusinessDetailPage() {
     if (!teamDragging) return;
     e.preventDefault();
     if (!teamContainerRef.current) return;
-    
+
     const x = e.pageX - (teamContainerRef.current.offsetLeft || 0);
     const walk = (x - teamStartX) * 2;
     teamContainerRef.current.scrollLeft = teamScrollLeft - walk;
@@ -707,15 +703,15 @@ export default function BusinessDetailPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <style jsx global>{scrollbarHideStyles}</style>
-      <Header />
+      <Header user={null} />
       <main className="flex-grow">
         <div className="bg-white">
           <div className="space-y-16 mb-20">
             {/* Cover Section */}
             <section className="relative h-[480px] overflow-hidden">
-              <Image 
-                src={business.imageUrl} 
-                alt={business.name} 
+              <Image
+                src={business.cover_picture ?? ''}
+                alt={business.name}
                 width={1920}
                 height={1080}
                 className="object-cover w-full h-full"
@@ -731,7 +727,17 @@ export default function BusinessDetailPage() {
                         <StarIcon className="w-5 h-5 text-yellow-400 mr-1" />
                         <span className="text-lg font-semibold">{business.rating.toFixed(1)}</span>
                       </div>
-                      <span className="text-lg opacity-90">({business.priceRange})</span>
+                      <span className="text-lg opacity-90">
+                        {Array.from({ length: business?.price_range ?? 1 }).map((_, index) => (
+                          <span
+                            key={index}
+                            className={`text-[22px] font-medium ${business.is_premium ? 'text-amber-600' : 'text-neutral-900'
+                              }`}
+                          >
+                            $
+                          </span>
+                        ))}
+                      </span>
                     </div>
                     <div className={`flex items-center bg-white/20 rounded-full px-3 py-1 ${isBusinessOpen ? 'text-green-400' : 'text-red-400'}`}>
                       <Clock size={20} className="mr-1" />
@@ -744,7 +750,7 @@ export default function BusinessDetailPage() {
               </div>
             </section>
 
-            
+
 
             <div className='max-w-screen-2xl mx-auto flex flex-col lg:flex-row lg:space-x-8 px-8'>
               <div className='flex-1 space-y-10 lg:order-first order-last'>
@@ -762,11 +768,11 @@ export default function BusinessDetailPage() {
                         {category.services.map(service => {
                           const isSelected = selectedServices.some(s => s.name === service.name);
                           return (
-                            <div 
-                              key={service.name} 
+                            <div
+                              key={service.name}
                               className={`flex flex-col justify-between p-6 rounded-lg transition-all duration-300 cursor-pointer
-                                ${isSelected 
-                                  ? 'text-gray-800 border-2 border-black' 
+                                ${isSelected
+                                  ? 'text-gray-800 border-2 border-black'
                                   : 'text-gray-800 border-2 border-gray-100 hover:border-black'}`}
                               onClick={() => isSelected ? removeFromBooking(service.name) : addToBooking(service, category.name)}
                             >
@@ -795,11 +801,10 @@ export default function BusinessDetailPage() {
                 <section className="">
                   <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">Our Team</h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    <div 
+                    <div
                       key="random"
-                      className={`flex flex-col items-center transition-colors duration-200 cursor-pointer p-4 rounded-md border-2 border-gray-100 hover:border-gray-800 ${
-                        selectedTeamMember === 'Random' ? 'text-gray-800 border-2 border-gray-800' : ''
-                      }`}
+                      className={`flex flex-col items-center transition-colors duration-200 cursor-pointer p-4 rounded-md border-2 border-gray-100 hover:border-gray-800 ${selectedTeamMember === 'Random' ? 'text-gray-800 border-2 border-gray-800' : ''
+                        }`}
                       onClick={() => setSelectedTeamMember('Random')}
                     >
                       <div className="w-20 h-20 rounded-full bg-gray-800 flex items-center justify-center mb-3">
@@ -813,11 +818,10 @@ export default function BusinessDetailPage() {
                       </p>
                     </div>
                     {businessTeam.map(member => (
-                      <div 
+                      <div
                         key={member.name}
-                        className={`flex flex-col items-center transition-colors duration-200 cursor-pointer p-4 rounded-md border-2 border-gray-100 hover:border-gray-800 ${
-                          selectedTeamMember === member.name ? 'text-gray-800 border-2 border-gray-800' : ''
-                        }`}
+                        className={`flex flex-col items-center transition-colors duration-200 cursor-pointer p-4 rounded-md border-2 border-gray-100 hover:border-gray-800 ${selectedTeamMember === member.name ? 'text-gray-800 border-2 border-gray-800' : ''
+                          }`}
                         onClick={() => setSelectedTeamMember(member.name)}
                       >
                         <div className="w-20 h-20 rounded-full bg-gray-800 flex items-center justify-center mb-3">
@@ -843,18 +847,16 @@ export default function BusinessDetailPage() {
                         const isToday = index === (today === 0 ? 6 : today - 1);
                         const isSunday = index === 6;
                         return (
-                          <div 
-                            key={item.day} 
-                            className={`flex justify-between items-center py-2 ${
-                              isSunday ? 'text-gray-400' : ''
-                            }`}
+                          <div
+                            key={item.day}
+                            className={`flex justify-between items-center py-2 ${isSunday ? 'text-gray-400' : ''
+                              }`}
                           >
                             <span className={`${isToday ? 'font-bold' : ''} ${isSunday ? '' : 'text-gray-600'}`}>
                               {item.day}
                             </span>
-                            <span className={`${isToday ? 'font-bold' : ''} ${
-                              item.hours === 'Closed' ? 'text-red-500' : (isSunday ? '' : 'text-gray-800')
-                            }`}>
+                            <span className={`${isToday ? 'font-bold' : ''} ${item.hours === 'Closed' ? 'text-red-500' : (isSunday ? '' : 'text-gray-800')
+                              }`}>
                               {item.hours}
                             </span>
                           </div>
@@ -863,7 +865,7 @@ export default function BusinessDetailPage() {
                     </div>
                   </div>
                 </section>
-                
+
                 {/* Only show Special Offers section if business has offers */}
                 {availableOffers.length > 0 && (
                   <section className="mt-20">
@@ -878,17 +880,17 @@ export default function BusinessDetailPage() {
                           onBook={() => {
                             setSelectedServices(prev => [
                               ...prev,
-                              { 
-                                name: offer.title, 
+                              {
+                                name: offer.title,
                                 price: offer.discountedPrice,
-                                categoryName: offer.category 
+                                categoryName: offer.category
                               }
                             ]);
                             setBookingItems(prev => [
                               ...prev,
-                              { 
-                                name: offer.title, 
-                                price: offer.discountedPrice 
+                              {
+                                name: offer.title,
+                                price: offer.discountedPrice
                               }
                             ]);
                           }}
@@ -914,7 +916,7 @@ export default function BusinessDetailPage() {
                     </ul>
                   </section>
                 </div>
-                
+
               </div>
 
               {/* Booking Section */}
@@ -924,7 +926,7 @@ export default function BusinessDetailPage() {
                   <div className="space-y-6">
                     <div className="flex flex-col space-y-2">
                       <Label className="text-gray-700">Select Date</Label>
-                      <div 
+                      <div
                         ref={dateContainerRef}
                         className={cn(
                           "overflow-x-scroll scrollbar-hide cursor-grab active:cursor-grabbing rounded-md",
@@ -964,7 +966,7 @@ export default function BusinessDetailPage() {
 
                     <div className="flex flex-col space-y-2">
                       <Label className="text-gray-700">Select Time</Label>
-                      <div 
+                      <div
                         ref={timeSlotContainerRef}
                         className={cn(
                           "overflow-x-scroll scrollbar-hide cursor-grab active:cursor-grabbing rounded-md",
@@ -1003,7 +1005,7 @@ export default function BusinessDetailPage() {
                   {/* Team Member Selection */}
                   <div className="flex flex-col space-y-2">
                     <Label className="text-gray-700">Select Team Member</Label>
-                    <div 
+                    <div
                       ref={teamContainerRef}
                       className={cn(
                         "overflow-x-scroll scrollbar-hide cursor-grab active:cursor-grabbing rounded-md",
@@ -1055,28 +1057,27 @@ export default function BusinessDetailPage() {
                   {/* Selected Services - Togglable on mobile */}
                   {selectedServices.length > 0 && (
                     <div className="lg:block bg-gray-50 border-y border-gray-200 p-6 -mx-6">
-                      <div 
+                      <div
                         className="flex justify-between items-center cursor-pointer lg:cursor-default"
                         onClick={() => setIsServicesOpen(!isServicesOpen)}
                       >
                         <h3 className="text-base font-semibold text-gray-800">Selected Services</h3>
                         <button className="lg:hidden transition-transform duration-300 ease-in-out transform">
-                          <ChevronDown 
-                            size={20} 
-                            className={`text-gray-500 transition-transform duration-300 ${isServicesOpen ? 'rotate-180' : ''}`} 
+                          <ChevronDown
+                            size={20}
+                            className={`text-gray-500 transition-transform duration-300 ${isServicesOpen ? 'rotate-180' : ''}`}
                           />
                         </button>
                       </div>
-                      <div 
-                        className={`mt-4 overflow-hidden transition-all duration-500 ease-in-out ${
-                          isServicesOpen ? 'max-h-[1000px] opacity-100 visible' : 'max-h-0 opacity-0 invisible lg:max-h-[1000px] lg:opacity-100 lg:visible'
-                        }`}
+                      <div
+                        className={`mt-4 overflow-hidden transition-all duration-500 ease-in-out ${isServicesOpen ? 'max-h-[1000px] opacity-100 visible' : 'max-h-0 opacity-0 invisible lg:max-h-[1000px] lg:opacity-100 lg:visible'
+                          }`}
                       >
                         <div className="space-y-5">
                           {selectedServices.map((service, index) => (
                             <div key={index} className="flex justify-between items-center">
                               <div className='flex items-center space-x-2'>
-                                <button 
+                                <button
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     removeFromBooking(service.name);
@@ -1110,7 +1111,7 @@ export default function BusinessDetailPage() {
                   )}
 
                   {/* Book Now Button */}
-                  <Button 
+                  <Button
                     className="w-full font-semibold py-2 px-4 rounded transition duration-300 ease-in-out bg-black hover:bg-gray-800 text-white"
                     onClick={handleBooking}
                   >
@@ -1119,81 +1120,81 @@ export default function BusinessDetailPage() {
                 </div>
               </section>
             </div>
-          {/* Gallery Section */}
-          {business.galleryImages && business.galleryImages.length > 0 && (
-            <section className="max-w-screen-2xl mx-auto px-8">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-semibold text-gray-800">Gallery</h2>
-                <button 
-                  onClick={() => setSelectedImageIndex(0)}
-                  className="flex items-center text-gray-600 hover:text-black transition-colors duration-200"
-                >
-                  <Camera size={20} className="mr-2" />
-                  <span>View all photos</span>
-                </button>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {business.galleryImages.slice(0, 8).map((image, index) => (
-                  <div 
-                    key={index} 
-                    className="relative aspect-square rounded-lg overflow-hidden cursor-pointer"
-                    onClick={() => setSelectedImageIndex(index)}
-                  >
-                    <Image
-                      src={image}
-                      alt={`${business.name} gallery image ${index + 1}`}
-                      width={300}
-                      height={0}
-                      className="object-cover hover:scale-110 transition-transform duration-300 !h-full w-full"
-                    />
-                  </div>
-                ))}
-              </div>
-              {business.galleryImages.length > 8 && (
-                <div className="mt-4 text-center">
-                  <button 
+            {/* Gallery Section */}
+            {business.galleryImages && business.galleryImages.length > 0 && (
+              <section className="max-w-screen-2xl mx-auto px-8">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-3xl font-semibold text-gray-800">Gallery</h2>
+                  <button
                     onClick={() => setSelectedImageIndex(0)}
-                    className="text-gray-600 hover:text-black transition-colors duration-200"
+                    className="flex items-center text-gray-600 hover:text-black transition-colors duration-200"
                   >
-                    View all {business.galleryImages.length} photos
+                    <Camera size={20} className="mr-2" />
+                    <span>View all photos</span>
                   </button>
                 </div>
-              )}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {business.galleryImages.slice(0, 8).map((image, index) => (
+                    <div
+                      key={index}
+                      className="relative aspect-square rounded-lg overflow-hidden cursor-pointer"
+                      onClick={() => setSelectedImageIndex(index)}
+                    >
+                      <Image
+                        src={image}
+                        alt={`${business.name} gallery image ${index + 1}`}
+                        width={300}
+                        height={0}
+                        className="object-cover hover:scale-110 transition-transform duration-300 !h-full w-full"
+                      />
+                    </div>
+                  ))}
+                </div>
+                {business.galleryImages.length > 8 && (
+                  <div className="mt-4 text-center">
+                    <button
+                      onClick={() => setSelectedImageIndex(0)}
+                      className="text-gray-600 hover:text-black transition-colors duration-200"
+                    >
+                      View all {business.galleryImages.length} photos
+                    </button>
+                  </div>
+                )}
 
-              {/* Image Gallery Modal */}
-              <ImageGalleryModal
-                images={business.galleryImages}
-                initialIndex={selectedImageIndex}
-                isOpen={selectedImageIndex !== -1}
-                onClose={() => setSelectedImageIndex(-1)}
-              />
-            </section>
-          )}
+                {/* Image Gallery Modal */}
+                <ImageGalleryModal
+                  images={business.galleryImages}
+                  initialIndex={selectedImageIndex}
+                  isOpen={selectedImageIndex !== -1}
+                  onClose={() => setSelectedImageIndex(-1)}
+                />
+              </section>
+            )}
 
             {/* About Section */}
             <section className="mb-20 mt-20 max-w-screen-2xl mx-auto px-8">
-                <h2 className="text-3xl font-semibold mb-6 text-gray-800">About Us</h2>
-                <p className="text-gray-700 mb-6 text-lg">
-                  {business.description} We are committed to providing top-notch services to our clients in a welcoming and professional environment.
-                </p>
-                <div className="h-[400px] bg-gray-200 rounded-lg overflow-hidden">
-                  {!isLoaded ? (
-                    <div className="h-full flex items-center justify-center">
-                      <span>Loading map...</span>
-                    </div>
-                  ) : (
-                    <GoogleMap
-                      mapContainerStyle={mapContainerStyle}
-                      zoom={14}
-                      center={center}
-                      options={mapOptions}
-                    >
-                      <MarkerF position={center} />
-                    </GoogleMap>
-                  )}
+              <h2 className="text-3xl font-semibold mb-6 text-gray-800">About Us</h2>
+              <p className="text-gray-700 mb-6 text-lg">
+                {business.description} We are committed to providing top-notch services to our clients in a welcoming and professional environment.
+              </p>
+              <div className="h-[400px] bg-gray-200 rounded-lg overflow-hidden">
+                {!isLoaded ? (
+                  <div className="h-full flex items-center justify-center">
+                    <span>Loading map...</span>
+                  </div>
+                ) : (
+                  <GoogleMap
+                    mapContainerStyle={mapContainerStyle}
+                    zoom={14}
+                    center={center}
+                    options={mapOptions}
+                  >
+                    <MarkerF position={center} />
+                  </GoogleMap>
+                )}
               </div>
             </section>
-            
+
 
           </div>
         </div>

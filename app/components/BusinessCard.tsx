@@ -125,7 +125,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
                             </div>
 
                             <div className="flex items-center space-x-0.5">
-                                {Array.from(business?.price_range ?? '').map((_, index) => (
+                                {Array.from({length: business?.price_range ?? 1}).map((_, index) => (
                                     <span
                                         key={index}
                                         className={`text-[10px] font-medium ${business.is_premium ? 'text-amber-600' : 'text-neutral-900'
