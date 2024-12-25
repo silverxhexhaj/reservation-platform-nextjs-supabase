@@ -2,7 +2,8 @@
 
 # Tech stack
 - Next.js 14
-- Tailwind CSS
+- Tailwind CSS,
+- Shadcn UI
 - Supabase
 - Stripe
 

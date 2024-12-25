@@ -19,6 +19,11 @@ DROP TABLE IF EXISTS clients CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
 DROP TABLE IF EXISTS staff_services CASCADE;
 DROP TABLE IF EXISTS points_transactions CASCADE;
+DROP TABLE IF EXISTS client_profiles CASCADE;
+DROP TABLE IF EXISTS staff_profiles CASCADE;
+DROP TYPE IF EXISTS profile_type CASCADE;
+DROP TYPE IF EXISTS business_category CASCADE;
+
 
 -- Drop enums if they exist
 DROP TYPE IF EXISTS payment_status CASCADE;
@@ -34,6 +39,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TYPE campaign_status AS ENUM ('draft', 'active', 'inactive', 'expired');
 CREATE TYPE booking_status AS ENUM ('pending', 'confirmed', 'cancelled', 'completed');
 CREATE TYPE payment_status AS ENUM ('pending', 'paid', 'refunded', 'failed');
+CREATE TYPE profile_type AS ENUM ('client', 'staff');
 CREATE TYPE notification_type AS ENUM (
     'booking_created',
     'booking_confirmed',
@@ -47,6 +53,23 @@ CREATE TYPE notification_type AS ENUM (
     'points_redeemed',
     'reward_claimed',
     'schedule_changed'
+);
+CREATE TYPE business_category AS ENUM (
+    'hair_salon',
+    'nail_salon',
+    'waxing_salon',
+    'beauty_salon',
+    'barbershop',
+    'eyebrows_and_lashes',
+    'massage',
+    'spa',
+    'gym_and_fitness',
+    'personal_trainer',
+    'therapy_centre',
+    'tattoo_and_piercing',
+    'tanning_studio',
+    'aesthetics',
+    'weight_loss'
 );
 
 -- Clients table
@@ -81,8 +104,14 @@ CREATE TABLE businesses (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
     description TEXT,
+    category business_category NOT NULL,
+    price_range INTEGER NOT NULL CHECK (price_range BETWEEN 1 AND 4),
     phone VARCHAR(20),
     website_url TEXT,
+    profile_picture TEXT,
+    cover_picture TEXT,
+    is_premium BOOLEAN DEFAULT false,
+    tags TEXT[],
     external_link_facebook TEXT,
     external_link_instagram TEXT,
     external_link_tiktok TEXT,
@@ -321,6 +350,24 @@ CREATE TABLE reviews (
         (review_type = 'staff' AND staff_id IS NOT NULL AND business_id IS NULL)
     )
 );
+-- Create profiles table
+CREATE TABLE profiles (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    profile_type profile_type NOT NULL,
+    bio TEXT,
+    date_of_birth DATE,
+    gender VARCHAR(50),
+    preferred_language VARCHAR(50),
+    specialties TEXT[],
+    years_of_experience INTEGER,
+    education TEXT[],
+    certifications TEXT[],
+    languages TEXT[],
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT unique_user_profile UNIQUE (user_id)
+);
 
 -- Create indexes for better query performance
 CREATE INDEX idx_businesses_owner ON businesses(owner_id);
@@ -355,6 +402,7 @@ CREATE INDEX idx_business_features_available ON business_features(business_id, f
 CREATE INDEX idx_business_gallery_business ON business_gallery(business_id);
 CREATE INDEX idx_business_gallery_featured ON business_gallery(business_id, is_featured) WHERE is_featured = true;
 CREATE INDEX idx_business_gallery_order ON business_gallery(business_id, sort_order);
+CREATE INDEX idx_profiles_user ON profiles(user_id);
 
 -- Add triggers for updated_at timestamps
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -442,5 +490,10 @@ CREATE TRIGGER update_business_features_updated_at
 
 CREATE TRIGGER update_business_gallery_updated_at
     BEFORE UPDATE ON business_gallery
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_profiles_updated_at
+    BEFORE UPDATE ON profiles
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();

@@ -2,15 +2,13 @@
 
 import { useState, useEffect, useRef, ReactElement, Suspense } from 'react';
 import { Header } from './components/Header';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "./components/ui/card";
+import { Card, CardContent,  CardTitle } from "./components/ui/card";
 import { Button } from "./components/ui/button";
 import { supabase } from '@/lib/supabase';
-import { Search, Star, X, Scissors, Dumbbell, Heart, Syringe, Eye, Sun, LayoutGrid } from 'lucide-react';
+import { Search, Star, X,  LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
-import { Business, Category, categories, categoryToIcon } from '@/data';
-import { businesses } from '@/data/mock';
 import Image from 'next/image'
-import { ArrowRight } from 'lucide-react'
+import { businesses } from '@/data/mock';
 import {
   Dialog,
   DialogContent,
@@ -19,8 +17,7 @@ import {
 } from "./components/ui/dialog"
 import { Badge } from "./components/ui/badge";
 import { Calendar, Shield, CheckCircle, Lock } from 'lucide-react';
-import { Instagram, Facebook, Music, Apple, Smartphone } from 'lucide-react';
-import { FeaturedDeals } from "./components/FeaturedDeals";
+import { Instagram, Facebook, Music, } from 'lucide-react';
 import { CategoryIcon } from './components/CategoryIcon';
 import { motion } from 'framer-motion'
 import {
@@ -33,115 +30,11 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/app/components/ui/command"
-import { cn } from '@/lib/utils';
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2
-    }
-  }
-}
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5
-    }
-  }
-}
-
-const renderBusinessCard = (business: Business): ReactElement => (
-  <Link 
-    href={`/pages/private/business/dashboard/${business.id}`} 
-    key={business.id} 
-    className="group block h-full"
-  >
-    <Card className="overflow-hidden h-full transition-all duration-300 hover:shadow-lg border border-gray-100 hover:border-gray-200">
-      {/* Image Container */}
-      <div className="aspect-[4/3] overflow-hidden relative border-b border-gray-100">
-        <Image 
-          src={business.imageUrl} 
-          alt={business.name} 
-          fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-        {/* Category Badge */}
-        <div className="absolute top-4 left-4">
-          <Badge 
-            variant="secondary" 
-            className="bg-white/90 backdrop-blur-sm text-neutral-900 font-medium border border-gray-100/50"
-          >
-            {business.category}
-          </Badge>
-        </div>
-      </div>
-
-      {/* Content */}
-      <CardContent className="p-4 flex flex-col justify-between h-[calc(100%-60%)]">
-        {/* Business Info */}
-        <div className="space-y-2 flex-1">
-          <CardTitle className="text-lg font-semibold line-clamp-1">
-            {business.name}
-          </CardTitle>
-          <p className="text-sm text-neutral-600 min-h-[2.5rem] line-clamp-2">
-            {business.description}
-          </p>
-        </div>
-
-        {/* Rating and Price */}
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-          {/* Rating */}
-          <div className="flex items-center space-x-1">
-            <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-            <span className="text-sm font-medium text-neutral-900">
-              {business.rating.toFixed(1)}
-            </span>
-          </div>
-
-          {/* Price Range */}
-          <div className="flex items-center space-x-0.5">
-            {Array.from(business.priceRange).map((_, index) => (
-              <span
-                key={index}
-                className="text-sm font-medium text-neutral-900"
-              >
-                $
-              </span>
-            ))}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  </Link>
-);
-
-// Import the pricing plans data
-const pricingPlans = [
-  {
-    name: 'Basic',
-    price: 29,
-    features: ['Up to 5 bookings per month', 'Basic scheduling', 'Email support'],
-    recommended: false,
-  },
-  {
-    name: 'Pro',
-    price: 59,
-    features: ['Unlimited bookings', 'Advanced scheduling', 'Priority support', 'Performance tracking'],
-    recommended: true,
-  },
-  {
-    name: 'Enterprise',
-    price: 99,
-    features: ['Custom booking packages', 'Dedicated account manager', '24/7 phone support', 'API access'],
-    recommended: false,
-  },
-];
+import { Business, BusinessCategory, businessCategories } from '@/app/models/supabase.models';
+import { categoryToIcon } from '@/data';
+import { BusinessCard } from './components/BusinessCar';
+import { OfferCard } from './components/OfferCard';
+import { containerVariants, itemVariants } from '@/app/models/transitionEffects.models';
 
 // Add these statistics
 const platformStats = [
@@ -205,19 +98,6 @@ const socialProof = [
   { platform: "TikTok", followers: "25K+", handle: "@nooor" }
 ];
 
-// Add this new interface for offers
-interface BusinessOffer {
-  id: string;
-  businessId: string;
-  title: string;
-  description: string;
-  originalPrice: number;
-  discountedPrice: number;
-  discountPercentage: number;
-  validUntil: string;
-  imageUrl: string;
-}
-
 // Update the businessOffers data with reliable image URLs
 const businessOffers: BusinessOffer[] = [
   {
@@ -255,113 +135,7 @@ const businessOffers: BusinessOffer[] = [
   }
 ];
 
-// Add the render function for offer cards
-const renderOfferCard = (offer: BusinessOffer): ReactElement => {
-  const business = businesses.find(b => b.id === offer.businessId);
-  
-  return (
-    <Link 
-      href={`/pages/private/business/dashboard/${offer.businessId}?offer=${offer.id}`}
-      key={offer.id}
-      className="group block"
-    >
-      <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-white hover:shadow-lg transition-all duration-300">
-        {/* Image and Discount Badge */}
-        <div className="relative aspect-[16/9] overflow-hidden">
-          <Image 
-            src={offer.imageUrl}
-            alt={offer.title}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-          <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-            {offer.discountPercentage}% OFF
-          </div>
-          {business && (
-            <div className="absolute bottom-4 left-4 right-4">
-              <div className="bg-white/90 backdrop-blur-sm rounded-lg px-4 py-2 flex justify-between">
-                <p className="text-sm font-medium text-gray-900">{business.name}</p>
-                <div className="flex items-center space-x-1">
-                  <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                  <span className="text-xs text-gray-600">{business.rating}</span>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
 
-        {/* Content */}
-        <div className="p-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">{offer.title}</h3>
-          <p className="text-sm text-gray-600 mb-4 min-h-[2.5rem] line-clamp-2">
-            {offer.description}
-          </p>
-          
-          {/* Price and CTA */}
-          <div className="flex items-end justify-between">
-            <div className="space-y-1">
-              <p className="text-sm text-gray-500 line-through">${offer.originalPrice}</p>
-              <p className="text-xl font-bold text-gray-900">${offer.discountedPrice}</p>
-            </div>
-            <Button 
-              variant="outline"
-              className="text-sm border-gray-200 hover:bg-gray-50"
-            >
-              Book Now
-            </Button>
-          </div>
-
-          {/* Valid Until */}
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <p className="text-xs text-gray-500">
-              Valid until {formatDate(offer.validUntil)}
-            </p>
-          </div>
-        </div>
-      </div>
-    </Link>
-  );
-};
-
-// Move the formatDate function to use UTC consistently
-function formatDate(dateString: string) {
-  const date = new Date(dateString + 'T00:00:00Z'); // Force UTC
-  return new Intl.DateTimeFormat('en-US', {
-    month: '2-digit',
-    day: '2-digit',
-    year: 'numeric',
-    timeZone: 'UTC'
-  }).format(date);
-}
-
-// Update the FALLBACK_IMAGES with reliable URLs
-const FALLBACK_IMAGES = {
-  spa: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&h=600&fit=crop",
-  hair: "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=800&h=600&fit=crop",
-  fitness: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
-  beauty: "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=800&h=600&fit=crop",
-  default: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&h=600&fit=crop"
-};
-
-// Add this function after the FALLBACK_IMAGES constant
-function getFallbackImage(category?: string) {
-  if (!category) return FALLBACK_IMAGES.default;
-  const categoryLower = category.toLowerCase();
-  
-  if (categoryLower.includes('spa')) return FALLBACK_IMAGES.spa;
-  if (categoryLower.includes('hair')) return FALLBACK_IMAGES.hair;
-  if (categoryLower.includes('fitness') || categoryLower.includes('gym')) return FALLBACK_IMAGES.fitness;
-  if (categoryLower.includes('beauty')) return FALLBACK_IMAGES.beauty;
-  
-  return FALLBACK_IMAGES.default;
-}
-
-const NoResultsMessage = (): ReactElement => (
-  <div className="text-center py-10">
-    <h3 className="text-xl font-semibold text-gray-600 mb-2">No results found</h3>
-    <p className="text-gray-500">Try adjusting your search or filter to find what you&apos;re looking for.</p>
-  </div>
-);
 
 export default function HomePage() {
   const [user, setUser] = useState<{ username: string } | null>(null);
@@ -407,8 +181,8 @@ export default function HomePage() {
       if (!isInputFocused) {
         setFadeOut(true);
         placeholderTimeoutRef.current = setTimeout(() => {
-          setPlaceholderIndex((prevIndex) => (prevIndex + 1) % categories.length);
-          setPlaceholder(`Search for ${categories[(placeholderIndex + 1) % categories.length]}...`);
+          setPlaceholderIndex((prevIndex) => (prevIndex + 1) % businessCategories.length);
+          setPlaceholder(`Search for ${businessCategories[(placeholderIndex + 1) % businessCategories.length]}...`);
           setFadeOut(false);
         }, 200);
       }
@@ -449,9 +223,9 @@ export default function HomePage() {
 
   const handleSearch = () => {
     const filtered = businesses.filter(business => 
-      business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      business.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (selectedCategory && business.category.toLowerCase() === selectedCategory.toLowerCase())
+      business?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      business?.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (selectedCategory && business?.category?.toLowerCase() === selectedCategory.toLowerCase())
     );
     setFilteredBusinesses(filtered);
   };
@@ -483,18 +257,8 @@ export default function HomePage() {
     }
   }, [searchTerm]);
 
-  const topBusinesses = filteredBusinesses.sort((a, b) => b.rating - a.rating).slice(0, 5);
-  const healthyBodyBusinesses = filteredBusinesses.filter(b => ['Gym & Fitness', 'Personal Trainer'].includes(b.category));
-  const womenSectionBusinesses = filteredBusinesses.filter(b => ['Hair Salon', 'Nail Salon', 'Waxing Salon'].includes(b.category));
+  const topBusinesses = filteredBusinesses.sort((a, b) => b?.rating - a?.rating).slice(0, 5);
 
-  useEffect(() => {
-    // Ensure video loads and plays
-    if (videoRef.current) {
-      videoRef.current.play().catch(error => {
-        console.log("Video autoplay failed:", error);
-      });
-    }
-  }, []);
 
   return (
     <div className="min-h-screen font-sans bg-white flex flex-col">
@@ -551,7 +315,7 @@ export default function HomePage() {
                         <CommandList className="max-h-[300px] overflow-auto py-1">
                           <CommandEmpty>No results found.</CommandEmpty>
                           <CommandGroup heading="Categories">
-                            {categories.map((category, index) => (
+                            {businessCategories.map((category, index) => (
                               <CommandItem
                                 key={category}
                                 value={category}
@@ -590,7 +354,7 @@ export default function HomePage() {
             >
               <div className="space-y-6 w-full">
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4 max-w-2xl mx-auto">
-                  {categories.slice(0, 8).map((category, index) => {
+                  {businessCategories.slice(0, 8).map((category, index) => {
                     const slug = category.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-');
                     return (
                       <motion.div
@@ -646,7 +410,7 @@ export default function HomePage() {
                       {/* Content - Scrollable */}
                       <div className="flex-1 overflow-y-auto p-4 md:p-0">
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                          {categories.map(category => {
+                          {businessCategories.map(category => {
                             const slug = category.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-');
                             return (
                               <Link 
@@ -657,7 +421,7 @@ export default function HomePage() {
                               >
                                 <div className="flex items-center space-x-4">
                                   <span className="w-12 h-12 flex items-center justify-center bg-white rounded-xl shadow-sm group-hover:shadow-md transition-all duration-300">
-                                    <CategoryIcon icon={categoryToIcon[category]} />
+                                    <CategoryIcon icon={categoryToIcon[category as BusinessCategory]} />
                                   </span>
                                   <span className="font-medium text-gray-900">
                                     {category}
@@ -680,17 +444,14 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-b from-red-700/40 to-pink-700/40" />
               }>
                 <video 
-                  ref={videoRef}
+                  preload="auto"
                   className="absolute inset-0 w-full h-full object-cover" 
                   crossOrigin="" 
                   playsInline 
                   muted 
                   autoPlay
                   loop
-                  onLoadedData={() => setIsVideoLoaded(true)}
-                  style={{ opacity: isVideoLoaded ? 1 : 0 }}
-                  src="https://videos.pexels.com/video-files/3753716/3753716-uhd_2560_1440_25fps.mp4" 
-                  preload="metadata"
+                  src="/video/nooor_home_cover_video.mp4" 
                 >
                   <track kind="metadata" label="cuepoints" />
                 </video>
@@ -707,7 +468,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Platform Statistics Section */}
+    
         <motion.section 
           variants={containerVariants}
           initial="hidden"
@@ -789,7 +550,7 @@ export default function HomePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                   {topBusinesses.map((business, index) => (
                     <motion.div key={business.id} variants={itemVariants}>
-                      {renderBusinessCard(business)}
+                      <BusinessCard business={business} />
                     </motion.div>
                   ))}
                 </div>
@@ -812,7 +573,7 @@ export default function HomePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {businessOffers.map((offer, index) => (
                     <motion.div key={offer.id} variants={itemVariants}>
-                      {renderOfferCard(offer)}
+                      <OfferCard offer={offer} business={businesses.find(business => business.id === offer.businessId)} />
                     </motion.div>
                   ))}
                 </div>
@@ -838,7 +599,7 @@ export default function HomePage() {
                     .slice(0, 5)
                     .map((business, index) => (
                       <motion.div key={business.id} variants={itemVariants}>
-                        {renderBusinessCard(business)}
+                        <BusinessCard business={business} />
                       </motion.div>
                     ))}
                 </div>
@@ -864,7 +625,7 @@ export default function HomePage() {
                     .slice(0, 5)
                     .map((business, index) => (
                       <motion.div key={business.id} variants={itemVariants}>
-                        {renderBusinessCard(business)}
+                        <BusinessCard business={business} />
                       </motion.div>
                     ))}
                 </div>
@@ -1007,8 +768,6 @@ export default function HomePage() {
             </motion.div>
           </div>
         </motion.section>
-
-        <FeaturedDeals />
       </main>
     </div>
   );

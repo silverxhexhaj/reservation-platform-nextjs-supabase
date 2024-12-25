@@ -6,8 +6,9 @@ import { Card, CardContent } from '@/app/components/ui/card'
 import { Header } from '@/app/components/Header'
 import { motion } from 'framer-motion'
 import { Button } from '@/app/components/ui/button'
-import { ArrowRight, Star, Users, Building2, Trophy, CheckCircle, Calendar, Shield } from 'lucide-react'
+import { ArrowRight, Star, Users, Building2, Trophy, Calendar, Shield } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { containerVariants, itemVariants } from "@/app/models/transitionEffects.models";
 
 const teamMembers = [
   {
@@ -54,27 +55,6 @@ const testimonials = [
     image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"
   },
 ]
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2
-    }
-  }
-}
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5
-    }
-  }
-}
 
 const AnimatedGradient = () => {
   return (

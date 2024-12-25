@@ -4,44 +4,24 @@ import { useState, Suspense } from "react"
 import { Header } from "@/app/components/Header"
 import { BusinessesCollection } from "./components/BusinessesCollection"
 import { ExploreFilters } from "./components/ExploreFilters"
-import { categories, categoryToIcon, Category } from "@/data";
+import { categoryToIcon } from "@/data";
+
 import { Button } from "@/app/components/ui/button";
 import { CategoryIcon } from "@/app/components/CategoryIcon";
 import Link from "next/link";
 import { motion } from "framer-motion";
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2
-    }
-  }
-}
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5
-    }
-  }
-}
-
+import { BusinessCategory, businessCategories } from "@/app/models/supabase.models";
+import { containerVariants, itemVariants } from "@/app/models/transitionEffects.models";
 export default function ExplorePage() {
   const [user, setUser] = useState<{ username: string } | null>(null);
-
   // Select some popular categories to display
-  const popularCategories: Category[] = [
-    "Gym & Fitness",
-    "Spa",
-    "Hair Salon",
-    "Beauty Salon",
-    "Massage",
-    "Nail Salon"
+  const popularCategories: BusinessCategory[] = [
+    "gym_and_fitness",
+    "spa",
+    "hair_salon",
+    "beauty_salon",
+    "massage",
+    "nail_salon"
   ];
 
   return (
@@ -62,7 +42,7 @@ export default function ExplorePage() {
           {/* Filters */}
           <motion.div variants={itemVariants} className="w-full">
             <Suspense fallback={<div>Loading filters...</div>}>
-              <ExploreFilters categories={[...categories]} />
+              <ExploreFilters categories={[...businessCategories]} />
             </Suspense>
           </motion.div>
 
@@ -86,7 +66,7 @@ export default function ExplorePage() {
                         variant="outline"
                         className="w-full h-[80px] flex flex-col items-center justify-center p-2 space-y-2 hover:bg-gray-50 border-gray-200 transition-all duration-300 hover:scale-105"
                       >
-                        <CategoryIcon icon={categoryToIcon[category]} className="w-5 h-5" />
+                        <CategoryIcon icon={categoryToIcon[category as BusinessCategory]} className="w-5 h-5" />
                         <span className="text-xs font-medium text-gray-700 text-center truncate w-full">{category}</span>
                       </Button>
                     </Link>

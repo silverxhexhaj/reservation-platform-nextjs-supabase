@@ -1,309 +1,26 @@
-import { Business, BusinessOffer, Category, ServiceCategory, TeamMember, categoryImages } from './index';
+import { Business, BusinessCategory } from "@/app/models/supabase.models";
 
-// Services by category
-const categoryServices: Record<Category, ServiceCategory[]> = {
-  "Hair Salon": [
-    {
-      name: "Haircuts",
-      services: [
-        { name: "Women's Haircut", price: 50 },
-        { name: "Men's Haircut", price: 35 },
-        { name: "Children's Haircut", price: 25 },
-      ]
-    },
-    {
-      name: "Coloring",
-      services: [
-        { name: "Full Color", price: 80 },
-        { name: "Highlights", price: 100 },
-        { name: "Balayage", price: 150 },
-      ]
-    },
-    {
-      name: "Styling",
-      services: [
-        { name: "Blowout", price: 40 },
-        { name: "Updo", price: 65 },
-        { name: "Hair Extensions", price: 200 },
-      ]
-    }
-  ],
-  "Nail Salon": [
-    {
-      name: "Manicures",
-      services: [
-        { name: "Basic Manicure", price: 30 },
-        { name: "Gel Manicure", price: 45 },
-        { name: "Nail Art", price: 20 },
-      ]
-    },
-    {
-      name: "Pedicures",
-      services: [
-        { name: "Basic Pedicure", price: 40 },
-        { name: "Spa Pedicure", price: 55 },
-        { name: "Gel Pedicure", price: 60 },
-      ]
-    }
-  ],
-  "Waxing Salon": [
-    {
-      name: "Facial Waxing",
-      services: [
-        { name: "Eyebrow Wax", price: 15 },
-        { name: "Upper Lip Wax", price: 10 },
-        { name: "Full Face Wax", price: 40 },
-      ]
-    },
-    {
-      name: "Body Waxing",
-      services: [
-        { name: "Leg Wax", price: 50 },
-        { name: "Brazilian Wax", price: 60 },
-        { name: "Full Body Wax", price: 150 },
-      ]
-    }
-  ],
-  "Beauty Salon": [
-    {
-      name: "Facial Treatments",
-      services: [
-        { name: "Basic Facial", price: 70 },
-        { name: "Deep Cleansing Facial", price: 90 },
-        { name: "Anti-Aging Facial", price: 110 },
-      ]
-    },
-    {
-      name: "Makeup Services",
-      services: [
-        { name: "Makeup Application", price: 60 },
-        { name: "Bridal Makeup", price: 120 },
-        { name: "Makeup Lesson", price: 80 },
-      ]
-    }
-  ],
-  "Barbershop": [
-    {
-      name: "Haircuts",
-      services: [
-        { name: "Men's Haircut", price: 30 },
-        { name: "Buzz Cut", price: 20 },
-        { name: "Kids Haircut", price: 25 },
-      ]
-    },
-    {
-      name: "Beard Services",
-      services: [
-        { name: "Beard Trim", price: 20 },
-        { name: "Hot Shave", price: 35 },
-        { name: "Hair & Beard Combo", price: 45 },
-      ]
-    }
-  ],
-  "Eyebrows & Lashes": [
-    {
-      name: "Eyebrow Services",
-      services: [
-        { name: "Eyebrow Threading", price: 15 },
-        { name: "Eyebrow Tinting", price: 20 },
-        { name: "Brow Lamination", price: 50 },
-      ]
-    },
-    {
-      name: "Lash Services",
-      services: [
-        { name: "Lash Lift", price: 60 },
-        { name: "Lash Tint", price: 25 },
-        { name: "Lash Extensions", price: 100 },
-      ]
-    }
-  ],
-  "Massage": [
-    {
-      name: "Massage Services",
-      services: [
-        { name: "Swedish Massage", price: 80 },
-        { name: "Deep Tissue Massage", price: 90 },
-        { name: "Hot Stone Massage", price: 100 },
-        { name: "Couples Massage", price: 150 },
-      ]
-    }
-  ],
-  "Spa": [
-    {
-      name: "Spa Services",
-      services: [
-        { name: "Spa Day Package", price: 200 },
-        { name: "Body Wrap", price: 90 },
-        { name: "Aromatherapy Session", price: 70 },
-        { name: "Hydrotherapy", price: 80 },
-      ]
-    }
-  ],
-  "Gym & Fitness": [
-    {
-      name: "Fitness Services",
-      services: [
-        { name: "Monthly Membership", price: 50 },
-        { name: "Day Pass", price: 15 },
-        { name: "Group Class", price: 20 },
-        { name: "Personal Training Session", price: 60 },
-      ]
-    }
-  ],
-  "Personal Trainer": [
-    {
-      name: "Personal Training Services",
-      services: [
-        { name: "1-on-1 Session", price: 70 },
-        { name: "Nutrition Consultation", price: 50 },
-        { name: "Fitness Assessment", price: 40 },
-        { name: "10-Session Package", price: 600 },
-      ]
-    }
-  ],
-  "Therapy Centre": [
-    {
-      name: "Therapy Services",
-      services: [
-        { name: "Individual Therapy", price: 100 },
-        { name: "Couples Therapy", price: 130 },
-        { name: "Group Therapy", price: 50 },
-        { name: "Art Therapy", price: 80 },
-      ]
-    }
-  ],
-  "Tattoo & Piercing": [
-    {
-      name: "Tattoo Services",
-      services: [
-        { name: "Small Tattoo", price: 100 },
-        { name: "Medium Tattoo", price: 200 },
-        { name: "Large Tattoo", price: 400 },
-      ]
-    },
-    {
-      name: "Piercing Services",
-      services: [
-        { name: "Basic Piercing", price: 40 },
-        { name: "Complex Piercing", price: 60 },
-        { name: "Jewelry Change", price: 20 },
-      ]
-    }
-  ],
-  "Tanning Studio": [
-    {
-      name: "Tanning Services",
-      services: [
-        { name: "Single Session", price: 25 },
-        { name: "Monthly Package", price: 80 },
-        { name: "Spray Tan", price: 40 },
-      ]
-    }
-  ],
-  "Aesthetics": [
-    {
-      name: "Aesthetic Services",
-      services: [
-        { name: "Botox", price: 300 },
-        { name: "Dermal Fillers", price: 400 },
-        { name: "Chemical Peel", price: 150 },
-      ]
-    }
-  ],
-  "Weight Loss": [
-    {
-      name: "Weight Loss Services",
-      services: [
-        { name: "Consultation", price: 50 },
-        { name: "Monthly Program", price: 200 },
-        { name: "Body Composition Analysis", price: 30 },
-      ]
-    }
-  ]
-};
-
-// Teams by category
-const categoryTeams: Record<Category, TeamMember[]> = {
-  "Hair Salon": [
-    { name: "Emma Styles", profession: "Senior Stylist" },
-    { name: "Liam Cuts", profession: "Color Specialist" },
-    { name: "Olivia Shears", profession: "Junior Stylist" },
-  ],
-  "Nail Salon": [
-    { name: "Sophia Nails", profession: "Nail Technician" },
-    { name: "Ava Polish", profession: "Nail Artist" },
-    { name: "Mia Manicure", profession: "Pedicure Specialist" },
-  ],
-  "Waxing Salon": [
-    { name: "Isabella Smooth", profession: "Waxing Specialist" },
-    { name: "Ethan Strip", profession: "Body Waxing Expert" },
-    { name: "Charlotte Gentle", profession: "Facial Waxing Specialist" },
-  ],
-  "Beauty Salon": [
-    { name: "Amelia Glow", profession: "Makeup Artist" },
-    { name: "Harper Beauty", profession: "Skincare Specialist" },
-    { name: "Evelyn Lash", profession: "Lash Technician" },
-  ],
-  "Barbershop": [
-    { name: "Noah Razor", profession: "Master Barber" },
-    { name: "William Trim", profession: "Beard Specialist" },
-    { name: "James Clipper", profession: "Junior Barber" },
-  ],
-  "Eyebrows & Lashes": [
-    { name: "Sophia Arch", profession: "Brow Artist" },
-    { name: "Ava Lash", profession: "Lash Extension Specialist" },
-    { name: "Mia Tint", profession: "Brow and Lash Tinting Expert" },
-  ],
-  "Massage": [
-    { name: "Oliver Knead", profession: "Massage Therapist" },
-    { name: "Elijah Relax", profession: "Sports Massage Specialist" },
-    { name: "Charlotte Zen", profession: "Hot Stone Massage Expert" },
-  ],
-  "Spa": [
-    { name: "Amelia Tranquil", profession: "Spa Manager" },
-    { name: "Harper Serene", profession: "Facial Specialist" },
-    { name: "Abigail Calm", profession: "Body Treatment Expert" },
-  ],
-  "Gym & Fitness": [
-    { name: "Lucas Muscle", profession: "Personal Trainer" },
-    { name: "Henry Cardio", profession: "Group Fitness Instructor" },
-    { name: "Evelyn Flex", profession: "Yoga Instructor" },
-  ],
-  "Personal Trainer": [
-    { name: "Alexander Fit", profession: "Strength Coach" },
-    { name: "Daniel Nutrition", profession: "Nutritionist" },
-    { name: "Sophia Endurance", profession: "Cardio Specialist" },
-  ],
-  "Therapy Centre": [
-    { name: "Benjamin Mind", profession: "Psychotherapist" },
-    { name: "Emily Counsel", profession: "Marriage Counselor" },
-    { name: "Michael Heal", profession: "Art Therapist" },
-  ],
-  "Tattoo & Piercing": [
-    { name: "Liam Ink", profession: "Tattoo Artist" },
-    { name: "Olivia Pierce", profession: "Body Piercing Specialist" },
-    { name: "Noah Design", profession: "Custom Tattoo Designer" },
-  ],
-  "Tanning Studio": [
-    { name: "Summer Glow", profession: "Tanning Specialist" },
-    { name: "Ray Bronze", profession: "Spray Tan Expert" },
-    { name: "Dawn Sun", profession: "Tanning Consultant" },
-  ],
-  "Aesthetics": [
-    { name: "Grace Beauty", profession: "Aesthetic Nurse" },
-    { name: "Claire Skin", profession: "Dermatologist" },
-    { name: "Rose Youth", profession: "Cosmetic Specialist" },
-  ],
-  "Weight Loss": [
-    { name: "Fit Coach", profession: "Weight Loss Specialist" },
-    { name: "Health Guide", profession: "Nutritionist" },
-    { name: "Slim Expert", profession: "Fitness Trainer" },
-  ],
+// Category Images
+export const categoryImages: Record<BusinessCategory, string> = {
+  "hair_salon": "https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+  "nail_salon": "https://images.unsplash.com/photo-1604654894610-df63bc536371?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+  "waxing_salon": "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+  "beauty_salon": "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+  "barbershop": "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+  "eyebrows_and_lashes": "https://images.unsplash.com/photo-1562322140-8baeececf3df?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+  "massage": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+  "spa": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+  "gym_and_fitness": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+  "personal_trainer": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+  "therapy_centre": "https://images.unsplash.com/photo-1598257006458-087169a1f08d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+  "tattoo_and_piercing": "https://images.unsplash.com/photo-1598371839696-5c5bb00bdc28?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+  "tanning_studio": "https://images.unsplash.com/photo-1607008829749-c0f284a49fc4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+  "aesthetics": "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+  "weight_loss": "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
 };
 
 // Sample offers
-export const businessOffers: BusinessOffer[] = [
+export const businessOffers: object[] = [
   {
     id: '1',
     businessId: '2', // Tranquil Waters Spa
@@ -313,7 +30,7 @@ export const businessOffers: BusinessOffer[] = [
     discountedPrice: 99,
     discountPercentage: 34,
     validUntil: '2024-08-31',
-    imageUrl: categoryImages["Spa"],
+    imageUrl: categoryImages["spa"],
     category: 'Spa Package'
   },
   {
@@ -325,7 +42,7 @@ export const businessOffers: BusinessOffer[] = [
     discountedPrice: 149,
     discountPercentage: 25,
     validUntil: '2024-07-31',
-    imageUrl: categoryImages["Hair Salon"],
+    imageUrl: categoryImages["hair_salon"],
     category: 'Hair Package'
   },
   {
@@ -337,24 +54,25 @@ export const businessOffers: BusinessOffer[] = [
     discountedPrice: 199,
     discountPercentage: 33,
     validUntil: '2024-06-30',
-    imageUrl: categoryImages["Gym & Fitness"],
+    imageUrl: categoryImages["gym_and_fitness"],
     category: 'Fitness Package'
   }
 ];
 
 // Sample businesses
-export const businesses: Business[] = [
+export const businesses: (Business & { rating: number, reviewCount: number })[] = [
   {
     id: "1",
     name: "Luxe Hair Studio",
     description: "Premium hair salon offering cutting-edge styles and treatments",
-    category: "Hair Salon",
+    category: "hair_salon",
     rating: 4.8,
     reviewCount: 128,
-    priceRange: "$$$",
-    imageUrl: categoryImages["Hair Salon"],
-    isPremium: true,
-    createdAt: "2023-08-15T00:00:00Z",
+    price_range: 3,
+    cover_picture: categoryImages["hair_salon"],
+    profile_picture: categoryImages["hair_salon"],
+    is_premium: true,
+    created_at: "2023-08-15T00:00:00Z",
     location: {
       address: "Rruga Myslym Shyri",
       city: "Tiranë",
@@ -386,7 +104,7 @@ export const businesses: Business[] = [
     amenities: ["Free WiFi", "Complimentary Beverages", "Parking"],
     tags: ["Hair", "Beauty", "Salon"],
     galleryImages: [
-      categoryImages["Hair Salon"]
+      categoryImages["hair_salon"]
     ],
     socialMedia: {
       instagram: "@luxehair",
@@ -397,13 +115,14 @@ export const businesses: Business[] = [
     id: "2",
     name: "Zen Massage & Spa",
     description: "Luxurious massage and spa treatments for ultimate relaxation",
-    category: "Spa",
+    category: "spa",
     rating: 4.9,
     reviewCount: 256,
-    priceRange: "$$$$",
-    imageUrl: categoryImages["Spa"],
-    isPremium: true,
-    createdAt: "2023-11-15T00:00:00Z",
+    price_range: 4,
+    cover_picture: categoryImages["spa"],
+    profile_picture: categoryImages["spa"],
+    is_premium: true,
+    created_at: "2023-11-15T00:00:00Z",
     location: {
       address: "Rruga e Kavajës",
       city: "Tiranë",
@@ -435,7 +154,7 @@ export const businesses: Business[] = [
     ],
     amenities: ["Sauna", "Steam Room", "Robes Provided", "Shower Facilities"],
     tags: ["Massage", "Spa", "Wellness"],
-    galleryImages: [categoryImages["Spa"]],
+    galleryImages: [categoryImages["spa"]],
     socialMedia: {
       instagram: "@zenspa",
       facebook: "zenspatirana"
@@ -445,13 +164,14 @@ export const businesses: Business[] = [
     id: "3",
     name: "Blloku Fitness Center",
     description: "Modern gym with state-of-the-art equipment and expert trainers",
-    category: "Gym & Fitness",
+    category: "gym_and_fitness",
     rating: 4.7,
     reviewCount: 189,
-    priceRange: "$$",
-    imageUrl: categoryImages["Gym & Fitness"],
-    isPremium: false,
-    createdAt: "2023-10-01T00:00:00Z",
+    price_range: 2,
+    cover_picture: categoryImages["gym_and_fitness"], 
+    profile_picture: categoryImages["gym_and_fitness"],
+    is_premium: false,
+    created_at: "2023-10-01T00:00:00Z",
     location: {
       address: "Blloku",
       city: "Tiranë",
@@ -483,7 +203,7 @@ export const businesses: Business[] = [
     ],
     amenities: ["Towel Service", "Lockers", "Showers", "Protein Bar"],
     tags: ["Fitness", "Gym", "Training"],
-    galleryImages: [categoryImages["Gym & Fitness"]],
+    galleryImages: [categoryImages["gym_and_fitness"]],
     socialMedia: {
       instagram: "@blokufitness",
       facebook: "blokufitnesstirana"
