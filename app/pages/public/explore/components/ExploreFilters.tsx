@@ -44,7 +44,7 @@ export function ExploreFilters({ categories }: ExploreFiltersProps) {
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
         <Input
           placeholder="Search businesses..."
-          className="w-full pl-10 pr-4"
+          className="w-full pl-10 pr-4 bg-white"
           defaultValue={searchParams.get("search") ?? ""}
           onChange={(e) => {
             router.push(`/pages/public/explore?search=${e.target.value}`)

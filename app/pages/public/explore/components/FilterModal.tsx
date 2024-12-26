@@ -90,7 +90,7 @@ export function FilterModal({ categories }: FilterModalProps) {
         <Button 
           variant="outline" 
           size="icon" 
-          className="shrink-0 hover:bg-gray-100 transition-colors"
+          className="shrink-0 hover:bg-gray-100 transition-colors bg-white"
         >
           <SlidersHorizontal className="h-4 w-4 text-gray-700" />
         </Button>
