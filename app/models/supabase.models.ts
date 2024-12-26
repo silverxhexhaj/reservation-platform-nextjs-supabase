@@ -22,7 +22,17 @@ export type BusinessCategory =
   | 'tattoo_and_piercing'
   | 'tanning_studio'
   | 'aesthetics'
-  | 'weight_loss';
+  | 'weight_loss'
+  | 'yoga_studio'
+  | 'pilates_studio'
+  | 'dental_clinic'
+  | 'chiropractor'
+  | 'physiotherapy'
+  | 'acupuncture'
+  | 'meditation_centre'
+  | 'wellness_centre'
+  | 'makeup_artist'
+  | 'hair_removal';
 
 export const businessCategories: BusinessCategory[] = [
   'hair_salon',
@@ -39,7 +49,17 @@ export const businessCategories: BusinessCategory[] = [
   'tattoo_and_piercing',
   'tanning_studio',
   'aesthetics',
-  'weight_loss'
+  'weight_loss',
+  'yoga_studio',
+  'pilates_studio',
+  'dental_clinic',
+  'chiropractor',
+  'physiotherapy',
+  'acupuncture',
+  'meditation_centre',
+  'wellness_centre',
+  'makeup_artist',
+  'hair_removal'
 ];
 
 

@@ -1,5 +1,5 @@
 import { ReactElement } from 'react';
-import { Scissors, Heart, Sun, Eye, Dumbbell, Syringe } from 'lucide-react';
+import { Scissors, Heart, Sun, Eye, Dumbbell, Syringe, Yoga, Flower2, Tooth, Activity, Stethoscope, Needle, Sparkles, Gem, Paintbrush, Zap } from 'lucide-react';
 import { BusinessCategory } from '@/app/models/supabase.models';
 
 // Types
@@ -74,30 +74,34 @@ export interface Business {
   };
 }
 
-export type CategoryIconType = 
-  | "scissors"
-  | "heart"
-  | "sun"
-  | "eye"
-  | "dumbbell"
-  | "syringe";
-  
+export type CategoryIconType = 'scissors' | 'heart' | 'sun' | 'eye' | 'dumbbell' | 'syringe' | 'yoga' | 'flower' | 'tooth' | 'activity' | 'stethoscope' | 'needle' | 'sparkles' | 'gem' | 'paintbrush' | 'zap';
+
 export const categoryToIcon: Record<BusinessCategory, CategoryIconType> = {
-  hair_salon: "scissors",
-  nail_salon: "heart",
-  waxing_salon: "sun", 
-  beauty_salon: "heart",
-  barbershop: "scissors",
-  eyebrows_and_lashes: "eye",
-  massage: "heart",
-  spa: "heart",
-  gym_and_fitness: "dumbbell",
-  personal_trainer: "dumbbell",
-  therapy_centre: "heart",
-  tattoo_and_piercing: "syringe",
-  tanning_studio: "sun",
-  aesthetics: "syringe",
-  weight_loss: "dumbbell"
+  hair_salon: 'scissors',
+  nail_salon: 'gem',
+  waxing_salon: 'sparkles',
+  beauty_salon: 'heart',
+  barbershop: 'scissors',
+  eyebrows_and_lashes: 'eye',
+  massage: 'flower',
+  spa: 'sparkles',
+  gym_and_fitness: 'dumbbell',
+  personal_trainer: 'activity',
+  therapy_centre: 'heart',
+  tattoo_and_piercing: 'needle',
+  tanning_studio: 'sun',
+  aesthetics: 'gem',
+  weight_loss: 'activity',
+  yoga_studio: 'yoga',
+  pilates_studio: 'yoga',
+  dental_clinic: 'tooth',
+  chiropractor: 'stethoscope',
+  physiotherapy: 'activity',
+  acupuncture: 'needle',
+  meditation_centre: 'flower',
+  wellness_centre: 'sparkles',
+  makeup_artist: 'paintbrush',
+  hair_removal: 'zap'
 };
 
 // Category Images
@@ -116,7 +120,17 @@ export const categoryImages: Record<BusinessCategory, string> = {
   tattoo_and_piercing: "https://images.unsplash.com/photo-1598371839696-5c5bb00bdc28?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
   tanning_studio: "https://images.unsplash.com/photo-1607008829749-c0f284a49fc4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
   aesthetics: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
-  weight_loss: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+  weight_loss: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+  yoga_studio: "https://images.unsplash.com/photo-1588286840104-8957b019727f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+  pilates_studio: "https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+  dental_clinic: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+  chiropractor: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+  physiotherapy: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+  acupuncture: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+  meditation_centre: "https://images.unsplash.com/photo-1536623975707-c4b3b2af565d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+  wellness_centre: "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+  makeup_artist: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+  hair_removal: "https://images.unsplash.com/photo-1598331668826-20cecc596b86?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80"
 }; 
 
 // Helper function to format category display names

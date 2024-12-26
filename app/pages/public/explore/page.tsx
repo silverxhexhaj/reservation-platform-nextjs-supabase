@@ -29,7 +29,17 @@ const categoryBackgrounds: Record<BusinessCategory, string> = {
   tattoo_and_piercing: 'bg-zinc-900/10',
   tanning_studio: 'bg-amber-800/10',
   aesthetics: 'bg-indigo-900/10',
-  weight_loss: 'bg-cyan-900/10'
+  weight_loss: 'bg-cyan-900/10',
+  yoga_studio: 'bg-green-900/10',
+  pilates_studio: 'bg-lime-900/10',
+  dental_clinic: 'bg-blue-900/10',
+  chiropractor: 'bg-sky-900/10',
+  physiotherapy: 'bg-red-900/10',
+  acupuncture: 'bg-yellow-900/10',
+  meditation_centre: 'bg-purple-800/10',
+  wellness_centre: 'bg-emerald-800/10',
+  makeup_artist: 'bg-pink-800/10',
+  hair_removal: 'bg-rose-800/10'
 };
 
 const categoryBorders: Record<BusinessCategory, string> = {
@@ -47,7 +57,17 @@ const categoryBorders: Record<BusinessCategory, string> = {
   tattoo_and_piercing: 'border-zinc-900',
   tanning_studio: 'border-amber-800',
   aesthetics: 'border-indigo-900',
-  weight_loss: 'border-cyan-900'
+  weight_loss: 'border-cyan-900',
+  yoga_studio: 'border-green-900',
+  pilates_studio: 'border-lime-900',
+  dental_clinic: 'border-blue-900',
+  chiropractor: 'border-sky-900',
+  physiotherapy: 'border-red-900',
+  acupuncture: 'border-yellow-900',
+  meditation_centre: 'border-purple-800',
+  wellness_centre: 'border-emerald-800',
+  makeup_artist: 'border-pink-800',
+  hair_removal: 'border-rose-800'
 };
 
 export default function ExplorePage({
@@ -66,7 +86,11 @@ export default function ExplorePage({
     "hair_salon",
     "beauty_salon",
     "massage",
-    "nail_salon"
+    "nail_salon",
+    "yoga_studio",
+    "dental_clinic",
+    "wellness_centre",
+    "makeup_artist"
   ];
 
   useEffect(() => {
