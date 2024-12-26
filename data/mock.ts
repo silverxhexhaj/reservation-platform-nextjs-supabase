@@ -1,4 +1,5 @@
-import { Business, BusinessCategory } from "@/app/models/supabase.models";
+import { Business } from "@/data";
+import { BusinessCategory } from "@/app/models/supabase.models";
 
 // Category Images
 export const categoryImages: Record<BusinessCategory, string> = {
@@ -60,7 +61,7 @@ export const businessOffers: object[] = [
 ];
 
 // Sample businesses
-export const businesses: (Business & { rating: number, reviewCount: number })[] = [
+export const businesses: Business[] = [
   {
     id: "1",
     name: "Luxe Hair Studio",
@@ -68,11 +69,10 @@ export const businesses: (Business & { rating: number, reviewCount: number })[] 
     category: "hair_salon",
     rating: 4.8,
     reviewCount: 128,
-    price_range: 3,
-    cover_picture: categoryImages["hair_salon"],
-    profile_picture: categoryImages["hair_salon"],
-    is_premium: true,
-    created_at: "2023-08-15T00:00:00Z",
+    priceRange: "$$$",
+    imageUrl: categoryImages["hair_salon"],
+    isPremium: true,
+    createdAt: "2023-08-15T00:00:00Z",
     location: {
       address: "Rruga Myslym Shyri",
       city: "Tiranë",
@@ -118,11 +118,10 @@ export const businesses: (Business & { rating: number, reviewCount: number })[] 
     category: "spa",
     rating: 4.9,
     reviewCount: 256,
-    price_range: 4,
-    cover_picture: categoryImages["spa"],
-    profile_picture: categoryImages["spa"],
-    is_premium: true,
-    created_at: "2023-11-15T00:00:00Z",
+    priceRange: "$$$$",
+    imageUrl: categoryImages["spa"],
+    isPremium: true,
+    createdAt: "2023-11-15T00:00:00Z",
     location: {
       address: "Rruga e Kavajës",
       city: "Tiranë",
@@ -167,11 +166,10 @@ export const businesses: (Business & { rating: number, reviewCount: number })[] 
     category: "gym_and_fitness",
     rating: 4.7,
     reviewCount: 189,
-    price_range: 2,
-    cover_picture: categoryImages["gym_and_fitness"], 
-    profile_picture: categoryImages["gym_and_fitness"],
-    is_premium: false,
-    created_at: "2023-10-01T00:00:00Z",
+    priceRange: "$$",
+    imageUrl: categoryImages["gym_and_fitness"],
+    isPremium: false,
+    createdAt: "2023-10-01T00:00:00Z",
     location: {
       address: "Blloku",
       city: "Tiranë",
@@ -207,6 +205,155 @@ export const businesses: (Business & { rating: number, reviewCount: number })[] 
     socialMedia: {
       instagram: "@blokufitness",
       facebook: "blokufitnesstirana"
+    }
+  },
+  {
+    id: "4",
+    name: "Glow Beauty Studio",
+    description: "Expert beauty treatments and skincare services in a luxurious setting",
+    category: "beauty_salon",
+    rating: 4.6,
+    reviewCount: 167,
+    priceRange: "$$$",
+    imageUrl: categoryImages["beauty_salon"],
+    isPremium: true,
+    createdAt: "2024-01-15T00:00:00Z",
+    location: {
+      address: "Rruga Ibrahim Rugova",
+      city: "Tiranë",
+      state: "AL",
+      zip: "1001"
+    },
+    hours: {
+      monday: { open: "10:00", close: "19:00" },
+      tuesday: { open: "10:00", close: "19:00" },
+      wednesday: { open: "10:00", close: "19:00" },
+      thursday: { open: "10:00", close: "20:00" },
+      friday: { open: "10:00", close: "20:00" },
+      saturday: { open: "09:00", close: "17:00" }
+    },
+    services: [
+      {
+        id: "s7",
+        name: "Facial Treatment",
+        price: 95,
+        duration: 75
+      },
+      {
+        id: "s8",
+        name: "Makeup Session",
+        price: 80,
+        duration: 60
+      }
+    ],
+    amenities: ["Luxury Lounge", "Skincare Products", "Free WiFi"],
+    tags: ["Beauty", "Skincare", "Makeup"],
+    galleryImages: [
+      categoryImages["beauty_salon"]
+    ],
+    socialMedia: {
+      instagram: "@glowbeauty",
+      facebook: "glowbeautytirana"
+    }
+  },
+  {
+    id: "5",
+    name: "Elite Fitness Center",
+    description: "State-of-the-art gym equipment and personalized training programs",
+    category: "gym_and_fitness",
+    rating: 4.5,
+    reviewCount: 203,
+    priceRange: "$$",
+    imageUrl: categoryImages["gym_and_fitness"],
+    isPremium: false,
+    createdAt: "2023-12-01T00:00:00Z",
+    location: {
+      address: "Rruga Sami Frashëri",
+      city: "Tiranë",
+      state: "AL",
+      zip: "1001"
+    },
+    hours: {
+      monday: { open: "06:00", close: "22:00" },
+      tuesday: { open: "06:00", close: "22:00" },
+      wednesday: { open: "06:00", close: "22:00" },
+      thursday: { open: "06:00", close: "22:00" },
+      friday: { open: "06:00", close: "21:00" },
+      saturday: { open: "07:00", close: "20:00" },
+      sunday: { open: "08:00", close: "18:00" }
+    },
+    services: [
+      {
+        id: "s9",
+        name: "Personal Training",
+        price: 45,
+        duration: 60
+      },
+      {
+        id: "s10",
+        name: "Group Fitness Class",
+        price: 20,
+        duration: 45
+      }
+    ],
+    amenities: ["Modern Equipment", "Locker Rooms", "Showers", "Towel Service"],
+    tags: ["Fitness", "Gym", "Personal Training"],
+    galleryImages: [
+      categoryImages["gym_and_fitness"]
+    ],
+    socialMedia: {
+      instagram: "@elitefitness",
+      facebook: "elitefitnessalbania"
+    }
+  },
+  {
+    id: "6",
+    name: "Serenity Massage & Wellness",
+    description: "Therapeutic massage and holistic wellness treatments",
+    category: "massage",
+    rating: 4.9,
+    reviewCount: 142,
+    priceRange: "$$$$",
+    imageUrl: categoryImages["massage"],
+    isPremium: true,
+    createdAt: "2023-11-01T00:00:00Z",
+    location: {
+      address: "Rruga Abdyl Frashëri",
+      city: "Tiranë",
+      state: "AL",
+      zip: "1001"
+    },
+    hours: {
+      monday: { open: "09:00", close: "20:00" },
+      tuesday: { open: "09:00", close: "20:00" },
+      wednesday: { open: "09:00", close: "20:00" },
+      thursday: { open: "09:00", close: "20:00" },
+      friday: { open: "09:00", close: "21:00" },
+      saturday: { open: "10:00", close: "18:00" },
+      sunday: { open: "10:00", close: "16:00" }
+    },
+    services: [
+      {
+        id: "s11",
+        name: "Deep Tissue Massage",
+        price: 110,
+        duration: 60
+      },
+      {
+        id: "s12",
+        name: "Hot Stone Therapy",
+        price: 130,
+        duration: 90
+      }
+    ],
+    amenities: ["Aromatherapy", "Tea Service", "Private Rooms", "Shower Facilities"],
+    tags: ["Massage", "Wellness", "Spa"],
+    galleryImages: [
+      categoryImages["massage"]
+    ],
+    socialMedia: {
+      instagram: "@serenitymassage",
+      facebook: "serenitymassagetirana"
     }
   }
 ]; 
