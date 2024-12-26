@@ -32,6 +32,24 @@ const categoryBackgrounds: Record<BusinessCategory, string> = {
   weight_loss: 'bg-cyan-900/10'
 };
 
+const categoryBorders: Record<BusinessCategory, string> = {
+  hair_salon: 'border-amber-900',
+  nail_salon: 'border-pink-900',
+  waxing_salon: 'border-purple-900',
+  beauty_salon: 'border-rose-900',
+  barbershop: 'border-orange-900',
+  eyebrows_and_lashes: 'border-fuchsia-900',
+  massage: 'border-violet-900',
+  spa: 'border-emerald-900',
+  gym_and_fitness: 'border-neutral-900',
+  personal_trainer: 'border-slate-900',
+  therapy_centre: 'border-teal-900',
+  tattoo_and_piercing: 'border-zinc-900',
+  tanning_studio: 'border-amber-800',
+  aesthetics: 'border-indigo-900',
+  weight_loss: 'border-cyan-900'
+};
+
 export default function ExplorePage({
   searchParams,
 }: {
@@ -57,68 +75,88 @@ export default function ExplorePage({
   }, [searchParams.category, searchParams.search]);
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-500 ${selectedCategory ? categoryBackgrounds[selectedCategory as BusinessCategory] : 'bg-white'}`}>
-      <div className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-500 ${selectedCategory ? categoryBackgrounds[selectedCategory as BusinessCategory] : 'bg-white'}`}>
+    <div className="min-h-screen flex flex-col bg-white">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white">
         <Header user={user} />
       </div>
       <main className="flex-grow pt-20">
-      
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="max-w-screen-2xl mx-auto px-4 py-4 md:py-8 space-y-4 md:space-y-6"
+          className="space-y-6 md:space-y-8"
         >
-          <motion.div variants={itemVariants}>
-            <h2 className="text-2xl md:text-3xl font-bold text-center text-neutral-900">Discover all services</h2>
-          </motion.div>
-        
-          <motion.div variants={itemVariants} className="w-full">
-            <Suspense fallback={<div>Loading filters...</div>}>
-              <ExploreFilters categories={[...businessCategories]} />
-            </Suspense>
-          </motion.div>
-
-        
-          <motion.div variants={itemVariants} className="w-full">
-            <div className="flex overflow-x-auto md:overflow-x-visible pb-2 -mb-2 scrollbar-hide space-x-4 md:space-x-6">
-              <motion.div variants={itemVariants} custom={-1} className="flex-shrink-0">
-                <Link href="/pages/public/explore" className="block w-[120px]">
-                  <Button variant="outline" className="w-full h-[80px] bg-white flex flex-col items-center justify-center p-2 space-y-2 hover:bg-gray-50 border-gray-200 transition-all duration-300 hover:scale-105">
-                    <CategoryIcon icon="heart" className="w-5 h-5" />
-                    <span className="text-xs font-medium text-gray-700 text-center truncate w-full">All Services</span>
-                  </Button>
-                </Link>
+          {/* Hero Section */}
+          <motion.div 
+            variants={itemVariants}
+            className={`h-[380px] mx-auto relative mb-8 transition-colors duration-500 flex flex-col justify-center
+              ${selectedCategory ? categoryBackgrounds[selectedCategory as BusinessCategory] : 'bg-gradient-to-r from-neutral-50 to-neutral-100'}`}
+          >
+            <div className="space-y-8 max-w-screen-2xl mx-auto">
+              <motion.div variants={itemVariants} className="max-w-3xl px-6 mx-auto space-y-2 text-center">
+                <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 tracking-tight">
+                  Find and Book Local Services
+                </h1>
+                <p className="text-neutral-600 text-lg">
+                  Discover and connect with the best service providers in your area
+                </p>
               </motion.div>
-              {popularCategories.map((category, index) => {
-                const slug = category.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-');
-                return (
-                  <motion.div
-                    key={category}
-                    variants={itemVariants}
-                    custom={index}
-                    className="flex-shrink-0"
-                  >
-                    <Link
-                      href={`/pages/public/explore?category=${slug}`}
-                      className="block w-[120px]"
-                    >
-                      <Button
-                        variant="outline"
-                        className="w-full h-[80px] bg-white flex flex-col items-center justify-center p-2 space-y-2 hover:bg-gray-50 border-gray-200 transition-all duration-300 hover:scale-105"
+
+              <motion.div variants={itemVariants} className="w-full max-w-2xl mx-auto">
+                <Suspense fallback={<div>Loading filters...</div>}>
+                  <ExploreFilters categories={[...businessCategories]} />
+                </Suspense>
+              </motion.div>
+
+              {/* Categories Section */}
+              <motion.div variants={itemVariants} className="w-full flex-1">
+                <div className="flex overflow-x-auto md:overflow-x-visible pb-2 -mb-2 scrollbar-hide space-x-4 md:space-x-6">
+                  <motion.div variants={itemVariants} custom={-1} className="flex-shrink-0">
+                    <Link href="/pages/public/explore" className="block w-[120px]">
+                      <Button 
+                        variant="outline" 
+                        className={`w-full h-[80px] flex flex-col items-center justify-center p-2 space-y-2 transition-all duration-300 hover:scale-105 border bg-white
+                          ${!selectedCategory ? 'border-neutral-900' : 'border-gray-200 hover:bg-gray-50'}`}
                       >
-                        <CategoryIcon icon={categoryToIcon[category as BusinessCategory]} className="w-5 h-5" />
-                        <span className="text-xs font-medium text-gray-700 text-center truncate w-full">{category.replace(/_/g, ' ')}</span>
+                        <CategoryIcon icon="heart" className="w-5 h-5" />
+                        <span className="text-xs font-medium text-gray-700 text-center truncate w-full">All Services</span>
                       </Button>
                     </Link>
                   </motion.div>
-                );
-              })}
+                  {popularCategories.map((category, index) => {
+                    const slug = category.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-');
+                    const isActive = selectedCategory === slug;
+                    return (
+                      <motion.div
+                        key={category}
+                        variants={itemVariants}
+                        custom={index}
+                        className="flex-shrink-0"
+                      >
+                        <Link
+                          href={`/pages/public/explore?category=${slug}`}
+                          className="block w-[120px]"
+                        >
+                          <Button
+                            variant="outline"
+                            className={`w-full h-[80px] flex flex-col items-center justify-center p-2 space-y-2 transition-all duration-300 hover:scale-105 border bg-white
+                              ${isActive 
+                                ? `${categoryBorders[category as BusinessCategory]}` 
+                                : 'border-gray-200 hover:bg-gray-50'}`}
+                          >
+                            <CategoryIcon icon={categoryToIcon[category as BusinessCategory]} className="w-5 h-5" />
+                            <span className="text-xs font-medium text-gray-700 text-center truncate w-full">{category.replace(/_/g, ' ')}</span>
+                          </Button>
+                        </Link>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </motion.div>
             </div>
           </motion.div>
 
-    
-          <motion.div variants={itemVariants} className="w-full">
+          <motion.div variants={itemVariants} className="w-full max-w-screen-2xl px-6 mx-auto">
             <Suspense fallback={<div>Loading businesses...</div>}>
               <BusinessesCollection searchParams={{
                 category: selectedCategory,
