@@ -31,7 +31,8 @@ export const businessOffers: object[] = [
     discountedPrice: 99,
     discountPercentage: 34,
     validUntil: '2024-08-31',
-    imageUrl: categoryImages["spa"],
+    cover_picture: categoryImages["spa"],
+    profile_picture: categoryImages["spa"],
     category: 'Spa Package'
   },
   {
@@ -43,7 +44,8 @@ export const businessOffers: object[] = [
     discountedPrice: 149,
     discountPercentage: 25,
     validUntil: '2024-07-31',
-    imageUrl: categoryImages["hair_salon"],
+    cover_picture: categoryImages["hair_salon"],
+    profile_picture: categoryImages["hair_salon"],
     category: 'Hair Package'
   },
   {
@@ -55,7 +57,8 @@ export const businessOffers: object[] = [
     discountedPrice: 199,
     discountPercentage: 33,
     validUntil: '2024-06-30',
-    imageUrl: categoryImages["gym_and_fitness"],
+    cover_picture: categoryImages["gym_and_fitness"],
+    profile_picture: categoryImages["gym_and_fitness"],
     category: 'Fitness Package'
   }
 ];
@@ -70,7 +73,8 @@ export const businesses: Business[] = [
     rating: 4.8,
     reviewCount: 128,
     priceRange: "$$$",
-    imageUrl: categoryImages["hair_salon"],
+    cover_picture: categoryImages["hair_salon"],
+    profile_picture: categoryImages["hair_salon"],
     isPremium: true,
     createdAt: "2023-08-15T00:00:00Z",
     location: {
@@ -119,7 +123,8 @@ export const businesses: Business[] = [
     rating: 4.9,
     reviewCount: 256,
     priceRange: "$$$$",
-    imageUrl: categoryImages["spa"],
+    cover_picture: categoryImages["spa"],
+    profile_picture: categoryImages["spa"],
     isPremium: true,
     createdAt: "2023-11-15T00:00:00Z",
     location: {
@@ -167,7 +172,8 @@ export const businesses: Business[] = [
     rating: 4.7,
     reviewCount: 189,
     priceRange: "$$",
-    imageUrl: categoryImages["gym_and_fitness"],
+    cover_picture: categoryImages["gym_and_fitness"],
+    profile_picture: categoryImages["gym_and_fitness"],
     isPremium: false,
     createdAt: "2023-10-01T00:00:00Z",
     location: {
@@ -215,7 +221,8 @@ export const businesses: Business[] = [
     rating: 4.6,
     reviewCount: 167,
     priceRange: "$$$",
-    imageUrl: categoryImages["beauty_salon"],
+    cover_picture: categoryImages["beauty_salon"],
+    profile_picture: categoryImages["beauty_salon"],
     isPremium: true,
     createdAt: "2024-01-15T00:00:00Z",
     location: {
@@ -264,7 +271,8 @@ export const businesses: Business[] = [
     rating: 4.5,
     reviewCount: 203,
     priceRange: "$$",
-    imageUrl: categoryImages["gym_and_fitness"],
+    cover_picture: categoryImages["gym_and_fitness"],
+    profile_picture: categoryImages["gym_and_fitness"],
     isPremium: false,
     createdAt: "2023-12-01T00:00:00Z",
     location: {
@@ -314,7 +322,8 @@ export const businesses: Business[] = [
     rating: 4.9,
     reviewCount: 142,
     priceRange: "$$$$",
-    imageUrl: categoryImages["massage"],
+    cover_picture: categoryImages["massage"],
+    profile_picture: categoryImages["massage"],
     isPremium: true,
     createdAt: "2023-11-01T00:00:00Z",
     location: {
