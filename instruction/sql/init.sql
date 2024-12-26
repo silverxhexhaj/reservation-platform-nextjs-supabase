@@ -19,11 +19,9 @@ DROP TABLE IF EXISTS clients CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
 DROP TABLE IF EXISTS staff_services CASCADE;
 DROP TABLE IF EXISTS points_transactions CASCADE;
-DROP TABLE IF EXISTS client_profiles CASCADE;
-DROP TABLE IF EXISTS staff_profiles CASCADE;
+DROP TABLE IF EXISTS profiles CASCADE;
 DROP TYPE IF EXISTS profile_type CASCADE;
 DROP TYPE IF EXISTS business_category CASCADE;
-
 
 -- Drop enums if they exist
 DROP TYPE IF EXISTS payment_status CASCADE;
