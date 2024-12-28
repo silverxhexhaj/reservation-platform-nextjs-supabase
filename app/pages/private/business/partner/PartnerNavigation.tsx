@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 const menuItems = [
-  { name: 'Home', icon: Home, href: '/pages/private/business/partner' },
+  { name: 'Dashboard', icon: Home, href: '/pages/private/business/partner' },
   { name: 'Calendar', icon: Calendar, href: '/pages/private/business/partner/calendar' },
   { name: 'Calendar Beta', icon: Calendar, href: '/pages/private/business/partner/calendar-beta' },
   { name: 'Sales', icon: DollarSign, href: '/pages/private/business/partner/sales' },
@@ -25,9 +25,9 @@ export default function PartnerNavigation() {
 
   return (
     <aside className="w-80 bg-black text-white">
-      <div className="p-6">
+      <Link href="/pages/private/business/partner" className="block p-6 hover:bg-gray-900 transition-colors duration-200">
         <h2 className="text-2xl font-bold">Nooor <span className="text-blue-500 font-light">Partner</span></h2>
-      </div>
+      </Link>
       <nav className="mt-4 px-3">
         <ul>
           {menuItems.map((item) => {

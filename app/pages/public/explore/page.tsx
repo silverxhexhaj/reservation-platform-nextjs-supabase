@@ -113,10 +113,10 @@ export default function ExplorePage({
           {/* Hero Section */}
           <motion.div 
             variants={itemVariants}
-            className={`h-[380px] mx-auto relative mb-8 transition-colors duration-500 flex flex-col justify-center
+            className={`h-[380px] relative mb-8 transition-colors duration-500 flex flex-col justify-center
               ${selectedCategory ? categoryBackgrounds[selectedCategory as BusinessCategory] : 'bg-gradient-to-r from-neutral-50 to-neutral-100'}`}
           >
-            <div className="space-y-8 max-w-screen-2xl mx-auto">
+            <div className="space-y-8">
               <motion.div variants={itemVariants} className="max-w-3xl px-6 mx-auto space-y-2 text-center">
                 <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 tracking-tight">
                   Find and Book Local Services
@@ -133,7 +133,7 @@ export default function ExplorePage({
               </motion.div>
 
               {/* Categories Section */}
-              <motion.div variants={itemVariants} className="w-full flex-1">
+              <motion.div variants={itemVariants} className="w-full max-w-screen-2xl px-6 mx-auto">
                 <div className="flex overflow-x-auto md:overflow-x-visible pb-2 -mb-2 scrollbar-hide space-x-4 md:space-x-6">
                   <motion.div variants={itemVariants} custom={-1} className="flex-shrink-0">
                     <Link href="/pages/public/explore" className="block w-[120px]">
