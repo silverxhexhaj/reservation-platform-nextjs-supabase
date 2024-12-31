@@ -718,7 +718,7 @@ export default function BusinessDetailPage() {
                 priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-black/70 flex items-end">
-                <div className="p-8 text-white w-full max-w-screen-2xl mx-auto">
+                <div className="p-6 text-white w-full">
                   <h1 className="text-5xl font-bold mb-2">{business.name}</h1>
                   <p className="text-xl mb-4 opacity-90">{business.category}</p>
                   <div className="flex items-center justify-between space-x-4">
@@ -752,7 +752,7 @@ export default function BusinessDetailPage() {
 
 
 
-            <div className='max-w-screen-2xl mx-auto flex flex-col lg:flex-row lg:space-x-8 px-8'>
+            <div className='flex flex-col lg:flex-row lg:space-x-8 px-6'>
               <div className='flex-1 space-y-10 lg:order-first order-last'>
                 {/* Add Stories section here */}
                 <div className="">
@@ -1122,7 +1122,7 @@ export default function BusinessDetailPage() {
             </div>
             {/* Gallery Section */}
             {business.galleryImages && business.galleryImages.length > 0 && (
-              <section className="max-w-screen-2xl mx-auto px-8">
+              <section className="px-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-3xl font-semibold text-gray-800">Gallery</h2>
                   <button
@@ -1172,7 +1172,7 @@ export default function BusinessDetailPage() {
             )}
 
             {/* About Section */}
-            <section className="mb-20 mt-20 max-w-screen-2xl mx-auto px-8">
+            <section className="mb-20 mt-20 px-6">
               <h2 className="text-3xl font-semibold mb-6 text-gray-800">About Us</h2>
               <p className="text-gray-700 mb-6 text-lg">
                 {business.description} We are committed to providing top-notch services to our clients in a welcoming and professional environment.

@@ -117,7 +117,7 @@ export default function ExplorePage({
               ${selectedCategory ? categoryBackgrounds[selectedCategory as BusinessCategory] : 'bg-gradient-to-r from-neutral-50 to-neutral-100'}`}
           >
             <div className="space-y-8">
-              <motion.div variants={itemVariants} className="max-w-3xl px-6 mx-auto space-y-2 text-center">
+              <motion.div variants={itemVariants} className="px-8 space-y-2 text-center">
                 <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 tracking-tight">
                   Find and Book Local Services
                 </h1>
@@ -133,7 +133,7 @@ export default function ExplorePage({
               </motion.div>
 
               {/* Categories Section */}
-              <motion.div variants={itemVariants} className="w-full max-w-screen-2xl px-6 mx-auto">
+              <motion.div variants={itemVariants} className="w-full px-8">
                 <div className="flex overflow-x-auto md:overflow-x-visible pb-2 -mb-2 scrollbar-hide space-x-4 md:space-x-6">
                   <motion.div variants={itemVariants} custom={-1} className="flex-shrink-0">
                     <Link href="/pages/public/explore" className="block w-[120px]">
@@ -180,7 +180,7 @@ export default function ExplorePage({
             </div>
           </motion.div>
 
-          <motion.div variants={itemVariants} className="w-full max-w-screen-2xl px-6 mx-auto">
+          <motion.div variants={itemVariants} className="w-full px-8">
             <Suspense fallback={<div>Loading businesses...</div>}>
               <BusinessesCollection searchParams={{
                 category: selectedCategory,

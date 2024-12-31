@@ -462,7 +462,7 @@ export default function HomePage() {
           </div>
         </div>
 
-    
+        {/* Platform Statistics Section - Commented out
         <motion.section 
           variants={containerVariants}
           initial="hidden"
@@ -470,7 +470,7 @@ export default function HomePage() {
           viewport={{ once: true }}
           className="bg-gradient-to-r from-pink-600 to-red-600 py-16"
         >
-          <div className="max-w-screen-2xl mx-auto px-8">
+          <div className="px-8">
             <motion.h2 
               variants={itemVariants}
               className="text-3xl font-bold text-center mb-12 text-white"
@@ -487,6 +487,7 @@ export default function HomePage() {
             </div>
           </div>
         </motion.section>
+        */}
 
         {/* Platform Features Section */}
         <motion.section 
@@ -496,13 +497,7 @@ export default function HomePage() {
           viewport={{ once: true }}
           className="py-16 bg-white"
         >
-          <div className="max-w-screen-2xl mx-auto px-8">
-            <motion.h2 
-              variants={itemVariants}
-              className="text-3xl font-bold text-center mb-12 text-neutral-900"
-            >
-              Why Choose Nooor
-            </motion.h2>
+          <div className="px-8">
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {platformFeatures.map((feature, index) => (
                 <motion.div 

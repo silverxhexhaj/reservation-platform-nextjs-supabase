@@ -172,7 +172,7 @@ export function Header({ user }: HeaderProps) {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 will-change-height ${isScrolled || isMenuOpen ? 'bg-white h-20' : 'bg-transparent h-20'}`}>
-      <div className={`max-w-screen-2xl mx-auto px-6 flex justify-between items-center h-full transition-colors duration-300 ${isScrolled || isMenuOpen ? '' : ''}`}>
+      <div className={`px-6 flex justify-between items-center h-full transition-colors duration-300 ${isScrolled || isMenuOpen ? '' : ''}`}>
         <Link href="/" className={`text-4xl font-semibold md:w-80 ${bebasNeue.className} ${isScrolled || isMenuOpen ? 'text-black' : 'text-white'}`}>
           NOOOR
         </Link>
