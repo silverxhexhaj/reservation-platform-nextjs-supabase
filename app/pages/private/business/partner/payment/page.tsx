@@ -21,11 +21,15 @@ import {
   Settings2,
   Calendar,
   Wallet,
-  Plus
+  Plus,
+  User
 } from "lucide-react";
 import { format } from "date-fns";
 import { DatePickerWithRange } from "@/app/components/ui/date-range-picker";
 import { cn } from "@/lib/utils";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/app/components/ui/dropdown-menu";
+import { NewTransactionDialog } from './components/NewTransactionDialog';
 
 interface Transaction {
   id: string;
@@ -83,7 +87,8 @@ export default function PaymentPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
-  const [transactions] = useState<Transaction[]>(mockTransactions);
+  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
+  const [isNewTransactionOpen, setIsNewTransactionOpen] = useState(false);
 
   const stats = {
     totalRevenue: transactions
@@ -95,6 +100,10 @@ export default function PaymentPage() {
     lastPayout: transactions
       .filter(t => t.type === 'payout')
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]
+  };
+
+  const handleNewTransaction = (transaction: Transaction) => {
+    setTransactions(prev => [transaction, ...prev]);
   };
 
   const filteredTransactions = transactions.filter(transaction => {
@@ -125,15 +134,19 @@ export default function PaymentPage() {
           </Button>
           <Button 
             className="bg-blue-700 hover:bg-blue-800 text-white"
-            onClick={() => {
-              // Handle new transaction
-            }}
+            onClick={() => setIsNewTransactionOpen(true)}
           >
             <Plus className="h-4 w-4 mr-2" />
             New Transaction
           </Button>
         </div>
       </div>
+
+      <NewTransactionDialog
+        open={isNewTransactionOpen}
+        onOpenChange={setIsNewTransactionOpen}
+        onTransactionCreate={handleNewTransaction}
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -189,125 +202,163 @@ export default function PaymentPage() {
         </Card>
       </div>
 
-      {/* Filters and Actions */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="flex flex-1 gap-4 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-initial">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search transactions..."
-              className="pl-8 w-full sm:w-[300px]"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="booking">Bookings</SelectItem>
-              <SelectItem value="payout">Payouts</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="failed">Failed</SelectItem>
-            </SelectContent>
-          </Select>
-          <DatePickerWithRange className="w-[300px]" />
-        </div>
-        <div className="flex gap-2 w-full sm:w-auto">
-          <Button 
-            variant="outline"
-            size="icon"
-            className="h-10 w-10"
-            onClick={() => {
-              // Handle settings
-            }}
-          >
-            <Settings2 className="h-4 w-4" />
-          </Button>
-          <Button 
-            className="gap-2 bg-primary hover:bg-primary/90 text-white flex-1 sm:flex-initial"
-            onClick={() => {
-              // Handle export
-            }}
-          >
-            <Download className="h-4 w-4" />
-            Export
-          </Button>
-        </div>
-      </div>
-
-      {/* Transactions List */}
+      {/* Filters and Table Card */}
       <Card className="bg-white">
-        <ScrollArea className="h-[600px] rounded-md border">
-          <div className="p-4 space-y-4">
-            {filteredTransactions.map((transaction) => (
-              <div
-                key={transaction.id}
-                className="flex items-center justify-between p-4 rounded-lg border hover:bg-slate-50 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  <div className={cn(
-                    "h-10 w-10 rounded-full flex items-center justify-center",
-                    transaction.type === 'payout' 
-                      ? "bg-orange-100" 
-                      : "bg-primary/10"
-                  )}>
-                    {transaction.type === 'payout' 
-                      ? <Wallet className="h-5 w-5 text-orange-600" />
-                      : <DollarSign className="h-5 w-5 text-primary" />
-                    }
-                  </div>
-                  <div>
-                    <div className="font-medium">
-                      {transaction.type === 'payout' 
-                        ? 'Payout' 
-                        : transaction.customer?.name}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {transaction.description}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <div className={cn(
-                      "text-sm font-medium",
-                      transaction.type === 'payout' && "text-orange-600"
-                    )}>
-                      {transaction.type === 'payout' ? '-' : '+'}
-                      ${transaction.amount.toFixed(2)}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {format(new Date(transaction.date), "PP")}
-                    </div>
-                  </div>
-                  <div className={cn(
-                    "px-2.5 py-0.5 rounded-full text-xs font-medium",
-                    transaction.status === 'completed' && "bg-green-100 text-green-700",
-                    transaction.status === 'pending' && "bg-yellow-100 text-yellow-700",
-                    transaction.status === 'failed' && "bg-red-100 text-red-700"
-                  )}>
-                    {transaction.status}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {transaction.method}
-                  </div>
-                </div>
+        <CardContent className="p-0">
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between p-6">
+            <div className="flex flex-1 gap-4 w-full">
+              <div className="relative flex-1 sm:flex-initial">
+                <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search transactions..."
+                  className="pl-8 w-full sm:w-[300px]"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
-            ))}
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="booking">Bookings</SelectItem>
+                  <SelectItem value="payout">Payouts</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="failed">Failed</SelectItem>
+                </SelectContent>
+              </Select>
+              <DatePickerWithRange className="w-[300px]" />
+            </div>
           </div>
-        </ScrollArea>
+
+          {/* Transactions Table */}
+          <div className="">
+            <Table>
+              <TableHeader className="bg-slate-50">
+                <TableRow className="hover:bg-slate-50/50">
+                  <TableHead className="pl-6 font-medium">Transaction</TableHead>
+                  <TableHead className="font-medium">Type</TableHead>
+                  <TableHead className="font-medium">Status</TableHead>
+                  <TableHead className="font-medium">Amount</TableHead>
+                  <TableHead className="font-medium">Date</TableHead>
+                  <TableHead className="font-medium">Method</TableHead>
+                  <TableHead className="pr-6 text-right font-medium">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredTransactions.map((transaction) => (
+                  <TableRow 
+                    key={transaction.id}
+                    className="hover:bg-slate-50/50 transition-colors"
+                  >
+                    <TableCell className="pl-6">
+                      <div className="flex items-center gap-4">
+                        <div className={cn(
+                          "h-10 w-10 rounded-full flex items-center justify-center",
+                          transaction.type === 'payout' 
+                            ? "bg-orange-100" 
+                            : "bg-primary/10"
+                        )}>
+                          {transaction.type === 'payout' 
+                            ? <Wallet className="h-5 w-5 text-orange-600" />
+                            : <DollarSign className="h-5 w-5 text-primary" />
+                          }
+                        </div>
+                        <div>
+                          <div className="font-medium">
+                            {transaction.type === 'payout' 
+                              ? 'Payout' 
+                              : transaction.customer?.name}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {transaction.description}
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium capitalize">{transaction.type}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className={cn(
+                        "inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium",
+                        transaction.status === 'completed' && "bg-green-100 text-green-700",
+                        transaction.status === 'pending' && "bg-yellow-100 text-yellow-700",
+                        transaction.status === 'failed' && "bg-red-100 text-red-700"
+                      )}>
+                        {transaction.status}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className={cn(
+                        "font-medium",
+                        transaction.type === 'payout' && "text-orange-600"
+                      )}>
+                        {transaction.type === 'payout' ? '-' : '+'}
+                        ${transaction.amount.toFixed(2)}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm text-muted-foreground">
+                        {format(new Date(transaction.date), "PP")}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">{transaction.method}</div>
+                    </TableCell>
+                    <TableCell className="pr-6 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-100">
+                            <Settings2 className="h-4 w-4" />
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-white w-[180px]">
+                          <DropdownMenuItem 
+                            onClick={() => window.location.href = `/transactions/${transaction.id}`}
+                            className="hover:bg-slate-50 cursor-pointer flex items-center gap-2"
+                          >
+                            <Search className="h-4 w-4" />
+                            View Details
+                          </DropdownMenuItem>
+                          {transaction.type === 'booking' && transaction.customer && (
+                            <DropdownMenuItem 
+                              onClick={() => window.location.href = `/clients/${transaction.customer?.email}`}
+                              className="hover:bg-slate-50 cursor-pointer flex items-center gap-2"
+                            >
+                              <User className="h-4 w-4" />
+                              View Customer
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuSeparator className="bg-slate-100" />
+                          <DropdownMenuItem
+                            onClick={() => window.location.href = `/transactions/${transaction.id}/receipt`}
+                            className="hover:bg-slate-50 cursor-pointer flex items-center gap-2"
+                          >
+                            <Download className="h-4 w-4" />
+                            Download Receipt
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
       </Card>
     </div>
   );

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
-import { Plus, Search, Settings2, Star, Users2Icon, ActivityIcon, History } from "lucide-react";
+import { Plus, Search, Settings2, Star, Users2Icon, ActivityIcon, History, User, Trash2 } from "lucide-react";
 import { Input } from "@/app/components/ui/input";
 import {
   Select,
@@ -18,6 +18,9 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CreateClientDialog } from './components/CreateClientDialog';
 import type { Client } from './types';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/app/components/ui/table";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/app/components/ui/dropdown-menu";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/app/components/ui/alert-dialog";
 
 const clients: Client[] = [
   {
@@ -64,6 +67,8 @@ export default function Clients() {
   const [serviceFilter, setServiceFilter] = useState('all');
   const [clientsList, setClientsList] = useState<Client[]>(clients);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
 
   const filteredClients = clientsList.filter(client => {
     const matchesSearch = 
@@ -80,6 +85,29 @@ export default function Clients() {
     total: clientsList.length,
     active: clientsList.filter(c => c.status === 'active').length,
     returningRate: Math.round((clientsList.filter(c => c.totalAppointments > 1).length / clientsList.length) * 100)
+  };
+
+  const handleEditClient = (client: Client) => {
+    setSelectedClient(client);
+    setIsCreateDialogOpen(true);
+  };
+
+  const handleDeleteClick = (client: Client) => {
+    setClientToDelete(client);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (clientToDelete) {
+      setClientsList(prev => prev.filter(client => client.id !== clientToDelete.id));
+      setClientToDelete(null);
+    }
+  };
+
+  const handleClientUpdate = (updatedClient: Client) => {
+    setClientsList(prev => prev.map(client => 
+      client.id === updatedClient.id ? updatedClient : client
+    ));
+    setSelectedClient(null);
   };
 
   return (
@@ -140,104 +168,200 @@ export default function Clients() {
         </Card>
       </div>
 
-      {/* Filters and Actions */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="flex flex-1 gap-4 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-initial">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search clients..."
-              className="pl-8 w-full sm:w-[300px]"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <Select value={serviceFilter} onValueChange={setServiceFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Service" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Services</SelectItem>
-              <SelectItem value="Haircut & Styling">Haircut & Styling</SelectItem>
-              <SelectItem value="Beard Trim">Beard Trim</SelectItem>
-              <SelectItem value="Color Treatment">Color Treatment</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <Button 
-          className="gap-2 bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
-          onClick={() => setIsCreateDialogOpen(true)}
-        >
-          <Plus className="h-4 w-4" />
-          Add Client
-        </Button>
-      </div>
-
-      {/* Clients List */}
+      {/* Filters and Table Card */}
       <Card className="bg-white">
-        <ScrollArea className="h-[600px] rounded-md border">
-          <div className="p-4 space-y-4">
-            {filteredClients.map((client) => (
-              <div
-                key={client.id}
-                className="flex items-center justify-between p-4 rounded-lg border hover:bg-slate-50 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={client.avatar} alt={client.name} />
-                    <AvatarFallback>{client.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-medium">{client.name}</div>
-                    <div className="text-sm text-muted-foreground">{client.email}</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <div className="text-sm font-medium">{client.totalAppointments} visits</div>
-                    <div className="text-sm text-muted-foreground">
-                      Last visit: {format(new Date(client.lastVisit), "PP")}
-                    </div>
-                  </div>
-                  <div className={cn(
-                    "px-2.5 py-0.5 rounded-full text-xs font-medium",
-                    client.status === 'active' 
-                      ? "bg-green-100 text-green-700" 
-                      : "bg-gray-100 text-gray-700"
-                  )}>
-                    {client.status}
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium">${client.totalSpent}</div>
-                    <div className="text-xs text-muted-foreground">Total spent</div>
-                  </div>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <Settings2 className="h-4 w-4" />
-                  </Button>
-                </div>
+        <CardContent className="p-0">
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between p-6">
+            <div className="flex flex-1 gap-4 w-full">
+              <div className="relative flex-1 sm:flex-initial">
+                <Search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search clients..."
+                  className="pl-8 w-full sm:w-[300px]"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
-            ))}
+              <Select value={serviceFilter} onValueChange={setServiceFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Service" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Services</SelectItem>
+                  <SelectItem value="Haircut & Styling">Haircut & Styling</SelectItem>
+                  <SelectItem value="Beard Trim">Beard Trim</SelectItem>
+                  <SelectItem value="Color Treatment">Color Treatment</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-        </ScrollArea>
+
+          {/* Clients Table */}
+          <div className="">
+            <Table>
+              <TableHeader className="bg-slate-50">
+                <TableRow className="hover:bg-slate-50/50">
+                  <TableHead className="pl-6 font-medium">Client</TableHead>
+                  <TableHead className="font-medium">Phone</TableHead>
+                  <TableHead className="font-medium">Status</TableHead>
+                  <TableHead className="font-medium">Total Visits</TableHead>
+                  <TableHead className="font-medium">Last Visit</TableHead>
+                  <TableHead className="font-medium">Total Spent</TableHead>
+                  <TableHead className="pr-6 text-right font-medium">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredClients.map((client) => (
+                  <TableRow 
+                    key={client.id}
+                    className="hover:bg-slate-50/50 transition-colors"
+                  >
+                    <TableCell className="pl-6">
+                      <div className="flex items-center gap-4">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={client.avatar} alt={client.name} />
+                          <AvatarFallback>{client.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="font-medium">{client.name}</div>
+                          <div className="text-sm text-muted-foreground">{client.email}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{client.phone}</TableCell>
+                    <TableCell>
+                      <div className={cn(
+                        "inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium",
+                        client.status === 'active' 
+                          ? "bg-green-100 text-green-700" 
+                          : "bg-gray-100 text-gray-700"
+                      )}>
+                        {client.status}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium">{client.totalAppointments}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm text-muted-foreground">
+                        {format(new Date(client.lastVisit), "PP")}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium">${client.totalSpent}</div>
+                    </TableCell>
+                    <TableCell className="pr-6 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-100">
+                            <Settings2 className="h-4 w-4" />
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-white w-[180px]">
+                          <DropdownMenuItem 
+                            onClick={() => window.location.href = `/clients/${client.id}`}
+                            className="hover:bg-slate-50 cursor-pointer flex items-center gap-2"
+                          >
+                            <User className="h-4 w-4" />
+                            View Profile
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleEditClient(client)}
+                            className="hover:bg-slate-50 cursor-pointer flex items-center gap-2"
+                          >
+                            <Settings2 className="h-4 w-4" />
+                            Edit Details
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator className="bg-slate-100" />
+                          <DropdownMenuItem
+                            onClick={() => handleDeleteClick(client)}
+                            className="text-red-600 hover:bg-red-50 hover:text-red-700 cursor-pointer flex items-center gap-2"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Delete Client
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
       </Card>
 
       <CreateClientDialog
         open={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
-        onClientCreate={(newClient) => {
-          setClientsList(prev => [...prev, newClient]);
+        onOpenChange={(open) => {
+          setIsCreateDialogOpen(open);
+          if (!open) setSelectedClient(null);
         }}
+        onClientCreate={(clientData) => {
+          if (selectedClient) {
+            handleClientUpdate({ ...clientData, id: selectedClient.id });
+          } else {
+            setClientsList(prev => [...prev, clientData]);
+          }
+        }}
+        defaultValues={selectedClient}
       />
+
+      <AlertDialog 
+        open={!!clientToDelete} 
+        onOpenChange={(open: boolean) => {
+          if (!open) {
+            setClientToDelete(null);
+            document.body.style.pointerEvents = 'auto';
+            document.body.style.overflow = 'auto';
+          }
+        }}
+      >
+        <AlertDialogContent className="bg-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete{' '}
+              <span className="font-medium text-slate-900">{clientToDelete?.name}&apos;s</span> account
+              and remove their data from the system.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                setClientToDelete(null);
+                document.body.style.pointerEvents = 'auto';
+                document.body.style.overflow = 'auto';
+              }}
+              className="border-slate-200"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                handleDeleteConfirm();
+                document.body.style.pointerEvents = 'auto';
+                document.body.style.overflow = 'auto';
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete Client
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

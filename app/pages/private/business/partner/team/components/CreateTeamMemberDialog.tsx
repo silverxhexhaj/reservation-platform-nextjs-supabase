@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/app/components/ui/dialog";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
@@ -36,6 +36,7 @@ interface CreateTeamMemberDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onTeamMemberCreate: (member: TeamMember) => void;
+  defaultValues?: TeamMember | null;
 }
 
 const roles = [
@@ -48,6 +49,7 @@ export function CreateTeamMemberDialog({
   open,
   onOpenChange,
   onTeamMemberCreate,
+  defaultValues
 }: CreateTeamMemberDialogProps) {
   const [formData, setFormData] = useState<{
     name: string;
@@ -67,31 +69,48 @@ export function CreateTeamMemberDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openRoleCombobox, setOpenRoleCombobox] = useState(false);
 
+  // Initialize form with default values when editing
+  useEffect(() => {
+    if (defaultValues) {
+      setFormData({
+        name: defaultValues.name,
+        email: defaultValues.email,
+        role: defaultValues.role.toLowerCase(),
+        avatar: defaultValues.avatar,
+        status: defaultValues.status,
+        joinedDate: new Date(defaultValues.joinedDate),
+      });
+    }
+  }, [defaultValues]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      const newMember: TeamMember = {
-        id: Date.now().toString(),
+      const memberData: TeamMember = {
+        id: defaultValues?.id || Date.now().toString(),
         ...formData,
         joinedDate: formData.joinedDate.toISOString(),
-        rating: 0,
-        appointments: 0,
+        rating: defaultValues?.rating || 0,
+        appointments: defaultValues?.appointments || 0,
       };
 
-      onTeamMemberCreate(newMember);
+      onTeamMemberCreate(memberData);
       onOpenChange(false);
-      setFormData({
-        name: '',
-        email: '',
-        role: '',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + Math.random(),
-        status: 'active',
-        joinedDate: new Date(),
-      });
+      // Only reset form if not editing
+      if (!defaultValues) {
+        setFormData({
+          name: '',
+          email: '',
+          role: '',
+          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + Math.random(),
+          status: 'active',
+          joinedDate: new Date(),
+        });
+      }
     } catch (error) {
-      console.error('Error creating team member:', error);
+      console.error('Error saving team member:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -101,9 +120,9 @@ export function CreateTeamMemberDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] p-0 bg-white">
         <DialogHeader className="p-6 pb-0">
-          <DialogTitle>Add Team Member</DialogTitle>
+          <DialogTitle>{defaultValues ? 'Edit Team Member' : 'Add Team Member'}</DialogTitle>
           <DialogDescription>
-            Add a new team member to your organization.
+            {defaultValues ? 'Edit existing team member details.' : 'Add a new team member to your organization.'}
           </DialogDescription>
         </DialogHeader>
         
@@ -286,7 +305,7 @@ export function CreateTeamMemberDialog({
                 isSubmitting && "opacity-50 cursor-not-allowed"
               )}
             >
-              {isSubmitting ? "Creating..." : "Create Member"}
+              {isSubmitting ? (defaultValues ? "Saving..." : "Creating...") : (defaultValues ? "Save Changes" : "Create Member")}
             </Button>
           </div>
         </form>

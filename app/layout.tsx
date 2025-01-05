@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { Footer } from './components/Footer'
+import { FooterWrapper } from './components/FooterWrapper'
 import { sharedMetadata, sharedViewport } from './config/shared-metadata'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -35,7 +35,7 @@ export default function RootLayout({
           <div className="flex-grow">
             {children}
           </div>
-          <Footer />
+          <FooterWrapper />
         </div>
       </body>
     </html>
