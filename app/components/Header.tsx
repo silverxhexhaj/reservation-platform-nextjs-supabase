@@ -23,13 +23,13 @@ const bebasNeue = Bebas_Neue({
   subsets: ['latin'],
 });
 
-interface HeaderProps {
-  user?: { username: string } | null;
-}
+export function Header() {
+  
+  const user = null;
 
-export function Header({ user }: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
+  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 

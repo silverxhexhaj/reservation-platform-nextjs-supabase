@@ -1,322 +1,179 @@
 
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Drop tables if they exist (in reverse order of creation to handle dependencies)
-DROP TABLE IF EXISTS staff_working_hours CASCADE;
-DROP TABLE IF EXISTS payments CASCADE;
-DROP TABLE IF EXISTS bookings CASCADE;
-DROP TABLE IF EXISTS redeemed_rewards CASCADE;
-DROP TABLE IF EXISTS rewards CASCADE;
-DROP TABLE IF EXISTS loyalty_points CASCADE;
-DROP TABLE IF EXISTS deals CASCADE;
-DROP TABLE IF EXISTS campaigns CASCADE;
-DROP TABLE IF EXISTS products CASCADE;
-DROP TABLE IF EXISTS services CASCADE;
-DROP TABLE IF EXISTS business_staff CASCADE;
-DROP TABLE IF EXISTS locations CASCADE;
-DROP TABLE IF EXISTS business_gallery CASCADE;
-DROP TABLE IF EXISTS business_features CASCADE;
-DROP TABLE IF EXISTS businesses CASCADE;
-DROP TABLE IF EXISTS notifications CASCADE;
-DROP TABLE IF EXISTS clients CASCADE;
-DROP TABLE IF EXISTS reviews CASCADE;
-DROP TABLE IF EXISTS staff_services CASCADE;
-DROP TABLE IF EXISTS points_transactions CASCADE;
-DROP TABLE IF EXISTS profiles CASCADE;
-DROP TABLE IF EXISTS auth.users CASCADE;
-DROP TYPE IF EXISTS profile_type CASCADE;
-DROP TYPE IF EXISTS business_category CASCADE;
-
--- Drop enums if they exist
-DROP TYPE IF EXISTS payment_status CASCADE;
-DROP TYPE IF EXISTS booking_status CASCADE;
-DROP TYPE IF EXISTS campaign_status CASCADE;
-DROP TYPE IF EXISTS notification_type CASCADE;
+DELETE FROM staff_working_hours;
+DELETE FROM payments;
+DELETE FROM bookings;
+DELETE FROM redeemed_rewards;
+DELETE FROM rewards;
+DELETE FROM loyalty_points;
+DELETE FROM deals;
+DELETE FROM campaigns;
+DELETE FROM products;
+DELETE FROM services;
+DELETE FROM business_staff;
+DELETE FROM locations;
+DELETE FROM business_gallery;
+DELETE FROM business_features;
+DELETE FROM businesses;
+DELETE FROM notifications;
+DELETE FROM clients;
+DELETE FROM reviews;
+DELETE FROM staff_services;
+DELETE FROM points_transactions;
+DELETE FROM profiles;
 
 
+-- Insert 5 users in auth.users manually 
 
+-- Insert seed data for clients
+INSERT INTO clients (id, user_id, first_name, last_name, phone, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), 'John', 'Doe', '1234567890', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), 'Jane', 'Smith', '0987654321', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), 'Alice', 'Johnson', '1112223333', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), 'Bob', 'Brown', '4445556666', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), 'Charlie', 'Davis', '7778889999', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
+-- Insert seed data for businesses
+INSERT INTO businesses (id, name, description, category, price_range, phone, website_url, profile_picture, cover_picture, is_premium, tags, external_link_facebook, external_link_instagram, external_link_tiktok, external_link_linkedin, owner_id, created_at, updated_at) VALUES
+(uuid_generate_v4(), 'Salon A', 'A premium hair salon', 'hair_salon', 2, '1234567890', 'www.salonA.com', 'https://example.com/profile1.jpg', 'https://example.com/cover1.jpg', false, ARRAY['Hair', 'Beauty'], 'salonA', '@salonA', '@salonA', 'salon-a', (SELECT id FROM auth.users LIMIT 1 OFFSET 0), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), 'Salon B', 'Expert nail care', 'nail_salon', 3, '0987654321', 'www.salonB.com', 'https://example.com/profile2.jpg', 'https://example.com/cover2.jpg', true, ARRAY['Nails', 'Beauty'], 'salonB', '@salonB', '@salonB', 'salon-b', (SELECT id FROM auth.users LIMIT 1 OFFSET 1), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), 'Salon C', 'Luxury spa treatments', 'spa', 4, '1112223333', 'www.salonC.com', 'https://example.com/profile3.jpg', 'https://example.com/cover3.jpg', true, ARRAY['Spa', 'Wellness'], 'salonC', '@salonC', '@salonC', 'salon-c', (SELECT id FROM auth.users LIMIT 1 OFFSET 2), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), 'Salon D', 'Modern fitness center', 'gym_and_fitness', 1, '4445556666', 'www.salonD.com', 'https://example.com/profile4.jpg', 'https://example.com/cover4.jpg', false, ARRAY['Fitness', 'Gym'], 'salonD', '@salonD', '@salonD', 'salon-d', (SELECT id FROM auth.users LIMIT 1 OFFSET 3), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), 'Salon E', 'Professional massage services', 'massage', 2, '7778889999', 'www.salonE.com', 'https://example.com/profile5.jpg', 'https://example.com/cover5.jpg', true, ARRAY['Massage', 'Wellness'], 'salonE', '@salonE', '@salonE', 'salon-e', (SELECT id FROM auth.users LIMIT 1 OFFSET 4), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-INSERT INTO auth.users (id, email) VALUES
-    ('d0d8d2bc-e5c7-4350-9e61-7549e39b60ef', 'owner1@example.com'),
-    ('f3d1529e-64c3-4e65-9f47-1a5d87d254c4', 'owner2@example.com'),
-    ('8b55a5c5-6d56-4c1c-9c4d-7a4df2e5c806', 'owner3@example.com'),
-    ('b7e715d9-69c0-4e59-8f2c-6ee8d9e6ab94', 'staff1@example.com'),
-    ('e3e0d2a9-1c53-4f54-9c9d-7d8b3e5c8e7f', 'staff2@example.com'),
-    ('c4f3b2a1-9e8d-7c6b-5a4e-3f2d1c0b9a8d', 'staff3@example.com');
+-- Insert seed data for locations
+INSERT INTO locations (id, business_id, name, address, city, state, country, postal_code, latitude, longitude, phone, is_main_location, is_active, timezone, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Location A1', '123 Main St', 'City A', 'State A', 'Country A', '12345', 40.7128, -74.0060, '1234567890', true, true, 'UTC', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Location B1', '456 Elm St', 'City B', 'State B', 'Country B', '23456', 34.0522, -118.2437, '0987654321', true, true, 'UTC', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Location C1', '789 Oak St', 'City C', 'State C', 'Country C', '34567', 51.5074, -0.1278, '1112223333', true, true, 'UTC', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Location D1', '101 Pine St', 'City D', 'State D', 'Country D', '45678', 35.6762, 139.6503, '4445556666', true, true, 'UTC', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Location E1', '202 Maple St', 'City E', 'State E', 'Country E', '56789', 48.8566, 2.3522, '7778889999', true, true, 'UTC', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- Insert businesses
-INSERT INTO businesses (
-    id, 
-    name, 
-    description, 
-    category, 
-    price_range, 
-    profile_picture, 
-    cover_picture, 
-    is_premium, 
-    tags,
-    owner_id, 
-    created_at
-) VALUES
-    (
-        'f47ac10b-58cc-4372-a567-0e02b2c3d479', 
-        'Luxe Hair Studio', 
-        'Premium hair salon offering cutting-edge styles and treatments',
-        'hair_salon', 
-        3,
-        'https://images.unsplash.com/photo-1560066984-138dadb4c035',
-        'https://images.unsplash.com/photo-1560066984-138dadb4c035',
-        true, 
-        ARRAY['Hair', 'Beauty', 'Salon'],
-        'd0d8d2bc-e5c7-4350-9e61-7549e39b60ef',
-        '2023-08-15T00:00:00Z'
-    ),
-    (
-        'c9eb1c3e-1b2e-4c3b-8b1e-1c3b8b1e1c3b',
-        'Zen Massage & Spa',
-        'Luxurious massage and spa treatments for ultimate relaxation',
-        'spa', 4,
-        'https://images.unsplash.com/photo-1540555700478-4be289fbecef',
-        'https://images.unsplash.com/photo-1540555700478-4be289fbecef',
-        true, 
-        ARRAY['Massage', 'Spa', 'Wellness'],
-        'f3d1529e-64c3-4e65-9f47-1a5d87d254c4',
-        '2023-11-15T00:00:00Z'
-    ),
-    (
-        'd3c1e1b2-4c3b-8b1e-1c3b-8b1e1c3b8b1e', 
-        'Blloku Fitness Center',
-        'Modern gym with state-of-the-art equipment and expert trainers',
-        'gym_and_fitness', 2,
-        'https://images.unsplash.com/photo-1534438327276-14e5300c3a48',
-        'https://images.unsplash.com/photo-1534438327276-14e5300c3a48',
-        false, 
-        ARRAY['Fitness', 'Gym', 'Training'],
-        '8b55a5c5-6d56-4c1c-9c4d-7a4df2e5c806',
-        '2023-10-01T00:00:00Z'
-    );
+-- Insert seed data for business_staff
+INSERT INTO business_staff (id, business_id, user_id, position, is_active, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), 'Manager', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), 'Staff', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), 'Staff', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), 'Manager', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), 'Staff', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- Insert locations
-INSERT INTO locations (
-    id, 
-    business_id, 
-    name, 
-    address, 
-    city, 
-    state, 
-    country,
-    postal_code, 
-    is_main_location, 
-    timezone
-) VALUES
-    (
-        uuid_generate_v4(),
-        'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-        'Luxe Hair Studio Downtown',
-        'Rruga Myslym Shyri', 
-        'Tiranë', 
-        'AL', 
-        'Albania',
-        '1001', 
-        true, 
-        'Europe/Tirane'
-    ),
-    (
-        uuid_generate_v4(), 
-        'c9eb1c3e-1b2e-4c3b-8b1e-1c3b8b1e1c3b', 
-        'Zen Massage & Spa Central',
-        'Rruga e Kavajës',
-         'Tiranë', 
-         'AL',
-          'Albania',
-        '1001',
-         true, 
-         'Europe/Tirane'
-    ),
-    (
-        uuid_generate_v4(),
-        'd3c1e1b2-4c3b-8b1e-1c3b-8b1e1c3b8b1e', 
-        'Blloku Fitness Center',
-        'Blloku', 
-        'Tiranë', 
-        'AL', 
-        'Albania',
-        '1001', 
-        true,
-        'Europe/Tirane'
-    );
+-- Insert seed data for services
+INSERT INTO services (id, business_id, name, description, duration, base_price, is_active, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Haircut', 'Professional haircut service', 30, 20.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Manicure', 'Nail care and polish', 45, 25.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Massage', 'Relaxing full body massage', 60, 50.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Personal Training', 'One-on-one fitness training', 60, 40.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Facial', 'Rejuvenating facial treatment', 30, 30.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- Insert business staff
-INSERT INTO business_staff (
-    id, 
-    business_id,
-    user_id,
-    position,
-     is_active
-) VALUES
-    (
-        'd1e2f3a4-b5c6-7d8e-9f0a-11c2d3e4f5g6',
-        'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-        'b7e715d9-69c0-4e59-8f2c-6ee8d9e6ab94',
-        'Senior Stylist',
-        true
-    ),
-    (
-        'a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6',
-        'c9eb1c3e-1b2e-4c3b-8b1e-1c3b8b1e1c3b',
-        'e3e0d2a9-1c53-4f54-9c9d-7d8b3e5c8e7f',
-        'Massage Therapist',
-        true
-    ),
-    (
-        'f7g8h9i0-j1k2-l3m4-n5o6-p7q8r9s0t1u2',
-        'd3c1e1b2-4c3b-8b1e-1c3b-8b1e1c3b8b1e',
-        'c4f3b2a1-9e8d-7c6b-5a4e-3f2d1c0b9a8d',
-        'Personal Trainer',
-        true
-    );
+-- Insert seed data for bookings
+INSERT INTO bookings (id, user_id, business_id, staff_id, service_id, booking_date, status, total_amount, notes, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), (SELECT id FROM businesses LIMIT 1 OFFSET 0), (SELECT id FROM business_staff LIMIT 1 OFFSET 0), (SELECT id FROM services LIMIT 1 OFFSET 0), NOW() + INTERVAL '1 day', 'confirmed', 20.00, 'First time customer', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), (SELECT id FROM businesses LIMIT 1 OFFSET 1), (SELECT id FROM business_staff LIMIT 1 OFFSET 1), (SELECT id FROM services LIMIT 1 OFFSET 1), NOW() + INTERVAL '2 days', 'confirmed', 25.00, 'Regular customer', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), (SELECT id FROM businesses LIMIT 1 OFFSET 2), (SELECT id FROM business_staff LIMIT 1 OFFSET 2), (SELECT id FROM services LIMIT 1 OFFSET 2), NOW() + INTERVAL '3 days', 'confirmed', 50.00, 'Special requests noted', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), (SELECT id FROM businesses LIMIT 1 OFFSET 3), (SELECT id FROM business_staff LIMIT 1 OFFSET 3), (SELECT id FROM services LIMIT 1 OFFSET 3), NOW() + INTERVAL '4 days', 'confirmed', 40.00, 'Follow-up session', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), (SELECT id FROM businesses LIMIT 1 OFFSET 4), (SELECT id FROM business_staff LIMIT 1 OFFSET 4), (SELECT id FROM services LIMIT 1 OFFSET 4), NOW() + INTERVAL '5 days', 'confirmed', 30.00, 'VIP customer', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- Insert services
-INSERT INTO services (
-    id, 
-    business_id, 
-    name,
-    description,
-    duration, base_price, is_active
-) VALUES
-    (
-        'd3c1e1b2-4c3b-8b1e-1c3b-8b1e1c3b8b1e', 
-        'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-        'Haircut & Style',
-        'Professional haircut and styling',
-        60, 
-        85.00,
-        true
-    ),
-    (
-        'a2f1c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6', 
-        'f47ac10b-58cc-4372-a567-0e02b2c3d479', 
-        'Color Treatment',
-        'Professional hair coloring service',
-        120, 
-        120.00, 
-        true
-    ),
-    (
-        'b1c2d3e4-f5g6-h7i8-j9k0-l1m2n3o4p5q6', 
-        'c9eb1c3e-1b2e-4c3b-8b1e-1c3b8b1e1c3b', 
-        'Swedish Massage',
-        '60-minute relaxing massage',
-        60, 120.00, true
-    ),
-    (
-        'c3d4e5f6-7g8h-9i0j-k1l2-m3n4o5p6q7r', 
-        'c9eb1c3e-1b2e-4c3b-8b1e-1c3b8b1e1c3b',
-        'Deep Tissue Massage',
-        'Deep tissue massage therapy',
-        60, 140.00, true
-    ),
-    (
-        'd4e5f6g7-h8i9-j0k1-l2m3-n4o5p6q7r8s', 
-        'd3c1e1b2-4c3b-8b1e-1c3b-8b1e1c3b8b1e', 
-        'Personal Training',
-        'One-on-one personal training session',
-        60, 
-        50.00,
-        true
-    ),
-    (
-        'f5g6h7i8-j9k0-l1m2-n3o4-p5q6r7s8t9u', 
-        'd3c1e1b2-4c3b-8b1e-1c3b-8b1e1c3b8b1e',
-        'Group Classes',
-        'Group fitness class',
-        45, 25.00, true
-    );
+-- Insert seed data for payments
+INSERT INTO payments (id, booking_id, amount, status, payment_method, stripe_payment_id, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM bookings LIMIT 1 OFFSET 0), 20.00, 'pending', 'credit_card', 'pi_1234567890', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM bookings LIMIT 1 OFFSET 1), 25.00, 'pending', 'credit_card', 'pi_2345678901', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM bookings LIMIT 1 OFFSET 2), 50.00, 'pending', 'credit_card', 'pi_3456789012', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM bookings LIMIT 1 OFFSET 3), 40.00, 'pending', 'credit_card', 'pi_4567890123', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM bookings LIMIT 1 OFFSET 4), 30.00, 'pending', 'credit_card', 'pi_5678901234', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- Insert staff working hours
-INSERT INTO staff_working_hours (
-    staff_id, 
-    day_of_week, 
-    start_time, 
-    end_time,
-    hourly_rate, 
-    is_available
-) VALUES
-    -- Luxe Hair Studio staff hours
-    ('d1e2f3a4-b5c6-7d8e-9f0a-11c2d3e4f5g6', 1, '09:00', '18:00', 50.00, true),
-    ('d1e2f3a4-b5c6-7d8e-9f0a-11c2d3e4f5g6', 2, '09:00', '18:00', 50.00, true),
-    ('d1e2f3a4-b5c6-7d8e-9f0a-11c2d3e4f5g6', 3, '09:00', '18:00', 50.00, true),
-    ('d1e2f3a4-b5c6-7d8e-9f0a-11c2d3e4f5g6', 4, '09:00', '20:00', 50.00, true),
-    ('d1e2f3a4-b5c6-7d8e-9f0a-11c2d3e4f5g6', 5, '09:00', '20:00', 50.00, true),
-    ('d1e2f3a4-b5c6-7d8e-9f0a-11c2d3e4f5g6', 6, '10:00', '16:00', 50.00, true),
-    -- Zen Massage & Spa staff hours
-    ('a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6', 1, '10:00', '20:00', 60.00, true),
-    ('a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6', 2, '10:00', '20:00', 60.00, true),
-    ('a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6', 3, '10:00', '20:00', 60.00, true),
-    ('a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6', 4, '10:00', '21:00', 60.00, true),
-    ('a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6', 5, '10:00', '21:00', 60.00, true),
-    ('a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6', 6, '09:00', '22:00', 60.00, true),
-    ('a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6', 0, '11:00', '18:00', 60.00, true),
-    -- Blloku Fitness Center staff hours
-    ('f7g8h9i0-j1k2-l3m4-n5o6-p7q8r9s0t1u2', 1, '06:00', '23:00', 45.00, true),
-    ('f7g8h9i0-j1k2-l3m4-n5o6-p7q8r9s0t1u2', 2, '06:00', '23:00', 45.00, true),
-    ('f7g8h9i0-j1k2-l3m4-n5o6-p7q8r9s0t1u2', 3, '06:00', '23:00', 45.00, true),
-    ('f7g8h9i0-j1k2-l3m4-n5o6-p7q8r9s0t1u2', 4, '06:00', '23:00', 45.00, true),
-    ('f7g8h9i0-j1k2-l3m4-n5o6-p7q8r9s0t1u2', 5, '06:00', '22:00', 45.00, true),
-    ('f7g8h9i0-j1k2-l3m4-n5o6-p7q8r9s0t1u2', 6, '07:00', '20:00', 45.00, true),
-    ('f7g8h9i0-j1k2-l3m4-n5o6-p7q8r9s0t1u2', 0, '08:00', '18:00', 45.00, true);
+-- Insert seed data for reviews
+INSERT INTO reviews (id, business_id, rating, comment, review_type, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 5, 'Excellent service!', 'business', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 4, 'Very good experience.', 'business', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 3, 'Average service.', 'business', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 4, 'Good service.', 'business', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 5, 'Outstanding!', 'business', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- Insert staff services
-INSERT INTO staff_services (staff_id, service_id)
-VALUES
-    ('d1e2f3a4-b5c6-7d8e-9f0a-11c2d3e4f5g6', 'd3c1e1b2-4c3b-8b1e-1c3b-8b1e1c3b8b1e'),
-    ('d1e2f3a4-b5c6-7d8e-9f0a-11c2d3e4f5g6', 'a2f1c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6'),
-    ('a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6', 'b1c2d3e4-f5g6-h7i8-j9k0-l1m2n3o4p5q6'),
-    ('a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6', 'c3d4e5f6-7g8h-9i0j-k1l2-m3n4o5p6q7r'),
-    ('f7g8h9i0-j1k2-l3m4-n5o6-p7q8r9s0t1u2', 'd4e5f6g7-h8i9-j0k1-l2m3-n4o5p6q7r8s'),
-    ('f7g8h9i0-j1k2-l3m4-n5o6-p7q8r9s0t1u2', 'f5g6h7i8-j9k0-l1m2-n3o4-p5q6r7s8t9u');
+-- Insert seed data for loyalty_points
+INSERT INTO loyalty_points (id, user_id, points_balance, total_points_earned, total_points_spent, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), 100, 100, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), 200, 200, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), 
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), 150, 150, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), 250, 250, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), 300, 300, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- Insert business features
-INSERT INTO business_features (business_id, feature_name)
-VALUES
-    ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'Free WiFi'),
-    ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'Complimentary Beverages'),
-    ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'Parking'),
-    ('c9eb1c3e-1b2e-4c3b-8b1e-1c3b8b1e1c3b', 'Sauna'),
-    ('c9eb1c3e-1b2e-4c3b-8b1e-1c3b8b1e1c3b', 'Steam Room'),
-    ('c9eb1c3e-1b2e-4c3b-8b1e-1c3b8b1e1c3b', 'Robes Provided'),
-    ('c9eb1c3e-1b2e-4c3b-8b1e-1c3b8b1e1c3b', 'Shower Facilities'),
-    ('d3c1e1b2-4c3b-8b1e-1c3b-8b1e1c3b8b1e', 'Towel Service'),
-    ('d3c1e1b2-4c3b-8b1e-1c3b-8b1e1c3b8b1e', 'Lockers'),
-    ('d3c1e1b2-4c3b-8b1e-1c3b-8b1e1c3b8b1e', 'Showers'),
-    ('d3c1e1b2-4c3b-8b1e-1c3b-8b1e1c3b8b1e', 'Protein Bar');
+-- Insert seed data for campaigns
+INSERT INTO campaigns (id, business_id, name, description, start_date, end_date, status, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Summer Sale', 'Discounts on all services', NOW(), NOW() + INTERVAL '1 month', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Winter Sale', 'Special offers for winter', NOW(), NOW() + INTERVAL '2 months', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Spring Sale', 'Spring discounts', NOW(), NOW() + INTERVAL '1 month', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Autumn Sale', 'Autumn special offers', NOW(), NOW() + INTERVAL '1 month', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Holiday Sale', 'Holiday discounts', NOW(), NOW() + INTERVAL '1 month', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- Insert business gallery
-INSERT INTO business_gallery (
-    business_id, 
-    image_url, 
-    thumbnail_url,
-    alt_text,
-    is_featured
-) VALUES
-    (
-        'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-        'https://images.unsplash.com/photo-1560066984-138dadb4c035',
-        'https://images.unsplash.com/photo-1560066984-138dadb4c035',
-        'Modern salon interior',
-        true
-    ),
-    (
-        'c9eb1c3e-1b2e-4c3b-8b1e-1c3b8b1e1c3b',
-        'https://images.unsplash.com/photo-1540555700478-4be289fbecef',
-        'https://images.unsplash.com/photo-1540555700478-4be289fbecef',
-        'Relaxing spa environment',
-        true
-    ),
-    (
-        'd3c1e1b2-4c3b-8b1e-1c3b-8b1e1c3b8b1e',
-        'https://images.unsplash.com/photo-1534438327276-14e5300c3a48',
-        'https://images.unsplash.com/photo-1534438327276-14e5300c3a48',
-        'Modern gym equipment',
-        true
-    );
+-- Insert seed data for deals
+INSERT INTO deals (id, campaign_id, service_id, discount_percentage, discount_amount, start_date, end_date, is_active, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM campaigns LIMIT 1 OFFSET 0), (SELECT id FROM services LIMIT 1 OFFSET 0), 10, 2.00, NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM campaigns LIMIT 1 OFFSET 1), (SELECT id FROM services LIMIT 1 OFFSET 1), 15, 3.75, NOW(), NOW() + INTERVAL '2 months', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM campaigns LIMIT 1 OFFSET 2), (SELECT id FROM services LIMIT 1 OFFSET 2), 20, 10.00, NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM campaigns LIMIT 1 OFFSET 3), (SELECT id FROM services LIMIT 1 OFFSET 3), 25, 10.00, NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM campaigns LIMIT 1 OFFSET 4), (SELECT id FROM services LIMIT 1 OFFSET 4), 30, 9.00, NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Insert seed data for products
+INSERT INTO products (id, business_id, name, description, price, stock_quantity, is_active, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Shampoo', 'Professional hair shampoo', 10.00, 100, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Conditioner', 'Hair conditioner', 12.00, 80, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Lotion', 'Body lotion', 15.00, 50, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Cream', 'Face cream', 20.00, 30, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Oil', 'Massage oil', 25.00, 40, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Insert seed data for notifications
+INSERT INTO notifications (id, user_id, type, title, message, reference_id, reference_type, is_read, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), 'booking_confirmed', 'Booking Confirmed', 'Your booking has been confirmed.', (SELECT id FROM bookings LIMIT 1 OFFSET 0), 'bookings', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), 'payment_received', 'Payment Received', 'Your payment has been received.', (SELECT id FROM payments LIMIT 1 OFFSET 1), 'payments', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), 'booking_cancelled', 'Booking Cancelled', 'Your booking has been cancelled.', (SELECT id FROM bookings LIMIT 1 OFFSET 2), 'bookings', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), 'booking_rescheduled', 'Booking Rescheduled', 'Your booking has been rescheduled.', (SELECT id FROM bookings LIMIT 1 OFFSET 3), 'bookings', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), 'points_earned', 'Points Earned', 'You have earned loyalty points.', (SELECT id FROM loyalty_points LIMIT 1 OFFSET 4), 'loyalty_points', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Insert seed data for profiles
+INSERT INTO profiles (id, user_id, profile_type, bio, date_of_birth, gender, preferred_language, specialties, years_of_experience, education, certifications, languages, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), 'client', 'Bio for user 1', '1990-01-01', 'female', 'en', NULL, NULL, NULL, NULL, ARRAY['English'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), 'staff', 'Experienced hairstylist', '1985-03-15', 'male', 'en', ARRAY['Hair Cutting', 'Hair Coloring'], 8, ARRAY['Cosmetology School'], ARRAY['Licensed Cosmetologist'], ARRAY['English', 'Spanish'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), 'client', 'Bio for user 3', '1995-06-20', 'male', 'es', NULL, NULL, NULL, NULL, ARRAY['Spanish', 'English'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), 'staff', 'Professional massage therapist', '1988-09-10', 'female', 'en', ARRAY['Swedish Massage', 'Deep Tissue'], 5, ARRAY['Massage Therapy Institute'], ARRAY['Licensed Massage Therapist'], ARRAY['English'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), 'client', 'Bio for user 5', '1992-12-25', 'female', 'fr', NULL, NULL, NULL, NULL, ARRAY['French', 'English'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Insert seed data for staff_services
+INSERT INTO staff_services (id, staff_id, service_id, created_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM business_staff LIMIT 1 OFFSET 0), (SELECT id FROM services LIMIT 1 OFFSET 0), CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM business_staff LIMIT 1 OFFSET 1), (SELECT id FROM services LIMIT 1 OFFSET 1), CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM business_staff LIMIT 1 OFFSET 2), (SELECT id FROM services LIMIT 1 OFFSET 2), CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM business_staff LIMIT 1 OFFSET 3), (SELECT id FROM services LIMIT 1 OFFSET 3), CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM business_staff LIMIT 1 OFFSET 4), (SELECT id FROM services LIMIT 1 OFFSET 4), CURRENT_TIMESTAMP);
+
+-- Insert seed data for points_transactions
+INSERT INTO points_transactions (id, user_id, points_amount, transaction_type, reference_id, created_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), 10, 'earn', (SELECT id FROM bookings LIMIT 1 OFFSET 0), CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), 20, 'earn', (SELECT id FROM bookings LIMIT 1 OFFSET 1), CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), 15, 'redeem', (SELECT id FROM rewards LIMIT 1 OFFSET 0), CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), 25, 'earn', (SELECT id FROM bookings LIMIT 1 OFFSET 2), CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), 30, 'redeem', (SELECT id FROM rewards LIMIT 1 OFFSET 1), CURRENT_TIMESTAMP);
+
+-- Insert seed data for redeemed_rewards
+INSERT INTO redeemed_rewards (id, user_id, reward_id, points_spent, redeemed_at, expiry_date, is_used) VALUES
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), (SELECT id FROM rewards LIMIT 1 OFFSET 0), 50, NOW() - INTERVAL '5 days', NOW() + INTERVAL '30 days', false),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), (SELECT id FROM rewards LIMIT 1 OFFSET 1), 100, NOW() - INTERVAL '4 days', NOW() + INTERVAL '30 days', false),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), (SELECT id FROM rewards LIMIT 1 OFFSET 2), 150, NOW() - INTERVAL '3 days', NOW() + INTERVAL '30 days', false),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), (SELECT id FROM rewards LIMIT 1 OFFSET 3), 200, NOW() - INTERVAL '2 days', NOW() + INTERVAL '30 days', false),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), (SELECT id FROM rewards LIMIT 1 OFFSET 4), 250, NOW() - INTERVAL '1 day', NOW() + INTERVAL '30 days', false);
+
+-- Insert seed data for rewards
+INSERT INTO rewards (id, business_id, name, description, points_required, is_active, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Free Haircut', 'Get a complimentary haircut service', 50, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Spa Package', 'Enjoy a relaxing spa treatment package', 100, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), 
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Massage Session', 'One hour massage session of your choice', 150, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Beauty Bundle', 'Complete beauty treatment package', 200, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'VIP Treatment', 'Full day of premium services', 250, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Insert seed data for staff_working_hours
+INSERT INTO staff_working_hours (id, staff_id, day_of_week, start_time, end_time, hourly_rate, is_available, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM business_staff LIMIT 1 OFFSET 0), 0, '09:00', '17:00', 25.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM business_staff LIMIT 1 OFFSET 1), 1, '09:00', '17:00', 22.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM business_staff LIMIT 1 OFFSET 2), 2, '09:00', '17:00', 20.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM business_staff LIMIT 1 OFFSET 3), 3, '09:00', '17:00', 23.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM business_staff LIMIT 1 OFFSET 4), 4, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

@@ -19,11 +19,6 @@ interface BusinessesCollectionProps {
   }
 }
 
-function isNewBusiness(createdAt: Date): boolean {
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  return createdAt > thirtyDaysAgo;
-}
 
 export function BusinessesCollection({ searchParams }: BusinessesCollectionProps) {
 

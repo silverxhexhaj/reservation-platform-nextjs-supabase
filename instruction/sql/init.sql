@@ -43,6 +43,7 @@ CREATE TYPE notification_type AS ENUM (
     'booking_confirmed',
     'booking_cancelled',
     'booking_completed',
+    'booking_rescheduled',
     'payment_received',
     'payment_failed',
     'campaign_started',
@@ -97,6 +98,30 @@ CREATE TABLE notifications (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Locations table
+CREATE TABLE locations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    address TEXT NOT NULL,
+    city VARCHAR(100) NOT NULL,
+    state VARCHAR(100),
+    country VARCHAR(100) NOT NULL,
+    postal_code VARCHAR(20),
+    latitude DECIMAL(10,8),
+    longitude DECIMAL(11,8),
+    phone VARCHAR(20),
+    is_main_location BOOLEAN DEFAULT false,
+    is_active BOOLEAN DEFAULT true,
+    timezone VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT valid_coordinates CHECK (
+        (latitude BETWEEN -90 AND 90) AND 
+        (longitude BETWEEN -180 AND 180)
+    )
+);
+
 -- Businesses table
 CREATE TABLE businesses (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -114,7 +139,11 @@ CREATE TABLE businesses (
     external_link_instagram TEXT,
     external_link_tiktok TEXT,
     external_link_linkedin TEXT,
+    for_men BOOLEAN DEFAULT NULL,
+    for_women BOOLEAN DEFAULT NULL,
+    for_both BOOLEAN DEFAULT NULL, 
     owner_id UUID REFERENCES auth.users(id),
+    location_id UUID REFERENCES locations(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -145,29 +174,6 @@ CREATE TABLE business_gallery (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Locations table
-CREATE TABLE locations (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
-    name VARCHAR(255) NOT NULL,
-    address TEXT NOT NULL,
-    city VARCHAR(100) NOT NULL,
-    state VARCHAR(100),
-    country VARCHAR(100) NOT NULL,
-    postal_code VARCHAR(20),
-    latitude DECIMAL(10,8),
-    longitude DECIMAL(11,8),
-    phone VARCHAR(20),
-    is_main_location BOOLEAN DEFAULT false,
-    is_active BOOLEAN DEFAULT true,
-    timezone VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT valid_coordinates CHECK (
-        (latitude BETWEEN -90 AND 90) AND 
-        (longitude BETWEEN -180 AND 180)
-    )
-);
 
 CREATE TABLE business_staff (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -348,6 +354,7 @@ CREATE TABLE reviews (
         (review_type = 'staff' AND staff_id IS NOT NULL AND business_id IS NULL)
     )
 );
+
 -- Create profiles table
 CREATE TABLE profiles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -367,7 +374,19 @@ CREATE TABLE profiles (
     CONSTRAINT unique_user_profile UNIQUE (user_id)
 );
 
--- Create indexes for better query performance
+-- Business favorites table
+CREATE TABLE business_favorites (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT unique_user_business_favorite UNIQUE (user_id, business_id)
+);
+
+-- Add index for faster lookups
+CREATE INDEX idx_business_favorites_user ON business_favorites(user_id);
+CREATE INDEX idx_business_favorites_business ON business_favorites(business_id);
 CREATE INDEX idx_businesses_owner ON businesses(owner_id);
 CREATE INDEX idx_staff_business ON business_staff(business_id);
 CREATE INDEX idx_services_business ON services(business_id);
@@ -493,5 +512,11 @@ CREATE TRIGGER update_business_gallery_updated_at
 
 CREATE TRIGGER update_profiles_updated_at
     BEFORE UPDATE ON profiles
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+    
+-- Add trigger for updated_at
+CREATE TRIGGER update_business_favorites_updated_at
+    BEFORE UPDATE ON business_favorites
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();

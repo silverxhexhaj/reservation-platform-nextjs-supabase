@@ -68,6 +68,7 @@ export type NotificationType =
   | 'booking_confirmed'
   | 'booking_cancelled'
   | 'booking_completed'
+  | 'booking_rescheduled'
   | 'payment_received'
   | 'payment_failed'
   | 'campaign_started'
@@ -177,7 +178,7 @@ export interface BusinessStaff extends Timestamps {
 export interface StaffWorkingHours extends Timestamps {
   id: string;
   staff_id: string;
-  day_of_week: number;
+  day_of_week: number; // 0 = Sunday, 6 = Saturday
   start_time: string;
   end_time: string;
   hourly_rate: number;
@@ -190,7 +191,7 @@ export interface Service extends Timestamps {
   business_id: string;
   name: string;
   description?: string | null;
-  duration: number;
+  duration: number; // in minutes
   base_price: number;
   is_active: boolean;
 }
@@ -251,7 +252,7 @@ export interface PointsTransaction {
   id: string;
   user_id: string;
   points_amount: number;
-  transaction_type: string;
+  transaction_type: 'earn' | 'redeem'; // Added specific types
   reference_id?: string | null;
   created_at: string;
 }
@@ -308,13 +309,13 @@ export interface Review extends Timestamps {
   staff_id?: string | null;
   user_id: string;
   booking_id?: string | null;
-  rating: number;
+  rating: number; // CHECK (rating BETWEEN 1 AND 5)
   comment?: string | null;
   review_type: 'business' | 'staff';
   is_published: boolean;
 }
 
-// Add after Client interface
+// Profile
 export interface Profile extends Timestamps {
   id: string;
   user_id: string;
@@ -328,4 +329,61 @@ export interface Profile extends Timestamps {
   education?: string[] | null;
   certifications?: string[] | null;
   languages?: string[] | null;
+}
+
+// Loyalty Points
+export interface LoyaltyPoints extends Timestamps {
+  id: string;
+  user_id: string;
+  points_balance: number;
+  total_points_earned: number;
+  total_points_spent: number;
+}
+
+// Points Transaction
+export interface PointsTransaction extends Timestamps {
+  id: string;
+  user_id: string;
+  points_amount: number;
+  transaction_type: 'earn' | 'redeem';
+  reference_id?: string | null;
+}
+
+// Reward
+export interface Reward extends Timestamps {
+  id: string;
+  business_id: string;
+  name: string;
+  description?: string | null;
+  points_required: number;
+  is_active: boolean;
+}
+
+// Redeemed Reward
+export interface RedeemedReward extends Timestamps {
+  id: string;
+  user_id: string;
+  reward_id: string;
+  points_spent: number;
+  redeemed_at: string;
+  expiry_date?: string | null;
+  is_used: boolean;
+}
+
+// Deal
+export interface Deal extends Timestamps {
+  id: string;
+  campaign_id: string;
+  service_id: string;
+  discount_percentage?: number | null;
+  discount_amount?: number | null;
+  start_date: string;
+  end_date: string;
+  is_active: boolean;
+}
+
+export interface BusinessFavorite extends Timestamps {
+  id: string;
+  user_id: string;
+  business_id: string;
 }

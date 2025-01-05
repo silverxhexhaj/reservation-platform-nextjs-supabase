@@ -18,7 +18,7 @@ import type { CalendarEvent, TimeSlot, BusinessHours, Staff } from '@/app/types/
 import { 
   generateTimeSlots, 
   getDefaultBusinessHours
-} from '@/app/lib/calendar-utils';
+} from '@/lib/calendar-utils';
 import { CreateEventDialog } from './components/CreateEventDialog';
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import { ScrollArea } from "@/app/components/ui/scroll-area";

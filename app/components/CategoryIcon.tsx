@@ -1,20 +1,17 @@
-import { 
-  Scissors, 
-  Heart, 
-  Sun, 
-  Eye, 
-  Dumbbell, 
-  Syringe, 
-  Yoga as YogaIcon, 
-  Flower2, 
-  Tooth as ToothIcon, 
-  Activity, 
-  Stethoscope as StethoscopeIcon, 
-  Needle as NeedleIcon, 
-  Sparkles as SparklesIcon, 
-  Gem as GemIcon, 
-  Paintbrush as PaintbrushIcon, 
-  Zap 
+import {
+  Scissors,
+  Heart,
+  Sun,
+  Eye,
+  Dumbbell,
+  Syringe,
+  Flower2,
+  Activity,
+  Stethoscope as StethoscopeIcon,
+  Sparkles as SparklesIcon,
+  Gem as GemIcon,
+  Paintbrush as PaintbrushIcon,
+  Zap
 } from 'lucide-react';
 import { CategoryIconType } from '@/data';
 
@@ -30,12 +27,9 @@ const iconMap = {
   eye: Eye,
   dumbbell: Dumbbell,
   syringe: Syringe,
-  yoga: YogaIcon,
   flower: Flower2,
-  tooth: ToothIcon,
   activity: Activity,
   stethoscope: StethoscopeIcon,
-  needle: NeedleIcon,
   sparkles: SparklesIcon,
   gem: GemIcon,
   paintbrush: PaintbrushIcon,
