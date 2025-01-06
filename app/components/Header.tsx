@@ -24,14 +24,28 @@ const bebasNeue = Bebas_Neue({
 });
 
 export function Header() {
-  
-  const user = null;
-
+  const [user, setUser] = useState<any>(null);
   const router = useRouter();
   const pathname = usePathname();
   
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,7 +72,7 @@ export function Header() {
     if (mode === 'register') {
       router.push('/pages/public/signup');
     } else {
-      router.push('/pages/public/signin');
+      router.push(`/pages/public/signin?returnTo=${currentPath}`);
     }
     setIsMenuOpen(false);
   };
@@ -97,9 +111,9 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                 <Avatar className="h-9 w-9">
-                  <AvatarImage src="/avatars/01.png" alt={user.username} />
+                  <AvatarImage src="/avatars/01.png" alt={user.email} />
                   <AvatarFallback className="bg-slate-100 text-slate-600">
-                    {user.username.slice(0, 2).toUpperCase()}
+                    {user.email?.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               </Button>
@@ -107,8 +121,8 @@ export function Header() {
             <DropdownMenuContent className="w-56 bg-white" align="end" forceMount>
               <DropdownMenuLabel>
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium">{user.username}</p>
-                  <p className="text-xs text-muted-foreground">john@example.com</p>
+                  <p className="text-sm font-medium">{user.email?.split('@')[0]}</p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -206,9 +220,9 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                     <Avatar className="h-9 w-9">
-                      <AvatarImage src="/avatars/01.png" alt={user.username} />
+                      <AvatarImage src="/avatars/01.png" alt={user.email} />
                       <AvatarFallback className="bg-slate-100 text-slate-600">
-                        {user.username.slice(0, 2).toUpperCase()}
+                        {user.email?.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -216,8 +230,8 @@ export function Header() {
                 <DropdownMenuContent className="w-56 bg-white" align="end" forceMount>
                   <DropdownMenuLabel>
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium">{user.username}</p>
-                      <p className="text-xs text-muted-foreground">john@example.com</p>
+                      <p className="text-sm font-medium">{user.email?.split('@')[0]}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
@@ -306,9 +320,9 @@ export function Header() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                   <Avatar className="h-9 w-9">
-                    <AvatarImage src="/avatars/01.png" alt={user.username} />
+                    <AvatarImage src="/avatars/01.png" alt={user.email} />
                     <AvatarFallback className="bg-slate-100 text-slate-600">
-                      {user.username.slice(0, 2).toUpperCase()}
+                      {user.email?.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -316,8 +330,8 @@ export function Header() {
               <DropdownMenuContent className="w-56 bg-white" align="end" forceMount>
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium">{user.username}</p>
-                    <p className="text-xs text-muted-foreground">john@example.com</p>
+                    <p className="text-sm font-medium">{user.email?.split('@')[0]}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />

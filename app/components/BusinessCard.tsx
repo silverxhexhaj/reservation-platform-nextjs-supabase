@@ -41,7 +41,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
                     <div className="aspect-[4/3] overflow-hidden relative border-b border-gray-100">
                         <Image
                             src={business.cover_picture ?? ''}
-                            alt={business.name}
+                            alt={business.name ?? ''}
                             fill
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
                             className="object-cover transition-transform duration-300 group-hover:scale-105"
