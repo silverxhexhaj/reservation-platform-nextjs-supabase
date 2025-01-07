@@ -15,6 +15,8 @@ import { BusinessOffer } from '@/data';
 import { Stories } from './components/Stories';
 import { ImageGalleryModal } from "@/app/components/ImageGalleryModal";
 import { ServiceOffer } from "@/app/components/ServiceOffer";
+import { ServiceItem } from "./components/ServiceItem";
+import { BookingModal } from "./components/BookingModal";
 
 const scrollbarHideStyles = `
   .scrollbar-hide {
@@ -26,16 +28,6 @@ const scrollbarHideStyles = `
   }
 `;
 
-const openingHours = [
-  { day: 'Monday', hours: '09:00 - 20:00' },
-  { day: 'Tuesday', hours: '09:00 - 20:00' },
-  { day: 'Wednesday', hours: '09:00 - 20:00' },
-  { day: 'Thursday', hours: '09:00 - 20:00' },
-  { day: 'Friday', hours: '09:00 - 20:00' },
-  { day: 'Saturday', hours: '10:00 - 18:00' },
-  { day: 'Sunday', hours: 'Closed' },
-];
-
 interface Business {
   id: string;
   name: string;
@@ -44,7 +36,48 @@ interface Business {
   rating: number;
   priceRange: string;
   imageUrl: string;
-  galleryImages: string[];
+  cover_picture?: string;
+  profile_picture?: string;
+  galleryImages?: string[];
+  location: {
+    address: string;
+    city: string;
+    state: string;
+    zip: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+    country?: string;
+  };
+  hours?: {
+    [key: string]: {
+      open: string;
+      close: string;
+    };
+  };
+  openingHours?: {
+    day: string;
+    hours: string;
+  }[];
+  isOpen?: boolean;
+  closingTime?: string;
+  services?: {
+    id: string;
+    name: string;
+    price: number;
+    duration: number;
+  }[];
+  amenities?: string[];
+  tags?: string[];
+  socialMedia?: {
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
+  };
+  isPremium?: boolean;
+  createdAt: string;
+  reviewCount: number;
 }
 
 interface Service {
@@ -73,25 +106,25 @@ const categoryServices: CategoryServices = {
     {
       name: "Haircuts",
       services: [
-        { name: "Women's Haircut", price: 50 },
-        { name: "Men's Haircut", price: 35 },
-        { name: "Children's Haircut", price: 25 },
+        { name: "Women's Haircut", price: 50, duration: 60 },
+        { name: "Men's Haircut", price: 35, duration: 45 },
+        { name: "Children's Haircut", price: 25, duration: 30 },
       ]
     },
     {
       name: "Coloring",
       services: [
-        { name: "Full Color", price: 80 },
-        { name: "Highlights", price: 100 },
-        { name: "Balayage", price: 150 },
+        { name: "Full Color", price: 80, duration: 120 },
+        { name: "Highlights", price: 100, duration: 150 },
+        { name: "Balayage", price: 150, duration: 180 },
       ]
     },
     {
       name: "Styling",
       services: [
-        { name: "Blowout", price: 40 },
-        { name: "Updo", price: 65 },
-        { name: "Hair Extensions", price: 200 },
+        { name: "Blowout", price: 40, duration: 45 },
+        { name: "Updo", price: 65, duration: 60 },
+        { name: "Hair Extensions", price: 200, duration: 180 },
       ]
     }
   ],
@@ -99,17 +132,17 @@ const categoryServices: CategoryServices = {
     {
       name: "Manicures",
       services: [
-        { name: "Basic Manicure", price: 30 },
-        { name: "Gel Manicure", price: 45 },
-        { name: "Nail Art", price: 20 },
+        { name: "Basic Manicure", price: 30, duration: 30 },
+        { name: "Gel Manicure", price: 45, duration: 45 },
+        { name: "Nail Art", price: 20, duration: 30 },
       ]
     },
     {
       name: "Pedicures",
       services: [
-        { name: "Basic Pedicure", price: 40 },
-        { name: "Spa Pedicure", price: 55 },
-        { name: "Gel Pedicure", price: 60 },
+        { name: "Basic Pedicure", price: 40, duration: 45 },
+        { name: "Spa Pedicure", price: 55, duration: 60 },
+        { name: "Gel Pedicure", price: 60, duration: 60 },
       ]
     }
   ],
@@ -117,17 +150,17 @@ const categoryServices: CategoryServices = {
     {
       name: "Facial Waxing",
       services: [
-        { name: "Eyebrow Wax", price: 15 },
-        { name: "Upper Lip Wax", price: 10 },
-        { name: "Full Face Wax", price: 40 },
+        { name: "Eyebrow Wax", price: 15, duration: 15 },
+        { name: "Upper Lip Wax", price: 10, duration: 10 },
+        { name: "Full Face Wax", price: 40, duration: 45 },
       ]
     },
     {
       name: "Body Waxing",
       services: [
-        { name: "Leg Wax", price: 50 },
-        { name: "Brazilian Wax", price: 60 },
-        { name: "Full Body Wax", price: 150 },
+        { name: "Leg Wax", price: 50, duration: 45 },
+        { name: "Brazilian Wax", price: 60, duration: 45 },
+        { name: "Full Body Wax", price: 150, duration: 120 },
       ]
     }
   ],
@@ -135,25 +168,25 @@ const categoryServices: CategoryServices = {
     {
       name: "Facial Treatments",
       services: [
-        { name: "Basic Facial", price: 70 },
-        { name: "Deep Cleansing Facial", price: 90 },
-        { name: "Anti-Aging Facial", price: 110 },
+        { name: "Basic Facial", price: 70, duration: 60 },
+        { name: "Deep Cleansing Facial", price: 90, duration: 75 },
+        { name: "Anti-Aging Facial", price: 110, duration: 90 },
       ]
     },
     {
       name: "Makeup Services",
       services: [
-        { name: "Makeup Application", price: 60 },
-        { name: "Bridal Makeup", price: 120 },
-        { name: "Makeup Lesson", price: 80 },
+        { name: "Makeup Application", price: 60, duration: 45 },
+        { name: "Bridal Makeup", price: 120, duration: 90 },
+        { name: "Makeup Lesson", price: 80, duration: 60 },
       ]
     },
     {
       name: "Lash and Brow Services",
       services: [
-        { name: "Lash Extensions", price: 100 },
-        { name: "Lash Lift", price: 60 },
-        { name: "Microblading", price: 200 },
+        { name: "Lash Extensions", price: 100, duration: 120 },
+        { name: "Lash Lift", price: 60, duration: 45 },
+        { name: "Microblading", price: 200, duration: 180 },
       ]
     }
   ],
@@ -161,17 +194,17 @@ const categoryServices: CategoryServices = {
     {
       name: "Haircuts",
       services: [
-        { name: "Men's Haircut", price: 30 },
-        { name: "Buzz Cut", price: 20 },
-        { name: "Kids Haircut", price: 25 },
+        { name: "Men's Haircut", price: 30, duration: 30 },
+        { name: "Buzz Cut", price: 20, duration: 20 },
+        { name: "Kids Haircut", price: 25, duration: 30 },
       ]
     },
     {
       name: "Beard Services",
       services: [
-        { name: "Beard Trim", price: 20 },
-        { name: "Hot Shave", price: 35 },
-        { name: "Hair & Beard Combo", price: 45 },
+        { name: "Beard Trim", price: 20, duration: 15 },
+        { name: "Hot Shave", price: 35, duration: 30 },
+        { name: "Hair & Beard Combo", price: 45, duration: 45 },
       ]
     }
   ],
@@ -179,17 +212,17 @@ const categoryServices: CategoryServices = {
     {
       name: "Eyebrow Services",
       services: [
-        { name: "Eyebrow Threading", price: 15 },
-        { name: "Eyebrow Tinting", price: 20 },
-        { name: "Brow Lamination", price: 50 },
+        { name: "Eyebrow Threading", price: 15, duration: 15 },
+        { name: "Eyebrow Tinting", price: 20, duration: 20 },
+        { name: "Brow Lamination", price: 50, duration: 45 },
       ]
     },
     {
       name: "Lash Services",
       services: [
-        { name: "Lash Lift", price: 60 },
-        { name: "Lash Tint", price: 25 },
-        { name: "Lash Extensions", price: 100 },
+        { name: "Lash Lift", price: 60, duration: 45 },
+        { name: "Lash Tint", price: 25, duration: 20 },
+        { name: "Lash Extensions", price: 100, duration: 120 },
       ]
     }
   ],
@@ -197,10 +230,10 @@ const categoryServices: CategoryServices = {
     {
       name: "Massage Services",
       services: [
-        { name: "Swedish Massage", price: 80 },
-        { name: "Deep Tissue Massage", price: 90 },
-        { name: "Hot Stone Massage", price: 100 },
-        { name: "Couples Massage", price: 150 },
+        { name: "Swedish Massage", price: 80, duration: 60 },
+        { name: "Deep Tissue Massage", price: 90, duration: 60 },
+        { name: "Hot Stone Massage", price: 100, duration: 90 },
+        { name: "Couples Massage", price: 150, duration: 90 },
       ]
     }
   ],
@@ -208,10 +241,10 @@ const categoryServices: CategoryServices = {
     {
       name: "Spa Services",
       services: [
-        { name: "Spa Day Package", price: 200 },
-        { name: "Body Wrap", price: 90 },
-        { name: "Aromatherapy Session", price: 70 },
-        { name: "Hydrotherapy", price: 80 },
+        { name: "Spa Day Package", price: 200, duration: 180 },
+        { name: "Body Wrap", price: 90, duration: 60 },
+        { name: "Aromatherapy Session", price: 70, duration: 60 },
+        { name: "Hydrotherapy", price: 80, duration: 45 },
       ]
     }
   ],
@@ -219,10 +252,10 @@ const categoryServices: CategoryServices = {
     {
       name: "Fitness Services",
       services: [
-        { name: "Monthly Membership", price: 50 },
-        { name: "Day Pass", price: 15 },
-        { name: "Group Class", price: 20 },
-        { name: "Personal Training Session", price: 60 },
+        { name: "Monthly Membership", price: 50, duration: 0 },
+        { name: "Day Pass", price: 15, duration: 0 },
+        { name: "Group Class", price: 20, duration: 60 },
+        { name: "Personal Training Session", price: 60, duration: 60 },
       ]
     }
   ],
@@ -230,10 +263,10 @@ const categoryServices: CategoryServices = {
     {
       name: "Personal Training Services",
       services: [
-        { name: "1-on-1 Session", price: 70 },
-        { name: "Nutrition Consultation", price: 50 },
-        { name: "Fitness Assessment", price: 40 },
-        { name: "10-Session Package", price: 600 },
+        { name: "1-on-1 Session", price: 70, duration: 60 },
+        { name: "Nutrition Consultation", price: 50, duration: 45 },
+        { name: "Fitness Assessment", price: 40, duration: 30 },
+        { name: "10-Session Package", price: 600, duration: 600 },
       ]
     }
   ],
@@ -241,10 +274,10 @@ const categoryServices: CategoryServices = {
     {
       name: "Therapy Services",
       services: [
-        { name: "Individual Therapy", price: 100 },
-        { name: "Couples Therapy", price: 130 },
-        { name: "Group Therapy", price: 50 },
-        { name: "Art Therapy", price: 80 },
+        { name: "Individual Therapy", price: 100, duration: 60 },
+        { name: "Couples Therapy", price: 130, duration: 90 },
+        { name: "Group Therapy", price: 50, duration: 90 },
+        { name: "Art Therapy", price: 80, duration: 60 },
       ]
     }
   ],
@@ -252,10 +285,10 @@ const categoryServices: CategoryServices = {
     {
       name: "Tattoo & Piercing Services",
       services: [
-        { name: "Small Tattoo", price: 80 },
-        { name: "Large Tattoo", price: 200 },
-        { name: "Ear Piercing", price: 30 },
-        { name: "Body Piercing", price: 50 },
+        { name: "Small Tattoo", price: 80, duration: 60 },
+        { name: "Large Tattoo", price: 200, duration: 180 },
+        { name: "Ear Piercing", price: 30, duration: 15 },
+        { name: "Body Piercing", price: 50, duration: 30 },
       ]
     }
   ],
@@ -263,10 +296,10 @@ const categoryServices: CategoryServices = {
     {
       name: "Tanning Services",
       services: [
-        { name: "Single Session", price: 20 },
-        { name: "Monthly Unlimited", price: 60 },
-        { name: "Spray Tan", price: 40 },
-        { name: "Tanning Lotion", price: 25 },
+        { name: "Single Session", price: 20, duration: 15 },
+        { name: "Monthly Unlimited", price: 60, duration: 0 },
+        { name: "Spray Tan", price: 40, duration: 30 },
+        { name: "Tanning Lotion", price: 25, duration: 0 },
       ]
     }
   ],
@@ -274,10 +307,10 @@ const categoryServices: CategoryServices = {
     {
       name: "Aesthetic Services",
       services: [
-        { name: "Botox", price: 300 },
-        { name: "Dermal Fillers", price: 400 },
-        { name: "Chemical Peel", price: 150 },
-        { name: "Microdermabrasion", price: 100 },
+        { name: "Botox", price: 300, duration: 30 },
+        { name: "Dermal Fillers", price: 400, duration: 45 },
+        { name: "Chemical Peel", price: 150, duration: 60 },
+        { name: "Microdermabrasion", price: 100, duration: 45 },
       ]
     }
   ],
@@ -285,10 +318,10 @@ const categoryServices: CategoryServices = {
     {
       name: "Weight Loss Services",
       services: [
-        { name: "Initial Consultation", price: 50 },
-        { name: "Weekly Check-in", price: 30 },
-        { name: "Meal Plan", price: 100 },
-        { name: "Body Composition Analysis", price: 40 },
+        { name: "Initial Consultation", price: 50, duration: 60 },
+        { name: "Weekly Check-in", price: 30, duration: 30 },
+        { name: "Meal Plan", price: 100, duration: 45 },
+        { name: "Body Composition Analysis", price: 40, duration: 30 },
       ]
     }
   ],
@@ -395,11 +428,6 @@ const mapContainerStyle = {
   height: '400px'
 };
 
-const center = {
-  lat: 40.7128, // Default to New York City coordinates
-  lng: -74.0060
-};
-
 const mapOptions = {
   styles: [
     {
@@ -436,19 +464,37 @@ const mapOptions = {
 };
 
 function getBusinessOffers(businessId: string): BusinessOffer[] {
-  return businessOffers.filter(offer => offer.business_id === businessId);
+  return (businessOffers as BusinessOffer[]).filter(offer => offer.businessId === businessId);
+}
+
+function transformBusinessHours(hours: Business['hours']) {
+  if (!hours) return [];
+  
+  const daysOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  return daysOrder.map(day => {
+    const dayHours = hours[day];
+    return {
+      day: day.charAt(0).toUpperCase() + day.slice(1),
+      hours: dayHours ? `${dayHours.open} - ${dayHours.close}` : 'Closed'
+    };
+  });
 }
 
 export default function BusinessDetailPage() {
   const { id } = useParams();
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string
+  });
+
+  // State hooks
   const [business, setBusiness] = useState<Business | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState('');
   const [bookingItems, setBookingItems] = useState<BookingItem[]>([]);
   const [selectedServices, setSelectedServices] = useState<SelectedService[]>([]);
   const [selectedTeamMember, setSelectedTeamMember] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<string>('Featured');
   const [bookingError, setBookingError] = useState<string | null>(null);
-  const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isOpeningHoursOpen, setIsOpeningHoursOpen] = useState(false);
   const [isBusinessOpen, setIsBusinessOpen] = useState(false);
@@ -457,16 +503,21 @@ export default function BusinessDetailPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
-  const timeSlotContainerRef = useRef<HTMLDivElement>(null);
-  const dateContainerRef = useRef<HTMLDivElement>(null);
   const [dateDragging, setDateDragging] = useState(false);
   const [dateStartX, setDateStartX] = useState(0);
   const [dateScrollLeft, setDateScrollLeft] = useState(0);
-  const teamContainerRef = useRef<HTMLDivElement>(null);
   const [teamDragging, setTeamDragging] = useState(false);
   const [teamStartX, setTeamStartX] = useState(0);
   const [teamScrollLeft, setTeamScrollLeft] = useState(0);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
+  // Refs
+  const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeSlotContainerRef = useRef<HTMLDivElement>(null);
+  const dateContainerRef = useRef<HTMLDivElement>(null);
+  const teamContainerRef = useRef<HTMLDivElement>(null);
+
+  // Memoized values
   const availableDates = useMemo(() => {
     const today = new Date();
     const twoMonthsFromNow = addMonths(today, 2);
@@ -477,13 +528,32 @@ export default function BusinessDetailPage() {
     return dates;
   }, []);
 
+  const categories = useMemo(() => {
+    if (!business?.category || !categoryServices[business.category]) return [];
+    return ['Featured', ...categoryServices[business.category].map(cat => cat.name)];
+  }, [business?.category]);
+
+  const filteredServices = useMemo(() => {
+    if (!business?.category || !categoryServices[business.category]) return [];
+    if (activeTab === 'Featured') {
+      // For Featured tab, get one service from each category up to 4 services
+      const allCategories = categoryServices[business.category];
+      const featuredServices = allCategories.slice(0, 4).map(category => ({
+        name: '',
+        services: [category.services[0]] // Get first service from each category
+      }));
+      return featuredServices;
+    }
+    return categoryServices[business.category].filter(cat => cat.name === activeTab);
+  }, [business?.category, activeTab]);
+
   const availableTimeSlots = useMemo(() => {
-    if (!selectedDate) return [];
+    if (!selectedDate || !business?.openingHours) return [];
 
     const dayOfWeek = selectedDate.getDay();
-    const todayHours = openingHours[dayOfWeek === 0 ? 6 : dayOfWeek - 1].hours;
+    const todayHours = business.openingHours[dayOfWeek === 0 ? 6 : dayOfWeek - 1]?.hours;
 
-    if (todayHours === 'Closed') return [];
+    if (!todayHours || todayHours === 'Closed') return [];
 
     const [openTime, closeTime] = todayHours.split(' - ').map(t => {
       const [hours, minutes] = t.split(':').map(Number);
@@ -500,42 +570,34 @@ export default function BusinessDetailPage() {
       const minute = time % 60;
       const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
 
-      // Skip past times for today
       if (isToday && time <= currentTime) continue;
 
       slots.push(timeString);
     }
 
     return slots;
-  }, [selectedDate]);
+  }, [selectedDate, business?.openingHours]);
 
-  const validateBookingTime = useCallback(() => {
-    if (!selectedDate || !selectedTime) {
-      setIsValidBookingTime(false);
-      return;
-    }
-
-    const dayOfWeek = selectedDate.getDay();
-    const timeInMinutes = parseInt(selectedTime.split(':')[0]) * 60 + parseInt(selectedTime.split(':')[1]);
-
-    const todayHours = openingHours[dayOfWeek === 0 ? 6 : dayOfWeek - 1].hours;
-    if (todayHours === 'Closed') {
-      setIsValidBookingTime(false);
-      return;
-    }
-
-    const [openTime, closeTime] = todayHours.split(' - ').map(t => {
-      const [hours, minutes] = t.split(':').map(Number);
-      return hours * 60 + minutes;
-    });
-
-    setIsValidBookingTime(timeInMinutes >= openTime && timeInMinutes < closeTime);
-  }, [selectedDate, selectedTime]);
-
+  // Effects
   useEffect(() => {
     const foundBusiness = businesses.find(b => b.id === id);
-    console.log("Found business:", foundBusiness);
-    setBusiness(foundBusiness || null);
+    if (foundBusiness) {
+      const transformedBusiness: Business = {
+        ...foundBusiness,
+        openingHours: transformBusinessHours(foundBusiness.hours),
+        location: {
+          ...foundBusiness.location,
+          coordinates: foundBusiness.location.coordinates || { lat: 0, lng: 0 },
+          country: foundBusiness.location.state // Using state as country for now
+        },
+        isOpen: false, // Will be set by checkBusinessOpen
+        closingTime: foundBusiness.hours?.[Object.keys(foundBusiness.hours)[0]]?.close || '00:00',
+        galleryImages: foundBusiness.galleryImages || []
+      };
+      setBusiness(transformedBusiness);
+    } else {
+      setBusiness(null);
+    }
   }, [id]);
 
   useEffect(() => {
@@ -546,15 +608,17 @@ export default function BusinessDetailPage() {
 
   useEffect(() => {
     validateBookingTime();
-  }, [selectedDate, selectedTime, validateBookingTime]);
+  }, [selectedDate, selectedTime]);
 
   const checkBusinessOpen = () => {
+    if (!business?.openingHours) return;
+
     const now = new Date();
     const day = now.getDay();
     const time = now.getHours() * 100 + now.getMinutes();
 
-    const todayHours = openingHours[day === 0 ? 6 : day - 1].hours;
-    if (todayHours === 'Closed') {
+    const todayHours = business.openingHours[day === 0 ? 6 : day - 1]?.hours;
+    if (!todayHours || todayHours === 'Closed') {
       setIsBusinessOpen(false);
       return;
     }
@@ -567,9 +631,28 @@ export default function BusinessDetailPage() {
     setIsBusinessOpen(time >= openTime && time < closeTime);
   };
 
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string
-  });
+  const validateBookingTime = useCallback(() => {
+    if (!selectedDate || !selectedTime || !business?.openingHours) {
+      setIsValidBookingTime(false);
+      return;
+    }
+
+    const dayOfWeek = selectedDate.getDay();
+    const timeInMinutes = parseInt(selectedTime.split(':')[0]) * 60 + parseInt(selectedTime.split(':')[1]);
+
+    const todayHours = business.openingHours[dayOfWeek === 0 ? 6 : dayOfWeek - 1]?.hours;
+    if (!todayHours || todayHours === 'Closed') {
+      setIsValidBookingTime(false);
+      return;
+    }
+
+    const [openTime, closeTime] = todayHours.split(' - ').map(t => {
+      const [hours, minutes] = t.split(':').map(Number);
+      return hours * 60 + minutes;
+    });
+
+    setIsValidBookingTime(timeInMinutes >= openTime && timeInMinutes < closeTime);
+  }, [selectedDate, selectedTime, business?.openingHours]);
 
   if (!business) {
     return <div>Business not found</div>;
@@ -703,12 +786,12 @@ export default function BusinessDetailPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <style jsx global>{scrollbarHideStyles}</style>
-      <Header user={null} />
+      <Header />
       <main className="flex-grow">
         <div className="bg-white">
           <div className="space-y-16 mb-20">
             {/* Cover Section */}
-            <section className="relative h-[480px] overflow-hidden">
+            <section className="relative h-96 overflow-hidden">
               <Image
                 src={business.cover_picture ?? ''}
                 alt={business.name}
@@ -718,7 +801,7 @@ export default function BusinessDetailPage() {
                 priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-black/70 flex items-end">
-                <div className="p-6 text-white w-full">
+                <div className="p-6 text-white max-w-screen-2xl mx-auto w-full">
                   <h1 className="text-5xl font-bold mb-2">{business.name}</h1>
                   <p className="text-xl mb-4 opacity-90">{business.category}</p>
                   <div className="flex items-center justify-between space-x-4">
@@ -727,23 +810,34 @@ export default function BusinessDetailPage() {
                         <StarIcon className="w-5 h-5 text-yellow-400 mr-1" />
                         <span className="text-lg font-semibold">{business.rating.toFixed(1)}</span>
                       </div>
-                      <span className="text-lg opacity-90">
-                        {Array.from({ length: business?.price_range ?? 1 }).map((_, index) => (
-                          <span
-                            key={index}
-                            className={`text-[22px] font-medium ${business.is_premium ? 'text-amber-600' : 'text-neutral-900'
-                              }`}
-                          >
-                            $
-                          </span>
-                        ))}
-                      </span>
+                      <div className="flex items-center bg-white/20 rounded-full px-3 py-1">
+                        <span className="text-lg font-semibold">
+                          {Array.from({ length: business?.priceRange === 'LUXURY' ? 4 : business?.priceRange === 'EXPENSIVE' ? 3 : business?.priceRange === 'MODERATE' ? 2 : 1 }).map((_, index) => (
+                            <span
+                              key={index}
+                              className="text-white"
+                            >
+                              $
+                            </span>
+                          ))}
+                        </span>
+                      </div>
                     </div>
-                    <div className={`flex items-center bg-white/20 rounded-full px-3 py-1 ${isBusinessOpen ? 'text-green-400' : 'text-red-400'}`}>
-                      <Clock size={20} className="mr-1" />
-                      <span className="text-lg font-semibold">
-                        {isBusinessOpen ? 'Open' : 'Closed'}
-                      </span>
+                    <div className="flex items-center space-x-4">
+                      <Button
+                        variant="outline"
+                        className="bg-white/20 hover:bg-white/30 text-white border-white/40"
+                        onClick={() => setSelectedImageIndex(0)}
+                      >
+                        <Camera className="w-5 h-5 mr-2" />
+                        View Gallery
+                      </Button>
+                      <div className={`flex items-center bg-white/20 rounded-full px-3 py-1 ${isBusinessOpen ? 'text-green-400' : 'text-red-400'}`}>
+                        <Clock size={20} className="mr-1" />
+                        <span className="text-lg font-semibold">
+                          {isBusinessOpen ? 'Open' : 'Closed'}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -751,55 +845,93 @@ export default function BusinessDetailPage() {
             </section>
 
 
-
-            <div className='flex flex-col lg:flex-row lg:space-x-8 px-6'>
-              <div className='flex-1 space-y-10 lg:order-first order-last'>
+            <div className='flex flex-col lg:flex-row lg:space-x-16 px-6 max-w-screen-2xl mx-auto'>
+              <div className='flex-1 lg:order-first order-last'>
+                
                 {/* Add Stories section here */}
-                <div className="">
+                <div>
                   <Stories businessId={business.id} businessName={business.name} />
                 </div>
+
                 {/* Services Section */}
-                <section className="flex-1">
-                  <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">Services</h2>
-                  {categoryServices[business.category]?.map((category, index) => (
-                    <div key={index} className="mb-12">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-6">{category.name}</h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {category.services.map(service => {
-                          const isSelected = selectedServices.some(s => s.name === service.name);
-                          return (
-                            <div
-                              key={service.name}
-                              className={`flex flex-col justify-between p-6 rounded-lg transition-all duration-300 cursor-pointer
-                                ${isSelected
-                                  ? 'text-gray-800 border-2 border-black'
-                                  : 'text-gray-800 border-2 border-gray-100 hover:border-black'}`}
-                              onClick={() => isSelected ? removeFromBooking(service.name) : addToBooking(service, category.name)}
-                            >
-                              <div>
-                                <h4 className="text-lg font-semibold mb-2 truncate">{service.name}</h4>
-                                <p className={`text-sm ${isSelected ? 'text-gray-800' : 'text-gray-800'}`}>
-                                  {service.description || 'Professional service tailored to your needs'}
-                                </p>
-                              </div>
-                              <div className="mt-4 flex justify-between items-center">
-                                <span className="text-xl font-bold">${service.price}</span>
-                                {isSelected ? (
-                                  <CheckCircle size={24} className="text-green-400" />
-                                ) : (
-                                  <PlusCircle size={24} className={`text-gray-300 hover:text-black transition-colors duration-200`} />
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
+                <section>
+                  <div className="sticky top-20 bg-white z-40 pb-4">
+                    <h2 className="text-xl uppercase font-bold text-gray-950 pb-6 pt-6">Services</h2>
+                    
+                    {/* Categories Tabs */}
+                    <div className="relative">
+                      <div className="flex items-center space-x-2 overflow-x-auto scrollbar-hide">
+                        {categories.map((category, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setActiveTab(category)}
+                            className={`flex-none px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 
+                              ${activeTab === category 
+                                ? 'bg-black text-white' 
+                                : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'}`}
+                          >
+                            {category}
+                          </button>
+                        ))}
                       </div>
                     </div>
-                  ))}
+                  </div>
+
+                  {/* Services List */}
+                  {activeTab === 'Featured' ? (
+                    <div className="mb-12">
+                      <div className="flex flex-col gap-4">
+                        {filteredServices.map((category, categoryIndex) => 
+                          category.services.map((service, serviceIndex) => {
+                            const isSelected = selectedServices.some(s => s.name === service.name);
+                            return (
+                              <ServiceItem
+                                key={`${categoryIndex}-${serviceIndex}`}
+                                name={service.name}
+                                price={service.price}
+                                description={service.description}
+                                duration={service.duration}
+                                isSelected={isSelected}
+                                onToggle={() => isSelected 
+                                  ? removeFromBooking(service.name) 
+                                  : addToBooking(service, category.name)
+                                }
+                              />
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mb-12">
+                      <div className="flex flex-col gap-4">
+                        {filteredServices.flatMap(category => 
+                          category.services.map(service => {
+                            const isSelected = selectedServices.some(s => s.name === service.name);
+                            return (
+                              <ServiceItem
+                                key={service.name}
+                                name={service.name}
+                                price={service.price}
+                                description={service.description}
+                                duration={service.duration}
+                                isSelected={isSelected}
+                                onToggle={() => isSelected 
+                                  ? removeFromBooking(service.name) 
+                                  : addToBooking(service, category.name)
+                                }
+                              />
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </section>
+
                 {/* Team Section */}
-                <section className="">
-                  <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">Our Team</h2>
+                <section>
+                  <h2 className="text-xl uppercase font-bold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">Our Team</h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     <div
                       key="random"
@@ -838,38 +970,88 @@ export default function BusinessDetailPage() {
                   </div>
                 </section>
 
-                {/* Opening Hours Section */}
-                <section className="mt-10">
-                  <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">Opening Hours</h2>
-                  <div className="bg-white rounded-lg border border-gray-200 p-6">
-                    <div className="space-y-2">
-                      {openingHours.map((item, index) => {
-                        const isToday = index === (today === 0 ? 6 : today - 1);
-                        const isSunday = index === 6;
-                        return (
-                          <div
-                            key={item.day}
-                            className={`flex justify-between items-center py-2 ${isSunday ? 'text-gray-400' : ''
-                              }`}
-                          >
-                            <span className={`${isToday ? 'font-bold' : ''} ${isSunday ? '' : 'text-gray-600'}`}>
-                              {item.day}
-                            </span>
-                            <span className={`${isToday ? 'font-bold' : ''} ${item.hours === 'Closed' ? 'text-red-500' : (isSunday ? '' : 'text-gray-800')
-                              }`}>
-                              {item.hours}
-                            </span>
-                          </div>
-                        );
-                      })}
+                {/* Opening Hours and Additional Information Section */}
+                <div className="flex flex-col md:flex-row gap-8 ">
+                  {/* Opening Hours Section */}
+                  <section className="flex-1">
+                    <h2 className="text-xl uppercase font-bold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">Opening Hours</h2>
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <div className="space-y-2">
+                        {business?.openingHours?.map((item, index) => {
+                          const isToday = index === (today === 0 ? 6 : today - 1);
+                          const isSunday = index === 6;
+                          return (
+                            <div
+                              key={item.day}
+                              className={`flex justify-between items-center py-2 ${isSunday ? 'text-gray-400' : ''}`}
+                            >
+                              <span className={`${isToday ? 'font-bold' : ''} ${isSunday ? '' : 'text-gray-600'}`}>
+                                {item.day}
+                              </span>
+                              <span className={`${isToday ? 'font-bold' : ''} ${item.hours === 'Closed' ? 'text-red-500' : (isSunday ? '' : 'text-gray-800')}`}>
+                                {item.hours}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
+                  </section>
+
+                  {/* Additional Information */}
+                  <section className="flex-1">
+                    <h2 className="text-xl uppercase font-bold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">Additional Information</h2>
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                      <ul className="space-y-4">
+                        <li className="flex items-center text-base">
+                          <CheckCircle size={18} className="mr-2 text-green-500" />
+                          <span className="text-gray-800">Instant Confirmation</span>
+                        </li>
+                        <li className="flex items-center text-base">
+                          <CheckCircle size={18} className="mr-2 text-green-500" />
+                          <span className="text-gray-800">Free Cancellation (24 hours notice required)</span>
+                        </li>
+                        {business.amenities?.map((amenity, index) => (
+                          <li key={index} className="flex items-center text-base">
+                            <CheckCircle size={18} className="mr-2 text-green-500" />
+                            <span className="text-gray-800">{amenity}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </section>
+                </div>
+                
+                {/* About Section */}
+                <section className="">
+                  <h2 className="text-xl uppercase font-bold mb-6 text-gray-800">About Us</h2>
+                  <p className="text-gray-700 mb-6 text-lg">
+                    {business.description} We are committed to providing top-notch services to our clients in a welcoming and professional environment.
+                  </p>
+                  <div className="h-[400px] bg-gray-200 rounded-lg overflow-hidden">
+                    {!isLoaded ? (
+                      <div className="h-full flex items-center justify-center">
+                        <span>Loading map...</span>
+                      </div>
+                    ) : (
+                      <GoogleMap
+                        mapContainerStyle={mapContainerStyle}
+                        zoom={14}
+                        center={business?.location?.coordinates || { lat: 0, lng: 0 }}
+                        options={mapOptions}
+                      >
+                        {business?.location?.coordinates && (
+                          <MarkerF position={business.location.coordinates} />
+                        )}
+                      </GoogleMap>
+                    )}
                   </div>
                 </section>
 
                 {/* Only show Special Offers section if business has offers */}
                 {availableOffers.length > 0 && (
                   <section className="mt-20">
-                    <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">
+                    <h2 className="text-xl uppercase font-bold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">
                       Special Offers
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -899,303 +1081,126 @@ export default function BusinessDetailPage() {
                     </div>
                   </section>
                 )}
-
-                <div className="flex flex-col lg:flex-row space-y-16 lg:space-y-0 lg:space-x-16">
-                  {/* Additional Information */}
-                  <section className="flex-1">
-                    <h2 className="text-3xl font-semibold mb-6 text-gray-800">Additional Information</h2>
-                    <ul className="space-y-4">
-                      <li className="flex items-center text-base">
-                        <CheckCircle size={18} className="mr-2 text-green-500" />
-                        <span className="text-gray-800">Instant Confirmation</span>
-                      </li>
-                      <li className="flex items-center text-base">
-                        <CheckCircle size={18} className="mr-2 text-green-500" />
-                        <span className="text-gray-800">Free Cancellation (24 hours notice required)</span>
-                      </li>
-                    </ul>
-                  </section>
-                </div>
-
               </div>
 
               {/* Booking Section */}
-              <section className="lg:order-last order-first lg:w-96 md:sticky top-20 inset-0 mb-20 md:mb-0">
-                <div className="lg:sticky lg:top-24 bg-white p-6 rounded-lg shadow-lg space-y-6 flex flex-col border border-gray-200">
-                  <h2 className="text-lg lg:text-2xl font-semibold text-gray-800">Your Booking</h2>
-                  <div className="space-y-6">
-                    <div className="flex flex-col space-y-2">
-                      <Label className="text-gray-700">Select Date</Label>
-                      <div
-                        ref={dateContainerRef}
-                        className={cn(
-                          "overflow-x-scroll scrollbar-hide cursor-grab active:cursor-grabbing rounded-md",
-                          dateDragging && "select-none"
-                        )}
-                        onMouseDown={handleDateMouseDown}
-                        onMouseLeave={handleDateMouseLeave}
-                        onMouseUp={handleDateMouseUp}
-                        onMouseMove={handleDateMouseMove}
-                      >
-                        <div className="flex space-x-2 w-max">
-                          {availableDates.map((date) => (
-                            <Button
-                              key={date.toISOString()}
-                              variant="outline"
-                              className={cn(
-                                "flex-none px-4 py-6 flex flex-col items-center gap-1 select-none min-w-[100px] h-auto",
-                                isSameDay(selectedDate, date) && "bg-black text-white hover:bg-gray-800",
-                                isToday(date) && "border-black",
-                              )}
-                              onClick={() => !dateDragging && setSelectedDate(date)}
-                            >
-                              <span className="text-xs font-medium">
-                                {format(date, 'EEE')}
-                              </span>
-                              <span className="text-lg">
-                                {format(date, 'd')}
-                              </span>
-                              <span className="text-xs">
-                                {format(date, 'MMM')}
-                              </span>
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col space-y-2">
-                      <Label className="text-gray-700">Select Time</Label>
-                      <div
-                        ref={timeSlotContainerRef}
-                        className={cn(
-                          "overflow-x-scroll scrollbar-hide cursor-grab active:cursor-grabbing rounded-md",
-                          isDragging && "select-none"
-                        )}
-                        onMouseDown={handleMouseDown}
-                        onMouseLeave={handleMouseLeave}
-                        onMouseUp={handleMouseUp}
-                        onMouseMove={handleMouseMove}
-                      >
-                        <div className="flex space-x-2 w-max">
-                          {availableTimeSlots.length > 0 ? (
-                            availableTimeSlots.map((time) => (
-                              <Button
-                                key={time}
-                                variant="outline"
-                                className={cn(
-                                  "flex-none px-4 select-none",
-                                  selectedTime === time && "bg-black text-white hover:bg-gray-800"
-                                )}
-                                onClick={() => !isDragging && setSelectedTime(time)}
-                              >
-                                {time}
-                              </Button>
-                            ))
-                          ) : (
-                            <div className="px-4 py-3 text-sm text-gray-500">
-                              No available time slots for this date
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+              <section className="lg:order-last order-first lg:w-[420px] md:sticky top-20 inset-0 mb-20 md:mb-0">
+                <div className="lg:sticky lg:top-24 bg-white p-6 rounded-lg shadow-lg flex flex-col border border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg lg:text-2xl font-semibold text-gray-800">Your Booking</h2>
+                    {selectedServices.length > 0 && (
+                      <span className="text-sm text-gray-600">{selectedServices.length} service{selectedServices.length !== 1 ? 's' : ''} selected</span>
+                    )}
                   </div>
-
-                  {/* Team Member Selection */}
-                  <div className="flex flex-col space-y-2">
-                    <Label className="text-gray-700">Select Team Member</Label>
-                    <div
-                      ref={teamContainerRef}
-                      className={cn(
-                        "overflow-x-scroll scrollbar-hide cursor-grab active:cursor-grabbing rounded-md",
-                        teamDragging && "select-none"
-                      )}
-                      onMouseDown={handleTeamMouseDown}
-                      onMouseLeave={handleTeamMouseLeave}
-                      onMouseUp={handleTeamMouseUp}
-                      onMouseMove={handleTeamMouseMove}
-                    >
-                      <div className="flex space-x-2 w-max">
-                        <Button
-                          key="random"
-                          variant="outline"
-                          className={cn(
-                            "flex-none px-4 py-6 flex flex-col items-center gap-1 select-none min-w-[100px] h-auto",
-                            selectedTeamMember === 'Random' && "bg-black text-white hover:bg-gray-800"
-                          )}
-                          onClick={() => !teamDragging && setSelectedTeamMember('Random')}
-                        >
-                          <Shuffle className="h-6 w-6 mb-1" />
-                          <span className="text-sm font-medium">Random</span>
-                          <span className="text-xs">Any available</span>
-                        </Button>
-
-                        {businessTeam.map((member) => (
-                          <Button
-                            key={member.name}
-                            variant="outline"
-                            className={cn(
-                              "flex-none px-4 py-6 flex flex-col items-center gap-1 select-none min-w-[100px] h-auto",
-                              selectedTeamMember === member.name && "bg-black text-white hover:bg-gray-800"
-                            )}
-                            onClick={() => !teamDragging && setSelectedTeamMember(member.name)}
-                          >
-                            <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center mb-1">
-                              <span className="text-sm font-bold text-white">
-                                {member.name.split(' ').map(n => n[0]).join('')}
-                              </span>
-                            </div>
-                            <span className="text-sm font-medium text-center line-clamp-1">{member.name}</span>
-                            <span className="text-xs text-center line-clamp-1">{member.profession}</span>
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Selected Services - Togglable on mobile */}
-                  {selectedServices.length > 0 && (
-                    <div className="lg:block bg-gray-50 border-y border-gray-200 p-6 -mx-6">
-                      <div
-                        className="flex justify-between items-center cursor-pointer lg:cursor-default"
-                        onClick={() => setIsServicesOpen(!isServicesOpen)}
-                      >
-                        <h3 className="text-base font-semibold text-gray-800">Selected Services</h3>
-                        <button className="lg:hidden transition-transform duration-300 ease-in-out transform">
-                          <ChevronDown
-                            size={20}
-                            className={`text-gray-500 transition-transform duration-300 ${isServicesOpen ? 'rotate-180' : ''}`}
-                          />
-                        </button>
-                      </div>
-                      <div
-                        className={`mt-4 overflow-hidden transition-all duration-500 ease-in-out ${isServicesOpen ? 'max-h-[1000px] opacity-100 visible' : 'max-h-0 opacity-0 invisible lg:max-h-[1000px] lg:opacity-100 lg:visible'
-                          }`}
-                      >
-                        <div className="space-y-5">
-                          {selectedServices.map((service, index) => (
-                            <div key={index} className="flex justify-between items-center">
-                              <div className='flex items-center space-x-2'>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    removeFromBooking(service.name);
-                                  }}
-                                  className="text-red-500 hover:text-red-700"
-                                >
-                                  <X size={16} />
-                                </button>
-                                <span className="text-sm text-gray-600">{service.name}</span>
-                              </div>
-                              <span className="text-sm font-medium text-gray-800">${service.price}</span>
-                            </div>
-                          ))}
-                          <div className="flex justify-between items-center font-semibold border-t border-gray-200 pt-4">
-                            <span className='text-gray-800'>Total:</span>
-                            <span className='text-gray-800'>${totalPrice}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Error Message */}
-                  {bookingError && (
-                    <div className="bg-red-50 border border-red-200 text-red-400 px-4 py-3 rounded relative" role="alert">
-                      <div className="flex items-center">
-                        <AlertCircle className="w-5 h-5 mr-2" />
-                        <span>{bookingError}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Book Now Button */}
-                  <Button
-                    className="w-full font-semibold py-2 px-4 rounded transition duration-300 ease-in-out bg-black hover:bg-gray-800 text-white"
-                    onClick={handleBooking}
+                  
+                  <Button 
+                    className="w-full py-6 text-base font-semibold rounded-lg transition duration-300 ease-in-out bg-black hover:bg-gray-800 text-white"
+                    onClick={() => setIsBookingModalOpen(true)}
                   >
-                    Book Now
+                    {selectedServices.length === 0 ? 'Book Now' : `Book Now • $${totalPrice}`}
                   </Button>
-                </div>
-              </section>
-            </div>
-            {/* Gallery Section */}
-            {business.galleryImages && business.galleryImages.length > 0 && (
-              <section className="px-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-3xl font-semibold text-gray-800">Gallery</h2>
-                  <button
-                    onClick={() => setSelectedImageIndex(0)}
-                    className="flex items-center text-gray-600 hover:text-black transition-colors duration-200"
-                  >
-                    <Camera size={20} className="mr-2" />
-                    <span>View all photos</span>
-                  </button>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {business.galleryImages.slice(0, 8).map((image, index) => (
-                    <div
-                      key={index}
-                      className="relative aspect-square rounded-lg overflow-hidden cursor-pointer"
-                      onClick={() => setSelectedImageIndex(index)}
-                    >
-                      <Image
-                        src={image}
-                        alt={`${business.name} gallery image ${index + 1}`}
-                        width={300}
-                        height={0}
-                        className="object-cover hover:scale-110 transition-transform duration-300 !h-full w-full"
-                      />
-                    </div>
-                  ))}
-                </div>
-                {business.galleryImages.length > 8 && (
-                  <div className="mt-4 text-center">
-                    <button
-                      onClick={() => setSelectedImageIndex(0)}
-                      className="text-gray-600 hover:text-black transition-colors duration-200"
-                    >
-                      View all {business.galleryImages.length} photos
-                    </button>
-                  </div>
-                )}
 
-                {/* Image Gallery Modal */}
-                <ImageGalleryModal
-                  images={business.galleryImages}
-                  initialIndex={selectedImageIndex}
-                  isOpen={selectedImageIndex !== -1}
-                  onClose={() => setSelectedImageIndex(-1)}
+                  {/* Opening Hours and Location */}
+                  <div className="mt-4 space-y-4 pt-6 border-t border-gray-200">
+                    <div className="flex items-start space-x-3">
+                      <Clock className="w-5 h-5 text-gray-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <span className={business?.isOpen ? "text-green-600 font-medium" : "text-red-500 font-medium"}>
+                            {business?.isOpen ? 'Open' : 'Closed'}
+                          </span>
+                          {business?.isOpen && (
+                            <>
+                              <span className="text-gray-600">•</span>
+                              <span className="text-gray-600">closes soon at {business.closingTime}</span>
+                            </>
+                          )}
+                        </div>
+                        <button 
+                          onClick={() => setIsOpeningHoursOpen(!isOpeningHoursOpen)}
+                          className="text-sm text-gray-600 hover:text-gray-900 flex items-center mt-1"
+                        >
+                          See opening hours
+                          <ChevronDown className={`w-4 h-4 ml-1 transition-transform duration-200 ${isOpeningHoursOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        {isOpeningHoursOpen && business?.openingHours && (
+                          <div className="mt-2 space-y-1">
+                            {business.openingHours.map((item, index) => (
+                              <div key={item.day} className="flex justify-between text-sm">
+                                <span className={`${index === (today === 0 ? 6 : today - 1) ? 'font-medium' : ''} text-gray-600`}>
+                                  {item.day}
+                                </span>
+                                <span className={`${item.hours === 'Closed' ? 'text-red-500' : 'text-gray-900'}`}>
+                                  {item.hours}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 mt-1">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-gray-500">
+                          <path d="M12 13.43a3.12 3.12 0 1 0 0-6.24 3.12 3.12 0 0 0 0 6.24Z" stroke="currentColor" strokeWidth="1.5" />
+                          <path d="M3.62 8.49c1.97-8.66 14.8-8.65 16.76.01 1.15 5.08-2.01 9.38-4.78 12.04a5.193 5.193 0 0 1-7.21 0c-2.76-2.66-5.92-6.97-4.77-12.05Z" stroke="currentColor" strokeWidth="1.5" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-gray-900">
+                          {business?.location.address}, {business?.location.city}, {business?.location.country}
+                        </p>
+                        <a 
+                          href={business?.location?.coordinates ? 
+                            `https://www.google.com/maps/search/?api=1&query=${business.location.coordinates.lat},${business.location.coordinates.lng}` :
+                            '#'
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:text-blue-800 flex items-center mt-1"
+                        >
+                          Get directions
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <BookingModal
+                  isOpen={isBookingModalOpen}
+                  onClose={() => setIsBookingModalOpen(false)}
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                  selectedTime={selectedTime}
+                  setSelectedTime={setSelectedTime}
+                  selectedTeamMember={selectedTeamMember}
+                  setSelectedTeamMember={setSelectedTeamMember}
+                  selectedServices={selectedServices}
+                  removeFromBooking={removeFromBooking}
+                  availableDates={availableDates}
+                  availableTimeSlots={availableTimeSlots}
+                  businessTeam={businessTeam}
+                  totalPrice={totalPrice}
+                  bookingError={bookingError}
+                  handleBooking={handleBooking}
+                  dateDragging={dateDragging}
+                  dateStartX={dateStartX}
+                  dateScrollLeft={dateScrollLeft}
+                  handleDateMouseDown={handleDateMouseDown}
+                  handleDateMouseLeave={handleDateMouseLeave}
+                  handleDateMouseUp={handleDateMouseUp}
+                  handleDateMouseMove={handleDateMouseMove}
+                  dateContainerRef={dateContainerRef}
+                  services={filteredServices.flatMap(category => category.services)}
+                  categories={categories}
+                  addToBooking={addToBooking}
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  filteredServices={filteredServices}
                 />
               </section>
-            )}
-
-            {/* About Section */}
-            <section className="mb-20 mt-20 px-6">
-              <h2 className="text-3xl font-semibold mb-6 text-gray-800">About Us</h2>
-              <p className="text-gray-700 mb-6 text-lg">
-                {business.description} We are committed to providing top-notch services to our clients in a welcoming and professional environment.
-              </p>
-              <div className="h-[400px] bg-gray-200 rounded-lg overflow-hidden">
-                {!isLoaded ? (
-                  <div className="h-full flex items-center justify-center">
-                    <span>Loading map...</span>
-                  </div>
-                ) : (
-                  <GoogleMap
-                    mapContainerStyle={mapContainerStyle}
-                    zoom={14}
-                    center={center}
-                    options={mapOptions}
-                  >
-                    <MarkerF position={center} />
-                  </GoogleMap>
-                )}
-              </div>
-            </section>
-
-
+            </div>
           </div>
         </div>
       </main>

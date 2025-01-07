@@ -149,7 +149,7 @@ export function Header() {
           </DropdownMenu>
         </div>
       ) : (
-        <>
+        <div className="flex items-center space-x-4">
           <Button 
             onClick={() => router.push('/pages/public/signup/business')}
             className={`${isScrolled ? 'border-gray-900 text-gray-900  hover:bg-black/10' : ' border-white text-white  hover:bg-white/10'} font-semibold border hidden md:block mr-4`}
@@ -168,7 +168,7 @@ export function Header() {
           >
             Register
           </Button>
-        </>
+        </div>
       )}
     </>
   );
@@ -186,12 +186,12 @@ export function Header() {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 will-change-height ${isScrolled || isMenuOpen ? 'bg-white h-20' : 'bg-transparent h-20'}`}>
-      <div className={`px-6 flex justify-between items-center h-full transition-colors duration-300 ${isScrolled || isMenuOpen ? '' : ''}`}>
-        <Link href="/" className={`text-4xl font-semibold md:w-80 ${bebasNeue.className} ${isScrolled || isMenuOpen ? 'text-black' : 'text-white'}`}>
+      <div className={`max-w-screen-2xl mx-auto px-6 flex justify-between items-center h-full transition-colors duration-300 ${isScrolled || isMenuOpen ? '' : ''}`}>
+        <Link href="/" className={`text-4xl font-semibold lg:w-96 ${bebasNeue.className} ${isScrolled || isMenuOpen ? 'text-black' : 'text-white'}`}>
           NOOOR
         </Link>
         
-        <div className="hidden md:flex flex-1 justify-center items-center space-x-8">
+        <div className="hidden lg:flex flex-1 justify-center items-center space-x-8">
           <Link href="/" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
             Home
           </Link>
@@ -206,7 +206,7 @@ export function Header() {
           </Link>
         </div>
 
-        <div className="hidden md:flex md:w-84 items-center space-x-4 justify-end">
+        <div className="hidden lg:flex lg:w-96 items-center space-x-4 justify-end">
           {user ? (
             <div className="flex items-center gap-4">
               <Link href="/pages/private/business/partner">
@@ -258,7 +258,7 @@ export function Header() {
               </DropdownMenu>
             </div>
           ) : (
-            <>
+            <div className="flex items-center space-x-4">
               <Button 
                 onClick={() => router.push('/pages/public/signup/business')}
                 className={`${isScrolled ? 'border-gray-900 text-gray-900  hover:bg-black/10' : ' border-white text-white  hover:bg-white/10'} font-semibold border hidden md:block mr-4`}
@@ -277,19 +277,19 @@ export function Header() {
               >
                 Register
               </Button>
-            </>
+            </div>
           )}
         </div>
 
         <button
-          className={`md:hidden focus:outline-none ${isScrolled || isMenuOpen ? 'text-gray-600' : 'text-white'}`}
+          className={`lg:hidden focus:outline-none ${isScrolled || isMenuOpen ? 'text-gray-600' : 'text-white'}`}
           onClick={toggleMenu}
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
       <div 
-        className={`md:hidden absolute top-20 left-0 right-0 bg-white shadow-md px-8 py-4 space-y-4 transform transition-all duration-300 ease-in-out origin-top h-[calc(100vh-5rem)] flex flex-col justify-between ${
+        className={`lg:hidden absolute top-20 left-0 right-0 bg-white shadow-md px-8 py-4 space-y-4 transform transition-all duration-300 ease-in-out origin-top h-[calc(100vh-5rem)] flex flex-col justify-between ${
           isMenuOpen 
             ? 'opacity-100 translate-y-0 animate-slideDown' 
             : 'opacity-0 -translate-y-4 pointer-events-none'
