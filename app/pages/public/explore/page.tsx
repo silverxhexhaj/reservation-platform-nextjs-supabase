@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import { BusinessCategory, businessCategories } from "@/app/models/supabase.models";
 import { containerVariants, itemVariants } from "@/app/models/transitionEffects.models";
 import { categoryBackgrounds, categoryBorders } from "@/lib/color.utils";
+import { loadInitialBusinesses } from "@/app/service/business/business.service";
 
 export default function ExplorePage({
   searchParams,

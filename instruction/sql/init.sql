@@ -101,7 +101,6 @@ CREATE TABLE notifications (
 -- Locations table
 CREATE TABLE locations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     address TEXT NOT NULL,
     city VARCHAR(100) NOT NULL,
@@ -384,7 +383,9 @@ CREATE TABLE business_favorites (
     CONSTRAINT unique_user_business_favorite UNIQUE (user_id, business_id)
 );
 
--- Add index for faster lookups
+
+
+-- Add indexes for business_offers
 CREATE INDEX idx_business_favorites_user ON business_favorites(user_id);
 CREATE INDEX idx_business_favorites_business ON business_favorites(business_id);
 CREATE INDEX idx_businesses_owner ON businesses(owner_id);
@@ -409,17 +410,15 @@ CREATE INDEX idx_reviews_staff ON reviews(staff_id) WHERE review_type = 'staff';
 CREATE INDEX idx_reviews_user ON reviews(user_id);
 CREATE INDEX idx_reviews_type_rating ON reviews(review_type, rating);
 CREATE INDEX idx_reviews_booking ON reviews(booking_id);
-CREATE INDEX idx_locations_business ON locations(business_id);
 CREATE INDEX idx_locations_city_country ON locations(city, country);
 CREATE INDEX idx_locations_coordinates ON locations(latitude, longitude);
-CREATE INDEX idx_locations_active ON locations(business_id, is_active);
-CREATE INDEX idx_locations_main ON locations(business_id, is_main_location) WHERE is_main_location = true;
 CREATE INDEX idx_business_features ON business_features(business_id, feature_name);
 CREATE INDEX idx_business_features_available ON business_features(business_id, feature_name) WHERE is_available = true;
 CREATE INDEX idx_business_gallery_business ON business_gallery(business_id);
 CREATE INDEX idx_business_gallery_featured ON business_gallery(business_id, is_featured) WHERE is_featured = true;
 CREATE INDEX idx_business_gallery_order ON business_gallery(business_id, sort_order);
 CREATE INDEX idx_profiles_user ON profiles(user_id);
+
 
 -- Add triggers for updated_at timestamps
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -515,7 +514,6 @@ CREATE TRIGGER update_profiles_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
     
--- Add trigger for updated_at
 CREATE TRIGGER update_business_favorites_updated_at
     BEFORE UPDATE ON business_favorites
     FOR EACH ROW

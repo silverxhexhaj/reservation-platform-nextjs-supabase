@@ -253,36 +253,10 @@ function SignInContent() {
 }
 
 export default function SignInPage() {
-  const [user, setUser] = useState<{ username: string } | null>(null);
-  const router = useRouter();
-
-  useEffect(() => {
-    // Check if user is already logged in
-    const checkUser = async () => {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('id', authUser.id)
-          .single();
-        
-        if (profile) {
-          setUser({ username: profile.username });
-          // If user is already logged in, redirect to returnTo or home
-          const searchParams = new URLSearchParams(window.location.search);
-          const returnTo = searchParams.get('returnTo') || '/';
-          router.push(returnTo);
-        }
-      }
-    };
-
-    checkUser();
-  }, [router]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header user={user} />
+      <Header />
       <main className="flex-grow flex items-center justify-center py-16 sm:py-20 bg-gradient-to-r from-purple-900 via-blue-900 to-purple-900">
         <Suspense fallback={
           <div className="flex items-center justify-center">

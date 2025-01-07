@@ -2,13 +2,13 @@
 
 import Link from 'next/link';
 import Image from 'next/image'
-import { Business } from "@/app/models/supabase.models"
 import { Heart, Crown, Percent, Sparkles, Star, Users, MapPin } from "lucide-react"
 import { Badge } from "./ui/badge"
 import { Card, CardContent} from "./ui/card"
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { itemVariants } from '../models/transitionEffects.models';
+import { BusinessSummary } from '../models/functions/businessSummary.model';
 
 
 function isNewBusiness(createdAt: Date): boolean {
@@ -19,7 +19,7 @@ function isNewBusiness(createdAt: Date): boolean {
 
 
 interface BusinessCardProps {
-    business: Business
+    business: BusinessSummary
 }
 
 export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
@@ -40,7 +40,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
                     }`}>
                     <div className="aspect-[4/3] overflow-hidden relative border-b border-gray-100">
                         <Image
-                            src={business.cover_picture ?? ''}
+                            src={business.image_url ?? ''}
                             alt={business.name ?? ''}
                             fill
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
@@ -65,7 +65,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
                             </Badge>
                         </div>
                         <div className="absolute bottom-3 right-3 z-10 flex flex-row gap-2">
-                            {isNewBusiness(new Date(business.created_at)) && (
+                            {business.created_at && isNewBusiness(new Date(business.created_at)) && (
                                 <Badge
                                     variant="secondary"
                                     className="bg-emerald-100/90 backdrop-blur-sm text-emerald-800 border-emerald-200/50 font-medium text-xs flex items-center gap-1"
@@ -115,7 +115,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
                                 <div className="flex items-center space-x-1">
                                     <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
                                     <span className="text-xs font-medium text-neutral-900">
-                                        {business.rating?.toFixed(1) ?? '0.0'}
+                                        {business.review_average?.toFixed(1) ?? '0.0'}
                                     </span>
                                 </div>
                                 <div className="flex items-center space-x-1 text-neutral-500">

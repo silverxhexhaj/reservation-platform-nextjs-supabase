@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Header } from '@/app/components/Header'
 import { motion } from 'framer-motion'
 import { Button } from '@/app/components/ui/button'
 import { ArrowRight, CheckCircle } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import {
   Accordion,
   AccordionContent,
@@ -35,54 +34,10 @@ const AnimatedGradient = () => {
 };
 
 export default function PricingPage() {
-  const [user, setUser] = useState<{ username: string } | null>(null);
-
-  useEffect(() => {
-    async function getUser() {
-      try {
-        const { data: { user: authUser } } = await supabase.auth.getUser();
-        if (authUser) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('username')
-            .eq('id', authUser.id)
-            .single();
-          
-          if (profile) {
-            setUser({ username: profile.username });
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching user:', error);
-      }
-    }
-
-    getUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('id', session.user.id)
-          .single();
-        
-        if (profile) {
-          setUser({ username: profile.username });
-        }
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
+ 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header user={user} />
+      <Header />
       
       {/* Hero Section with Gradient Background */}
       <div className="relative h-full md:h-screen flex items-center justify-center overflow-hidden">
