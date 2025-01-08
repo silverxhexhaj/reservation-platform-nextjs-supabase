@@ -53,15 +53,15 @@ export function ServiceItem({
         </div>
 
         {/* Select Button */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2">
+        <div className="absolute right-6 top-1/2 -translate-y-1/2">
           <Button
             variant="ghost"
             size="sm"
             className={cn(
-              "h-10 px-6 rounded-full transition-all duration-200 font-medium",
+              "p-4 rounded-full transition-all duration-200 font-medium text-xs flex items-center",
               isSelected 
                 ? "bg-black text-white hover:bg-gray-800" 
-                : "border-2 border-gray-200 hover:border-gray-300"
+                : "border border-gray-200 hover:border-gray-300"
             )}
             onClick={(e) => {
               e.stopPropagation();
@@ -70,12 +70,12 @@ export function ServiceItem({
           >
             {isSelected ? (
               <>
-                <CheckCircle className="w-4 h-4 mr-2" />
+                <CheckCircle className="w-4 h-4 mr-1" />
                 <span>Booked</span>
               </>
             ) : (
               <>
-                <PlusCircle className="w-4 h-4 mr-2" />
+                <PlusCircle className="w-4 h-4 mr-1" />
                 <span>Book</span>
               </>
             )}

@@ -17,6 +17,8 @@ import { ImageGalleryModal } from "@/app/components/ImageGalleryModal";
 import { ServiceOffer } from "@/app/components/ServiceOffer";
 import { ServiceItem } from "./components/ServiceItem";
 import { BookingModal } from "./components/BookingModal";
+import { StaffDetailModal } from './components/StaffDetailModal';
+import { Reviews } from './components/Reviews';
 
 const scrollbarHideStyles = `
   .scrollbar-hide {
@@ -510,6 +512,20 @@ export default function BusinessDetailPage() {
   const [teamStartX, setTeamStartX] = useState(0);
   const [teamScrollLeft, setTeamScrollLeft] = useState(0);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState<TeamMember | null>(null);
+
+  const gradients = [
+    'from-blue-400 to-blue-600',
+    'from-purple-400 to-purple-600',
+    'from-pink-400 to-pink-600',
+    'from-green-400 to-green-600',
+    'from-yellow-400 to-yellow-600',
+    'from-red-400 to-red-600',
+    'from-indigo-400 to-indigo-600',
+    'from-teal-400 to-teal-600',
+    'from-orange-400 to-orange-600',
+    'from-cyan-400 to-cyan-600'
+  ];
 
   // Refs
   const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -787,11 +803,10 @@ export default function BusinessDetailPage() {
     <div className="min-h-screen flex flex-col">
       <style jsx global>{scrollbarHideStyles}</style>
       <Header />
-      <main className="flex-grow">
-        <div className="bg-white">
-          <div className="space-y-16 mb-20">
+      <main className="flex-grow relative">
+          <div className="space-y-8 lg:space-y-16">
             {/* Cover Section */}
-            <section className="relative h-96 overflow-hidden">
+            <section className="relative h-64 lg:h-96 overflow-hidden">
               <Image
                 src={business.cover_picture ?? ''}
                 alt={business.name}
@@ -802,16 +817,16 @@ export default function BusinessDetailPage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-black/70 flex items-end">
                 <div className="p-6 text-white max-w-screen-2xl mx-auto w-full">
-                  <h1 className="text-5xl font-bold mb-2">{business.name}</h1>
-                  <p className="text-xl mb-4 opacity-90">{business.category}</p>
+                  <h1 className="text-3xl lg:text-5xl font-bold mb-2">{business.name}</h1>
+                  <p className="lg:text-xl mb-4 opacity-90">{business.category}</p>
                   <div className="flex items-center justify-between space-x-4">
                     <div className="flex items-center space-x-2">
                       <div className="flex items-center bg-white/20 rounded-full px-3 py-1">
-                        <StarIcon className="w-5 h-5 text-yellow-400 mr-1" />
-                        <span className="text-lg font-semibold">{business.rating.toFixed(1)}</span>
+                        <StarIcon className="w-4 lg:w-5 h-4 lg:h-5 text-yellow-400 mr-1" />
+                        <span className="text-sm lg:text-lg font-semibold">{business.rating.toFixed(1)}</span>
                       </div>
                       <div className="flex items-center bg-white/20 rounded-full px-3 py-1">
-                        <span className="text-lg font-semibold">
+                        <span className="text-sm lg:text-lg font-semibold">
                           {Array.from({ length: business?.priceRange === 'LUXURY' ? 4 : business?.priceRange === 'EXPENSIVE' ? 3 : business?.priceRange === 'MODERATE' ? 2 : 1 }).map((_, index) => (
                             <span
                               key={index}
@@ -826,15 +841,15 @@ export default function BusinessDetailPage() {
                     <div className="flex items-center space-x-4">
                       <Button
                         variant="outline"
-                        className="bg-white/20 hover:bg-white/30 text-white border-white/40"
+                        className="bg-white/20 hover:bg-white/30 text-white border-white/40 text-sm lg:text-base"
                         onClick={() => setSelectedImageIndex(0)}
                       >
-                        <Camera className="w-5 h-5 mr-2" />
+                        <Camera className="w-4 lg:w-5 h-4 lg:h-5 mr-2" />
                         View Gallery
                       </Button>
                       <div className={`flex items-center bg-white/20 rounded-full px-3 py-1 ${isBusinessOpen ? 'text-green-400' : 'text-red-400'}`}>
-                        <Clock size={20} className="mr-1" />
-                        <span className="text-lg font-semibold">
+                        <Clock className="mr-1 w-4 lg:w-5 h-4 lg:h-5" />
+                        <span className="text-sm lg:text-base font-semibold">
                           {isBusinessOpen ? 'Open' : 'Closed'}
                         </span>
                       </div>
@@ -845,8 +860,8 @@ export default function BusinessDetailPage() {
             </section>
 
 
-            <div className='flex flex-col lg:flex-row lg:space-x-16 px-6 max-w-screen-2xl mx-auto'>
-              <div className='flex-1 lg:order-first order-last'>
+            <div className='flex flex-col lg:flex-row lg:space-x-16 px-6 max-w-screen-2xl mx-auto relative'>
+              <div className='flex flex-col flex-1 lg:order-first order-last space-y-8 lg:space-y-16 pb-32 lg:pb-0'>
                 
                 {/* Add Stories section here */}
                 <div>
@@ -855,8 +870,8 @@ export default function BusinessDetailPage() {
 
                 {/* Services Section */}
                 <section>
-                  <div className="sticky top-20 bg-white z-40 pb-4">
-                    <h2 className="text-xl uppercase font-bold text-gray-950 pb-6 pt-6">Services</h2>
+                  <div className="sticky top-20 bg-white z-40">
+                    <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6">Services</h2>
                     
                     {/* Categories Tabs */}
                     <div className="relative">
@@ -879,102 +894,127 @@ export default function BusinessDetailPage() {
 
                   {/* Services List */}
                   {activeTab === 'Featured' ? (
-                    <div className="mb-12">
-                      <div className="flex flex-col gap-4">
-                        {filteredServices.map((category, categoryIndex) => 
-                          category.services.map((service, serviceIndex) => {
-                            const isSelected = selectedServices.some(s => s.name === service.name);
-                            return (
-                              <ServiceItem
-                                key={`${categoryIndex}-${serviceIndex}`}
-                                name={service.name}
-                                price={service.price}
-                                description={service.description}
-                                duration={service.duration}
-                                isSelected={isSelected}
-                                onToggle={() => isSelected 
-                                  ? removeFromBooking(service.name) 
-                                  : addToBooking(service, category.name)
-                                }
-                              />
-                            );
-                          })
-                        )}
-                      </div>
+                    <div className="flex flex-col gap-4 pt-6">
+                      {filteredServices.map((category, categoryIndex) => 
+                        category.services.map((service, serviceIndex) => {
+                          const isSelected = selectedServices.some(s => s.name === service.name);
+                          return (
+                            <ServiceItem
+                              key={`${categoryIndex}-${serviceIndex}`}
+                              name={service.name}
+                              price={service.price}
+                              description={service.description}
+                              duration={service.duration}
+                              isSelected={isSelected}
+                              onToggle={() => isSelected 
+                                ? removeFromBooking(service.name) 
+                                : addToBooking(service, category.name)
+                              }
+                            />
+                          );
+                        })
+                      )}
                     </div>
                   ) : (
-                    <div className="mb-12">
-                      <div className="flex flex-col gap-4">
-                        {filteredServices.flatMap(category => 
-                          category.services.map(service => {
-                            const isSelected = selectedServices.some(s => s.name === service.name);
-                            return (
-                              <ServiceItem
-                                key={service.name}
-                                name={service.name}
-                                price={service.price}
-                                description={service.description}
-                                duration={service.duration}
-                                isSelected={isSelected}
-                                onToggle={() => isSelected 
-                                  ? removeFromBooking(service.name) 
-                                  : addToBooking(service, category.name)
-                                }
-                              />
-                            );
-                          })
-                        )}
-                      </div>
+                    <div className="flex flex-col gap-4 pt-6">
+                      {filteredServices.flatMap(category => 
+                        category.services.map(service => {
+                          const isSelected = selectedServices.some(s => s.name === service.name);
+                          return (
+                            <ServiceItem
+                              key={service.name}
+                              name={service.name}
+                              price={service.price}
+                              description={service.description}
+                              duration={service.duration}
+                              isSelected={isSelected}
+                              onToggle={() => isSelected 
+                                ? removeFromBooking(service.name) 
+                                : addToBooking(service, category.name)
+                              }
+                            />
+                          );
+                        })
+                      )}
                     </div>
                   )}
                 </section>
 
                 {/* Team Section */}
                 <section>
-                  <h2 className="text-xl uppercase font-bold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">Our Team</h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    <div
-                      key="random"
-                      className={`flex flex-col items-center transition-colors duration-200 cursor-pointer p-4 rounded-md border-2 border-gray-100 hover:border-gray-800 ${selectedTeamMember === 'Random' ? 'text-gray-800 border-2 border-gray-800' : ''
-                        }`}
-                      onClick={() => setSelectedTeamMember('Random')}
-                    >
-                      <div className="w-20 h-20 rounded-full bg-gray-800 flex items-center justify-center mb-3">
-                        <Shuffle size={32} className="text-white" />
-                      </div>
-                      <p className={`text-sm font-medium text-center ${selectedTeamMember === 'Random' ? 'text-gray-800' : 'text-gray-800'}`}>
-                        Random
-                      </p>
-                      <p className={`text-xs text-center mt-1 ${selectedTeamMember === 'Random' ? 'text-gray-800' : 'text-gray-600'}`}>
-                        Any available
-                      </p>
-                    </div>
-                    {businessTeam.map(member => (
-                      <div
-                        key={member.name}
-                        className={`flex flex-col items-center transition-colors duration-200 cursor-pointer p-4 rounded-md border-2 border-gray-100 hover:border-gray-800 ${selectedTeamMember === member.name ? 'text-gray-800 border-2 border-gray-800' : ''
-                          }`}
-                        onClick={() => setSelectedTeamMember(member.name)}
-                      >
-                        <div className="w-20 h-20 rounded-full bg-gray-800 flex items-center justify-center mb-3">
-                          <span className="text-2xl font-bold text-white">{member.name.split(' ').map(n => n[0]).join('')}</span>
+                  <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6">Our Team</h2>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+                    {businessTeam.map((member, index) => {
+                      const gradient = gradients[index % gradients.length];
+
+                      return (
+                        <div
+                          key={member.name}
+                          className="group flex flex-col items-center p-3 rounded-lg border border-gray-100 hover:border-gray-300 transition-all duration-200 cursor-pointer"
+                          onClick={() => setSelectedStaff(member)}
+                        >
+                          <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center mb-2 group-hover:scale-105 transition-transform duration-200`}>
+                            <span className="text-sm font-bold text-white">{member.name.split(' ').map(n => n[0]).join('')}</span>
+                          </div>
+                          <p className="text-sm font-medium text-center text-gray-700 truncate w-full group-hover:text-gray-900">
+                            {member.name}
+                          </p>
+                          <p className="text-xs text-center text-gray-500 truncate w-full">
+                            {member.profession}
+                          </p>
                         </div>
-                        <p className={`text-sm font-medium text-center ${selectedTeamMember === member.name ? 'text-gray-800' : 'text-gray-800'}`}>
-                          {member.name}
-                        </p>
-                        <p className={`text-xs text-center mt-1 text-ellipsis overflow-hidden ${selectedTeamMember === member.name ? 'text-gray-800' : 'text-gray-600'}`}>
-                          {member.profession}
-                        </p>
+                      );
+                    })}
+                  </div>
+
+                  {/* Staff Detail Modal */}
+                  {selectedStaff && (
+                    <StaffDetailModal
+                      isOpen={!!selectedStaff}
+                      onClose={() => setSelectedStaff(null)}
+                      staff={selectedStaff}
+                      gradient={gradients[businessTeam.findIndex(m => m.name === selectedStaff.name) % gradients.length]}
+                    />
+                  )}
+                </section>
+
+                {/* Reviews Section */}
+                <section>
+                  <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6">Reviews</h2>
+                  <Reviews businessId={business.id} />
+                </section>
+
+                {/* About Section */}
+                <section className="">
+                  <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6">About Us</h2>
+                  <p className="text-gray-700 mb-6 text-lg">
+                    {business.description} We are committed to providing top-notch services to our clients in a welcoming and professional environment. We are committed to providing top-notch services to our clients in a welcoming and professional environment. We are committed to providing top-notch services to our clients in a welcoming and professional environment.
+                  </p>
+                  <div className="h-[400px] bg-gray-200 rounded-lg overflow-hidden">
+                    {!isLoaded ? (
+                      <div className="h-full flex items-center justify-center">
+                        <span>Loading map...</span>
                       </div>
-                    ))}
+                    ) : (
+                      <GoogleMap
+                        mapContainerStyle={mapContainerStyle}
+                        zoom={14}
+                        center={business?.location?.coordinates || { lat: 0, lng: 0 }}
+                        options={mapOptions}
+                      >
+                        {business?.location?.coordinates && (
+                          <MarkerF position={business.location.coordinates} />
+                        )}
+                      </GoogleMap>
+                    )}
                   </div>
                 </section>
 
                 {/* Opening Hours and Additional Information Section */}
-                <div className="flex flex-col md:flex-row gap-8 ">
+                <div className="flex flex-col md:flex-row gap-8">
                   {/* Opening Hours Section */}
                   <section className="flex-1">
-                    <h2 className="text-xl uppercase font-bold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">Opening Hours</h2>
+                    <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6">Opening Hours</h2>
                     <div className="bg-white rounded-lg border border-gray-200 p-6">
                       <div className="space-y-2">
                         {business?.openingHours?.map((item, index) => {
@@ -1000,7 +1040,7 @@ export default function BusinessDetailPage() {
 
                   {/* Additional Information */}
                   <section className="flex-1">
-                    <h2 className="text-xl uppercase font-bold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">Additional Information</h2>
+                    <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6">Additional Information</h2>
                     <div className="bg-white rounded-lg border border-gray-200 p-6">
                       <ul className="space-y-4">
                         <li className="flex items-center text-base">
@@ -1022,31 +1062,7 @@ export default function BusinessDetailPage() {
                   </section>
                 </div>
                 
-                {/* About Section */}
-                <section className="">
-                  <h2 className="text-xl uppercase font-bold mb-6 text-gray-800">About Us</h2>
-                  <p className="text-gray-700 mb-6 text-lg">
-                    {business.description} We are committed to providing top-notch services to our clients in a welcoming and professional environment.
-                  </p>
-                  <div className="h-[400px] bg-gray-200 rounded-lg overflow-hidden">
-                    {!isLoaded ? (
-                      <div className="h-full flex items-center justify-center">
-                        <span>Loading map...</span>
-                      </div>
-                    ) : (
-                      <GoogleMap
-                        mapContainerStyle={mapContainerStyle}
-                        zoom={14}
-                        center={business?.location?.coordinates || { lat: 0, lng: 0 }}
-                        options={mapOptions}
-                      >
-                        {business?.location?.coordinates && (
-                          <MarkerF position={business.location.coordinates} />
-                        )}
-                      </GoogleMap>
-                    )}
-                  </div>
-                </section>
+                
 
                 {/* Only show Special Offers section if business has offers */}
                 {availableOffers.length > 0 && (
@@ -1084,8 +1100,8 @@ export default function BusinessDetailPage() {
               </div>
 
               {/* Booking Section */}
-              <section className="lg:order-last order-first lg:w-[420px] md:sticky top-20 inset-0 mb-20 md:mb-0">
-                <div className="lg:sticky lg:top-24 bg-white p-6 rounded-lg shadow-lg flex flex-col border border-gray-200">
+              <section className="lg:w-[420px] lg:relative lg:top-auto lg:bottom-auto lg:inset-x-auto fixed bottom-0 inset-x-0 z-40">
+                <div className="lg:sticky lg:top-24 bg-white p-6 lg:rounded-lg lg:shadow-lg flex flex-col lg:border border-gray-200 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.1)]">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg lg:text-2xl font-semibold text-gray-800">Your Booking</h2>
                     {selectedServices.length > 0 && (
@@ -1101,44 +1117,47 @@ export default function BusinessDetailPage() {
                   </Button>
 
                   {/* Opening Hours and Location */}
-                  <div className="mt-4 space-y-4 pt-6 border-t border-gray-200">
+                  <div className="lg:block hidden mt-4 space-y-4 pt-6 border-t border-gray-200">
                     <div className="flex items-start space-x-3">
                       <Clock className="w-5 h-5 text-gray-500 mt-1 flex-shrink-0" />
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <span className={business?.isOpen ? "text-green-600 font-medium" : "text-red-500 font-medium"}>
-                            {business?.isOpen ? 'Open' : 'Closed'}
-                          </span>
-                          {business?.isOpen && (
-                            <>
-                              <span className="text-gray-600">•</span>
-                              <span className="text-gray-600">closes soon at {business.closingTime}</span>
-                            </>
-                          )}
-                        </div>
-                        <button 
-                          onClick={() => setIsOpeningHoursOpen(!isOpeningHoursOpen)}
-                          className="text-sm text-gray-600 hover:text-gray-900 flex items-center mt-1"
-                        >
-                          See opening hours
-                          <ChevronDown className={`w-4 h-4 ml-1 transition-transform duration-200 ${isOpeningHoursOpen ? 'rotate-180' : ''}`} />
-                        </button>
-                        {isOpeningHoursOpen && business?.openingHours && (
-                          <div className="mt-2 space-y-1">
-                            {business.openingHours.map((item, index) => (
-                              <div key={item.day} className="flex justify-between text-sm">
-                                <span className={`${index === (today === 0 ? 6 : today - 1) ? 'font-medium' : ''} text-gray-600`}>
-                                  {item.day}
-                                </span>
-                                <span className={`${item.hours === 'Closed' ? 'text-red-500' : 'text-gray-900'}`}>
-                                  {item.hours}
-                                </span>
-                              </div>
-                            ))}
+                      <div className='flex justify-between w-full'>
+                        <div className="flex flex-col">
+                          <div className="flex items-center space-x-2">
+                            <span className={business?.isOpen ? "text-green-600 font-medium" : "text-red-500 font-medium"}>
+                              {business?.isOpen ? 'Open' : 'Closed'}
+                            </span>
+                            {business?.isOpen && (
+                              <>
+                                <span className="text-gray-600">•</span>
+                                <span className="text-gray-600">Closes at {business.closingTime}</span>
+                              </>
+                            )}
                           </div>
-                        )}
+                          <button 
+                            onClick={() => setIsOpeningHoursOpen(!isOpeningHoursOpen)}
+                            className="text-sm text-gray-600 hover:text-gray-900 flex items-center mt-1"
+                          >
+                            See opening hours
+                            <ChevronDown className={`w-4 h-4 ml-1 transition-transform duration-200 ${isOpeningHoursOpen ? 'rotate-180' : ''}`} />
+                          </button>
+                        </div>
                       </div>
                     </div>
+
+                    {isOpeningHoursOpen && business?.openingHours && (
+                      <div className="mt-2 space-y-1 pl-8">
+                        {business.openingHours.map((item, index) => (
+                          <div key={item.day} className="flex justify-between text-sm">
+                            <span className={`${index === today - 1 ? 'font-medium' : ''} text-gray-600`}>
+                              {item.day}
+                            </span>
+                            <span className={`${item.hours === 'Closed' ? 'text-red-500' : 'text-gray-900'}`}>
+                              {item.hours}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
                     <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0 mt-1">
@@ -1202,7 +1221,6 @@ export default function BusinessDetailPage() {
               </section>
             </div>
           </div>
-        </div>
       </main>
     </div>
   );
