@@ -3,22 +3,20 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { Header } from '@/app/components/Header';
-import { format, addMonths, eachDayOfInterval, isToday, isSameDay } from 'date-fns';
+import { format, addMonths, eachDayOfInterval } from 'date-fns';
 import { useLoadScript, GoogleMap, MarkerF } from '@react-google-maps/api';
 import Image from 'next/image';
 import { Button } from "@/app/components/ui/button";
 import { businesses, businessOffers } from '@/data/mock';
-import { cn } from "@/lib/utils";
-import { StarIcon, CheckCircle, PlusCircle, X, Clock, AlertCircle, Camera, ChevronDown, Shuffle } from "lucide-react";
-import { Label } from "@/app/components/ui/label";
-import { BusinessOffer } from '@/data';
+import { StarIcon, CheckCircle, Clock, Camera, ChevronDown } from "lucide-react";
+import { Business, BusinessOffer, categoryServices, categoryTeams, TeamMember } from '@/data';
 import { Stories } from './components/Stories';
-import { ImageGalleryModal } from "@/app/components/ImageGalleryModal";
 import { ServiceOffer } from "@/app/components/ServiceOffer";
 import { ServiceItem } from "./components/ServiceItem";
 import { BookingModal } from "./components/BookingModal";
 import { StaffDetailModal } from './components/StaffDetailModal';
 import { Reviews } from './components/Reviews';
+import { BookingItem, SelectedService } from '@/app/models/custom.models';
 
 const scrollbarHideStyles = `
   .scrollbar-hide {
@@ -30,439 +28,10 @@ const scrollbarHideStyles = `
   }
 `;
 
-interface Business {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  rating: number;
-  priceRange: string;
-  imageUrl: string;
-  cover_picture?: string;
-  profile_picture?: string;
-  galleryImages?: string[];
-  location: {
-    address: string;
-    city: string;
-    state: string;
-    zip: string;
-    coordinates?: {
-      lat: number;
-      lng: number;
-    };
-    country?: string;
-  };
-  hours?: {
-    [key: string]: {
-      open: string;
-      close: string;
-    };
-  };
-  openingHours?: {
-    day: string;
-    hours: string;
-  }[];
-  isOpen?: boolean;
-  closingTime?: string;
-  services?: {
-    id: string;
-    name: string;
-    price: number;
-    duration: number;
-  }[];
-  amenities?: string[];
-  tags?: string[];
-  socialMedia?: {
-    instagram?: string;
-    facebook?: string;
-    twitter?: string;
-  };
-  isPremium?: boolean;
-  createdAt: string;
-  reviewCount: number;
-}
-
-interface Service {
-  name: string;
-  price: number;
-  description?: string;
-  id?: string;
-  duration?: number;
-  categoryId?: string;
-  businessId?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-interface ServiceCategory {
-  name: string;
-  services: Service[];
-}
-
-interface CategoryServices {
-  [key: string]: ServiceCategory[];
-}
-
-const categoryServices: CategoryServices = {
-  "hair_salon": [
-    {
-      name: "Haircuts",
-      services: [
-        { name: "Women's Haircut", price: 50, duration: 60 },
-        { name: "Men's Haircut", price: 35, duration: 45 },
-        { name: "Children's Haircut", price: 25, duration: 30 },
-      ]
-    },
-    {
-      name: "Coloring",
-      services: [
-        { name: "Full Color", price: 80, duration: 120 },
-        { name: "Highlights", price: 100, duration: 150 },
-        { name: "Balayage", price: 150, duration: 180 },
-      ]
-    },
-    {
-      name: "Styling",
-      services: [
-        { name: "Blowout", price: 40, duration: 45 },
-        { name: "Updo", price: 65, duration: 60 },
-        { name: "Hair Extensions", price: 200, duration: 180 },
-      ]
-    }
-  ],
-  "nail_salon": [
-    {
-      name: "Manicures",
-      services: [
-        { name: "Basic Manicure", price: 30, duration: 30 },
-        { name: "Gel Manicure", price: 45, duration: 45 },
-        { name: "Nail Art", price: 20, duration: 30 },
-      ]
-    },
-    {
-      name: "Pedicures",
-      services: [
-        { name: "Basic Pedicure", price: 40, duration: 45 },
-        { name: "Spa Pedicure", price: 55, duration: 60 },
-        { name: "Gel Pedicure", price: 60, duration: 60 },
-      ]
-    }
-  ],
-  "waxing_salon": [
-    {
-      name: "Facial Waxing",
-      services: [
-        { name: "Eyebrow Wax", price: 15, duration: 15 },
-        { name: "Upper Lip Wax", price: 10, duration: 10 },
-        { name: "Full Face Wax", price: 40, duration: 45 },
-      ]
-    },
-    {
-      name: "Body Waxing",
-      services: [
-        { name: "Leg Wax", price: 50, duration: 45 },
-        { name: "Brazilian Wax", price: 60, duration: 45 },
-        { name: "Full Body Wax", price: 150, duration: 120 },
-      ]
-    }
-  ],
-  "beauty_salon": [
-    {
-      name: "Facial Treatments",
-      services: [
-        { name: "Basic Facial", price: 70, duration: 60 },
-        { name: "Deep Cleansing Facial", price: 90, duration: 75 },
-        { name: "Anti-Aging Facial", price: 110, duration: 90 },
-      ]
-    },
-    {
-      name: "Makeup Services",
-      services: [
-        { name: "Makeup Application", price: 60, duration: 45 },
-        { name: "Bridal Makeup", price: 120, duration: 90 },
-        { name: "Makeup Lesson", price: 80, duration: 60 },
-      ]
-    },
-    {
-      name: "Lash and Brow Services",
-      services: [
-        { name: "Lash Extensions", price: 100, duration: 120 },
-        { name: "Lash Lift", price: 60, duration: 45 },
-        { name: "Microblading", price: 200, duration: 180 },
-      ]
-    }
-  ],
-  "barbershop": [
-    {
-      name: "Haircuts",
-      services: [
-        { name: "Men's Haircut", price: 30, duration: 30 },
-        { name: "Buzz Cut", price: 20, duration: 20 },
-        { name: "Kids Haircut", price: 25, duration: 30 },
-      ]
-    },
-    {
-      name: "Beard Services",
-      services: [
-        { name: "Beard Trim", price: 20, duration: 15 },
-        { name: "Hot Shave", price: 35, duration: 30 },
-        { name: "Hair & Beard Combo", price: 45, duration: 45 },
-      ]
-    }
-  ],
-  "eyebrows_and_lashes": [
-    {
-      name: "Eyebrow Services",
-      services: [
-        { name: "Eyebrow Threading", price: 15, duration: 15 },
-        { name: "Eyebrow Tinting", price: 20, duration: 20 },
-        { name: "Brow Lamination", price: 50, duration: 45 },
-      ]
-    },
-    {
-      name: "Lash Services",
-      services: [
-        { name: "Lash Lift", price: 60, duration: 45 },
-        { name: "Lash Tint", price: 25, duration: 20 },
-        { name: "Lash Extensions", price: 100, duration: 120 },
-      ]
-    }
-  ],
-  "massage": [
-    {
-      name: "Massage Services",
-      services: [
-        { name: "Swedish Massage", price: 80, duration: 60 },
-        { name: "Deep Tissue Massage", price: 90, duration: 60 },
-        { name: "Hot Stone Massage", price: 100, duration: 90 },
-        { name: "Couples Massage", price: 150, duration: 90 },
-      ]
-    }
-  ],
-  "spa": [
-    {
-      name: "Spa Services",
-      services: [
-        { name: "Spa Day Package", price: 200, duration: 180 },
-        { name: "Body Wrap", price: 90, duration: 60 },
-        { name: "Aromatherapy Session", price: 70, duration: 60 },
-        { name: "Hydrotherapy", price: 80, duration: 45 },
-      ]
-    }
-  ],
-  "gym_and_fitness": [
-    {
-      name: "Fitness Services",
-      services: [
-        { name: "Monthly Membership", price: 50, duration: 0 },
-        { name: "Day Pass", price: 15, duration: 0 },
-        { name: "Group Class", price: 20, duration: 60 },
-        { name: "Personal Training Session", price: 60, duration: 60 },
-      ]
-    }
-  ],
-  "personal_trainer": [
-    {
-      name: "Personal Training Services",
-      services: [
-        { name: "1-on-1 Session", price: 70, duration: 60 },
-        { name: "Nutrition Consultation", price: 50, duration: 45 },
-        { name: "Fitness Assessment", price: 40, duration: 30 },
-        { name: "10-Session Package", price: 600, duration: 600 },
-      ]
-    }
-  ],
-  "therapy_centre": [
-    {
-      name: "Therapy Services",
-      services: [
-        { name: "Individual Therapy", price: 100, duration: 60 },
-        { name: "Couples Therapy", price: 130, duration: 90 },
-        { name: "Group Therapy", price: 50, duration: 90 },
-        { name: "Art Therapy", price: 80, duration: 60 },
-      ]
-    }
-  ],
-  "tattoo_and_piercing": [
-    {
-      name: "Tattoo & Piercing Services",
-      services: [
-        { name: "Small Tattoo", price: 80, duration: 60 },
-        { name: "Large Tattoo", price: 200, duration: 180 },
-        { name: "Ear Piercing", price: 30, duration: 15 },
-        { name: "Body Piercing", price: 50, duration: 30 },
-      ]
-    }
-  ],
-  "tanning_studio": [
-    {
-      name: "Tanning Services",
-      services: [
-        { name: "Single Session", price: 20, duration: 15 },
-        { name: "Monthly Unlimited", price: 60, duration: 0 },
-        { name: "Spray Tan", price: 40, duration: 30 },
-        { name: "Tanning Lotion", price: 25, duration: 0 },
-      ]
-    }
-  ],
-  "aesthetics": [
-    {
-      name: "Aesthetic Services",
-      services: [
-        { name: "Botox", price: 300, duration: 30 },
-        { name: "Dermal Fillers", price: 400, duration: 45 },
-        { name: "Chemical Peel", price: 150, duration: 60 },
-        { name: "Microdermabrasion", price: 100, duration: 45 },
-      ]
-    }
-  ],
-  "weight_loss": [
-    {
-      name: "Weight Loss Services",
-      services: [
-        { name: "Initial Consultation", price: 50, duration: 60 },
-        { name: "Weekly Check-in", price: 30, duration: 30 },
-        { name: "Meal Plan", price: 100, duration: 45 },
-        { name: "Body Composition Analysis", price: 40, duration: 30 },
-      ]
-    }
-  ],
-};
-
-interface TeamMember {
-  name: string;
-  profession: string;
-}
-
-interface CategoryTeam {
-  [key: string]: TeamMember[];
-}
-
-const categoryTeams: CategoryTeam = {
-  "hair_salon": [
-    { name: "Emma Styles", profession: "Senior Stylist" },
-    { name: "Liam Cuts", profession: "Color Specialist" },
-    { name: "Olivia Shears", profession: "Junior Stylist" },
-  ],
-  "nail_salon": [
-    { name: "Sophia Nails", profession: "Nail Technician" },
-    { name: "Ava Polish", profession: "Nail Artist" },
-    { name: "Mia Manicure", profession: "Pedicure Specialist" },
-  ],
-  "waxing_salon": [
-    { name: "Isabella Smooth", profession: "Waxing Specialist" },
-    { name: "Ethan Strip", profession: "Body Waxing Expert" },
-    { name: "Charlotte Gentle", profession: "Facial Waxing Specialist" },
-  ],
-  "beauty_salon": [
-    { name: "Amelia Glow", profession: "Makeup Artist" },
-    { name: "Harper Beauty", profession: "Skincare Specialist" },
-    { name: "Evelyn Lash", profession: "Lash Technician" },
-  ],
-  "barbershop": [
-    { name: "Noah Razor", profession: "Master Barber" },
-    { name: "William Trim", profession: "Beard Specialist" },
-    { name: "James Clipper", profession: "Junior Barber" },
-  ],
-  "eyebrows_and_lashes": [
-    { name: "Sophia Arch", profession: "Brow Artist" },
-    { name: "Ava Lash", profession: "Lash Extension Specialist" },
-    { name: "Mia Tint", profession: "Brow and Lash Tinting Expert" },
-  ],
-  "massage": [
-    { name: "Oliver Knead", profession: "Massage Therapist" },
-    { name: "Elijah Relax", profession: "Sports Massage Specialist" },
-    { name: "Charlotte Zen", profession: "Hot Stone Massage Expert" },
-  ],
-  "spa": [
-    { name: "Amelia Tranquil", profession: "Spa Manager" },
-    { name: "Harper Serene", profession: "Facial Specialist" },
-    { name: "Abigail Calm", profession: "Body Treatment Expert" },
-  ],
-  "gym_and_fitness": [
-    { name: "Lucas Muscle", profession: "Personal Trainer" },
-    { name: "Henry Cardio", profession: "Group Fitness Instructor" },
-    { name: "Evelyn Flex", profession: "Yoga Instructor" },
-  ],
-  "personal_trainer": [
-    { name: "Alexander Fit", profession: "Strength Coach" },
-    { name: "Daniel Nutrition", profession: "Nutritionist" },
-    { name: "Sophia Endurance", profession: "Cardio Specialist" },
-  ],
-  "therapy_centre": [
-    { name: "Benjamin Mind", profession: "Psychotherapist" },
-    { name: "Emily Counsel", profession: "Marriage Counselor" },
-    { name: "Michael Heal", profession: "Art Therapist" },
-  ],
-  "tattoo_and_piercing": [
-    { name: "Liam Ink", profession: "Tattoo Artist" },
-    { name: "Olivia Pierce", profession: "Body Piercing Specialist" },
-    { name: "Noah Design", profession: "Custom Tattoo Designer" },
-  ],
-  "tanning_studio": [
-    { name: "Ava Bronze", profession: "Spray Tan Specialist" },
-    { name: "Ethan Sun", profession: "Tanning Consultant" },
-    { name: "Isabella Glow", profession: "Airbrush Technician" },
-  ],
-  "aesthetics": [
-    { name: "Sophia Botox", profession: "Aesthetic Nurse" },
-    { name: "William Filler", profession: "Dermal Filler Specialist" },
-    { name: "Emma Laser", profession: "Laser Treatment Expert" },
-  ],
-  "weight_loss": [
-    { name: "Oliver Slim", profession: "Weight Loss Consultant" },
-    { name: "Charlotte Diet", profession: "Nutritionist" },
-    { name: "James Active", profession: "Fitness Coach" },
-  ],
-};
-
-interface BookingItem {
-  name: string;
-  price: number;
-}
-
-interface SelectedService extends Service {
-  categoryName: string;
-}
 
 const mapContainerStyle = {
   width: '100%',
   height: '400px'
-};
-
-const mapOptions = {
-  styles: [
-    {
-      featureType: "all",
-      elementType: "geometry.fill",
-      stylers: [{ color: "#ffffff" }]
-    },
-    {
-      featureType: "water",
-      elementType: "geometry",
-      stylers: [{ color: "#e9e9e9" }]
-    },
-    {
-      featureType: "poi",
-      stylers: [{ visibility: "off" }]
-    },
-    {
-      featureType: "road",
-      elementType: "geometry.fill",
-      stylers: [{ color: "#f5f5f5" }]
-    },
-    {
-      featureType: "road",
-      elementType: "geometry.stroke",
-      stylers: [{ color: "#e0e0e0" }]
-    },
-    {
-      featureType: "transit",
-      stylers: [{ visibility: "off" }]
-    }
-  ],
-  disableDefaultUI: true,
-  zoomControl: true,
 };
 
 function getBusinessOffers(businessId: string): BusinessOffer[] {
@@ -501,15 +70,9 @@ export default function BusinessDetailPage() {
   const [isOpeningHoursOpen, setIsOpeningHoursOpen] = useState(false);
   const [isBusinessOpen, setIsBusinessOpen] = useState(false);
   const [isValidBookingTime, setIsValidBookingTime] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
   const [dateDragging, setDateDragging] = useState(false);
   const [dateStartX, setDateStartX] = useState(0);
   const [dateScrollLeft, setDateScrollLeft] = useState(0);
-  const [teamDragging, setTeamDragging] = useState(false);
-  const [teamStartX, setTeamStartX] = useState(0);
-  const [teamScrollLeft, setTeamScrollLeft] = useState(0);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<TeamMember | null>(null);
 
@@ -526,13 +89,9 @@ export default function BusinessDetailPage() {
     'from-cyan-400 to-cyan-600'
   ];
 
-  // Refs
   const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const timeSlotContainerRef = useRef<HTMLDivElement>(null);
   const dateContainerRef = useRef<HTMLDivElement>(null);
-  const teamContainerRef = useRef<HTMLDivElement>(null);
 
-  // Memoized values
   const availableDates = useMemo(() => {
     const today = new Date();
     const twoMonthsFromNow = addMonths(today, 2);
@@ -669,11 +228,7 @@ export default function BusinessDetailPage() {
     setIsValidBookingTime(timeInMinutes >= openTime && timeInMinutes < closeTime);
   }, [selectedDate, selectedTime, business?.openingHours]);
 
-  if (!business) {
-    return <div>Business not found</div>;
-  }
-
-  const businessTeam = categoryTeams[business.category] || [];
+  const businessTeam = business?.category ? categoryTeams[business.category] : [];
 
   const addToBooking = (service: Service, categoryName: string) => {
     if (!selectedServices.some(s => s.name === service.name)) {
@@ -707,7 +262,7 @@ export default function BusinessDetailPage() {
       errorMessage = "Please select a time within the business opening hours.";
     } else {
       const bookingDate = new Date(selectedDate);
-      alert(`Booking confirmed for ${business.name} on ${format(bookingDate, 'MMMM d, yyyy')} at ${selectedTime}\nTotal: $${totalPrice}\nTeam Member: ${selectedTeamMember || 'Random'}`);
+      alert(`Booking confirmed for ${business?.name ?? ''} on ${format(bookingDate, 'MMMM d, yyyy')} at ${selectedTime}\nTotal: $${totalPrice}\nTeam Member: ${selectedTeamMember || 'Random'}`);
     }
 
     setBookingError(errorMessage);
@@ -723,7 +278,6 @@ export default function BusinessDetailPage() {
   const today = new Date().getDay(); // 0 is Sunday, 1 is Monday, etc.
 
   const availableOffers = business ? getBusinessOffers(business.id) : [];
-
 
   const handleDateMouseDown = (e: React.MouseEvent) => {
     setDateDragging(true);
@@ -759,8 +313,8 @@ export default function BusinessDetailPage() {
             {/* Cover Section */}
             <section className="relative h-64 lg:h-96 overflow-hidden">
               <Image
-                src={business.cover_picture ?? ''}
-                alt={business.name}
+                src={business?.cover_picture ?? ''}
+                alt={business?.name ?? ''}
                 width={1920}
                 height={1080}
                 className="object-cover w-full h-full"
@@ -768,13 +322,13 @@ export default function BusinessDetailPage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-black/70 flex items-end">
                 <div className="p-6 text-white max-w-screen-2xl mx-auto w-full">
-                  <h1 className="text-3xl lg:text-5xl font-bold mb-2">{business.name}</h1>
-                  <p className="lg:text-xl mb-4 opacity-90">{business.category}</p>
+                  <h1 className="text-3xl lg:text-5xl font-bold mb-2">{business?.name ?? ''}</h1>
+                  <p className="lg:text-xl mb-4 opacity-90">{business?.category ?? ''}</p>
                   <div className="flex items-center justify-between space-x-4">
                     <div className="flex items-center space-x-2">
                       <div className="flex items-center bg-white/20 rounded-full px-3 py-1">
                         <StarIcon className="w-4 lg:w-5 h-4 lg:h-5 text-yellow-400 mr-1" />
-                        <span className="text-sm lg:text-lg font-semibold">{business.rating.toFixed(1)}</span>
+                        <span className="text-sm lg:text-lg font-semibold">{business?.rating?.toFixed(1) ?? ''}</span>
                       </div>
                       <div className="flex items-center bg-white/20 rounded-full px-3 py-1">
                         <span className="text-sm lg:text-lg font-semibold">
@@ -815,7 +369,7 @@ export default function BusinessDetailPage() {
                 
                 {/* Add Stories section here */}
                 <div>
-                  <Stories businessId={business.id} businessName={business.name} />
+                  <Stories businessId={business?.id ?? ''} businessName={business?.name ?? ''} />
                 </div>
 
                 {/* Services Section */}
@@ -931,14 +485,14 @@ export default function BusinessDetailPage() {
                 {/* Reviews Section */}
                 <section>
                   <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6">Reviews</h2>
-                  <Reviews businessId={business.id} />
+                  <Reviews businessId={business?.id ?? ''} />
                 </section>
 
                 {/* About Section */}
                 <section className="">
                   <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6">About Us</h2>
                   <p className="text-gray-700 mb-6 text-lg">
-                    {business.description} We are committed to providing top-notch services to our clients in a welcoming and professional environment. We are committed to providing top-notch services to our clients in a welcoming and professional environment. We are committed to providing top-notch services to our clients in a welcoming and professional environment.
+                    {business?.description ?? ''}
                   </p>
                   <div className="h-[400px] bg-gray-200 rounded-lg overflow-hidden">
                     {!isLoaded ? (
@@ -950,7 +504,6 @@ export default function BusinessDetailPage() {
                         mapContainerStyle={mapContainerStyle}
                         zoom={14}
                         center={business?.location?.coordinates || { lat: 0, lng: 0 }}
-                        options={mapOptions}
                       >
                         {business?.location?.coordinates && (
                           <MarkerF position={business.location.coordinates} />
@@ -1001,7 +554,7 @@ export default function BusinessDetailPage() {
                           <CheckCircle size={18} className="mr-2 text-green-500" />
                           <span className="text-gray-800">Free Cancellation (24 hours notice required)</span>
                         </li>
-                        {business.amenities?.map((amenity, index) => (
+                        {business?.amenities?.map((amenity, index) => (
                           <li key={index} className="flex items-center text-base">
                             <CheckCircle size={18} className="mr-2 text-green-500" />
                             <span className="text-gray-800">{amenity}</span>
@@ -1011,10 +564,7 @@ export default function BusinessDetailPage() {
                     </div>
                   </section>
                 </div>
-                
-                
 
-                {/* Only show Special Offers section if business has offers */}
                 {availableOffers.length > 0 && (
                   <section className="mt-20">
                     <h2 className="text-xl uppercase font-bold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">
@@ -1079,7 +629,7 @@ export default function BusinessDetailPage() {
                             {business?.isOpen && (
                               <>
                                 <span className="text-gray-600">•</span>
-                                <span className="text-gray-600">Closes at {business.closingTime}</span>
+                                <span className="text-gray-600">Closes at {business?.closingTime}</span>
                               </>
                             )}
                           </div>
@@ -1096,7 +646,7 @@ export default function BusinessDetailPage() {
 
                     {isOpeningHoursOpen && business?.openingHours && (
                       <div className="mt-2 space-y-1 pl-8">
-                        {business.openingHours.map((item, index) => (
+                        {business?.openingHours.map((item, index) => (
                           <div key={item.day} className="flex justify-between text-sm">
                             <span className={`${index === today - 1 ? 'font-medium' : ''} text-gray-600`}>
                               {item.day}
@@ -1118,7 +668,7 @@ export default function BusinessDetailPage() {
                       </div>
                       <div>
                         <p className="text-gray-900">
-                          {business?.location.address}, {business?.location.city}, {business?.location.country}
+                          {business?.location.address}, {business?.location.city}, {business?.location?.country}
                         </p>
                         <a 
                           href={business?.location?.coordinates ? 
