@@ -42,8 +42,7 @@ export function BusinessesCollection({ searchParams }: BusinessesCollectionProps
         offset: 0
       });
 
-      
-      if(!!searchParams?.category || !!searchParams?.search) {
+      if (!!searchParams?.category || !!searchParams?.search) {
         setFilteredBusinesses(businesses);
       }
     }
@@ -58,13 +57,13 @@ export function BusinessesCollection({ searchParams }: BusinessesCollectionProps
       setBusinesses(businesses);
     }
 
-    if(!searchParams?.category && !searchParams?.search) {
+    if (!searchParams?.category && !searchParams?.search) {
       fetchBusinesses();
     }
   }, []);
 
 
-  if (businesses.all_businesses?.length === 0 || filteredBusinesses?.length === 0) {
+  if (businesses?.all_businesses?.length === 0 && filteredBusinesses?.length === 0) {
     return (
       <motion.div
         initial={{ opacity: 0 }}

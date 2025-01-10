@@ -11,7 +11,7 @@ import Link from 'next/link';
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  
   const [selectedType, setSelectedType] = useState<'customer' | 'business' | null>(null);
 
   const handleTypeSelection = (type: 'customer' | 'business') => {
@@ -25,7 +25,7 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header user={user} />
+      <Header />
       <main className="flex-grow flex items-center justify-center py-16 sm:py-20 bg-gradient-to-r from-purple-900 via-blue-900 to-purple-900">
         <div className="relative w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">

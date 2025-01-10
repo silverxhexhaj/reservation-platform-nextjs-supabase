@@ -80,7 +80,7 @@ export default function CreateBusiness() {
 
   return (
     <div className="min-h-screen pt-20 max-w-7xl mx-auto">
-      <Header user={null} />
+      <Header />
       <main className="space-y-8 px-8 mt-20">
         <Card className="w-full border-gray-200">
           <CardHeader className="border-b border-gray-200">

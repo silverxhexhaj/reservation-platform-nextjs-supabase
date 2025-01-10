@@ -256,7 +256,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen font-sans bg-white flex flex-col">
-      <Header user={user} />
+      <Header />
       <main className="relative">
         {/* Hero Section */}
         <div className="p-8 flex relative h-screen">

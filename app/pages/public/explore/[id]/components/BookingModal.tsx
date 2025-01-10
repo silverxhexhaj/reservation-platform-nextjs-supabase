@@ -80,7 +80,6 @@ export function BookingModal({
 }: BookingModalProps) {
   const [currentStep, setCurrentStep] = useState(STEPS.SERVICES);
   const timeSlotContainerRef = useRef<HTMLDivElement>(null);
-  const teamContainerRef = useRef<HTMLDivElement>(null);
 
   const steps = [
     { id: STEPS.SERVICES, title: "Select Services" },
@@ -117,8 +116,8 @@ export function BookingModal({
                     onClick={() => setActiveTab(category)}
                     className={cn(
                       "flex-none px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200",
-                      activeTab === category 
-                        ? "bg-black text-white" 
+                      activeTab === category
+                        ? "bg-black text-white"
                         : "hover:bg-gray-100 text-gray-600 hover:text-gray-900"
                     )}
                   >
@@ -130,7 +129,7 @@ export function BookingModal({
 
             <div className="grid grid-cols-1 gap-4">
               {activeTab === 'Featured' ? (
-                filteredServices.map((category, categoryIndex) => 
+                filteredServices.map((category, categoryIndex) =>
                   category.services.map((service, serviceIndex) => {
                     const isSelected = selectedServices.some(s => s.name === service.name);
                     return (
@@ -174,7 +173,7 @@ export function BookingModal({
                   })
                 )
               ) : (
-                filteredServices.flatMap(category => 
+                filteredServices.flatMap(category =>
                   category.services.map(service => {
                     const isSelected = selectedServices.some(s => s.name === service.name);
                     return (

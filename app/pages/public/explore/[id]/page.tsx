@@ -724,29 +724,6 @@ export default function BusinessDetailPage() {
 
   const availableOffers = business ? getBusinessOffers(business.id) : [];
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setStartX(e.pageX - (timeSlotContainerRef.current?.offsetLeft || 0));
-    setScrollLeft(timeSlotContainerRef.current?.scrollLeft || 0);
-  };
-
-  const handleMouseLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    if (!timeSlotContainerRef.current) return;
-
-    const x = e.pageX - (timeSlotContainerRef.current.offsetLeft || 0);
-    const walk = (x - startX) * 2;
-    timeSlotContainerRef.current.scrollLeft = scrollLeft - walk;
-  };
 
   const handleDateMouseDown = (e: React.MouseEvent) => {
     setDateDragging(true);
@@ -772,15 +749,6 @@ export default function BusinessDetailPage() {
     dateContainerRef.current.scrollLeft = dateScrollLeft - walk;
   };
 
-  const handleTeamMouseMove = (e: React.MouseEvent) => {
-    if (!teamDragging) return;
-    e.preventDefault();
-    if (!teamContainerRef.current) return;
-
-    const x = e.pageX - (teamContainerRef.current.offsetLeft || 0);
-    const walk = (x - teamStartX) * 2;
-    teamContainerRef.current.scrollLeft = teamScrollLeft - walk;
-  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -825,7 +793,6 @@ export default function BusinessDetailPage() {
                       <Button
                         variant="outline"
                         className="bg-white/20 hover:bg-white/30 text-white border-white/40 text-sm lg:text-base"
-                        onClick={() => setSelectedImageIndex(0)}
                       >
                         <Camera className="w-4 lg:w-5 h-4 lg:h-5 mr-2" />
                         View Gallery
