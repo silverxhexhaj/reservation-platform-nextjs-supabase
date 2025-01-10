@@ -10,8 +10,8 @@ import { containerVariants } from "@/app/models/transitionEffects.models";
 import { BusinessCard } from "@/app/components/BusinessCard";
 
 
-import { loadInitialBusinesses } from "@/app/service/business/business.service";
-import { LoadInitialBusinessesResponse } from "@/app/models/functions/businessSummary.model";
+import { fetchBusinessesWithFilters, loadInitialBusinesses } from "@/app/service/business/business.service";
+import { BusinessSummary, LoadInitialBusinessesResponse } from "@/app/models/functions/businessSummary.model";
 
 interface BusinessesCollectionProps {
   searchParams?: {
@@ -23,6 +23,7 @@ interface BusinessesCollectionProps {
 
 export function BusinessesCollection({ searchParams }: BusinessesCollectionProps) {
 
+  const [filteredBusinesses, setFilteredBusinesses] = useState<BusinessSummary[]>([]);
   const [businesses, setBusinesses] = useState<LoadInitialBusinessesResponse>({
     popular: [],
     all_businesses: [],
@@ -33,20 +34,37 @@ export function BusinessesCollection({ searchParams }: BusinessesCollectionProps
 
 
   useEffect(() => {
-    // need to fetch when searching
+    const debouncedFetch = async () => {
+      const businesses = await fetchBusinessesWithFilters({
+        searchTerm: searchParams?.search,
+        selectedCategory: searchParams?.category,
+        limit: 25,
+        offset: 0
+      });
+
+      
+      if(!!searchParams?.category || !!searchParams?.search) {
+        setFilteredBusinesses(businesses);
+      }
+    }
+
+    const timeoutId = setTimeout(debouncedFetch, 500);
+    return () => clearTimeout(timeoutId);
   }, [searchParams?.category, searchParams?.search]);
 
   useEffect(() => {
     const fetchBusinesses = async () => {
       const businesses = await loadInitialBusinesses();
-      console.log(businesses)
       setBusinesses(businesses);
     }
-    fetchBusinesses();
+
+    if(!searchParams?.category && !searchParams?.search) {
+      fetchBusinesses();
+    }
   }, []);
 
 
-  if (businesses.all_businesses?.length === 0) {
+  if (businesses.all_businesses?.length === 0 || filteredBusinesses?.length === 0) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -228,7 +246,7 @@ export function BusinessesCollection({ searchParams }: BusinessesCollectionProps
             animate="visible"
             className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6"
           >
-            {businesses.all_businesses?.map((business) => (
+            {filteredBusinesses?.map((business) => (
               <BusinessCard key={business.id} business={business} />
             ))}
           </motion.div>

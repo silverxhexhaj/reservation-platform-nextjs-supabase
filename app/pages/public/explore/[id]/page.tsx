@@ -484,6 +484,7 @@ function transformBusinessHours(hours: Business['hours']) {
 
 export default function BusinessDetailPage() {
   const { id } = useParams();
+
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string
   });
@@ -497,11 +498,9 @@ export default function BusinessDetailPage() {
   const [selectedTeamMember, setSelectedTeamMember] = useState<string>('');
   const [activeTab, setActiveTab] = useState<string>('Featured');
   const [bookingError, setBookingError] = useState<string | null>(null);
-  const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isOpeningHoursOpen, setIsOpeningHoursOpen] = useState(false);
   const [isBusinessOpen, setIsBusinessOpen] = useState(false);
   const [isValidBookingTime, setIsValidBookingTime] = useState(false);
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(-1);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
@@ -674,8 +673,6 @@ export default function BusinessDetailPage() {
     return <div>Business not found</div>;
   }
 
-  console.log("Business gallery images:", business.galleryImages);
-
   const businessTeam = categoryTeams[business.category] || [];
 
   const addToBooking = (service: Service, categoryName: string) => {
@@ -773,20 +770,6 @@ export default function BusinessDetailPage() {
     const x = e.pageX - (dateContainerRef.current.offsetLeft || 0);
     const walk = (x - dateStartX) * 2;
     dateContainerRef.current.scrollLeft = dateScrollLeft - walk;
-  };
-
-  const handleTeamMouseDown = (e: React.MouseEvent) => {
-    setTeamDragging(true);
-    setTeamStartX(e.pageX - (teamContainerRef.current?.offsetLeft || 0));
-    setTeamScrollLeft(teamContainerRef.current?.scrollLeft || 0);
-  };
-
-  const handleTeamMouseLeave = () => {
-    setTeamDragging(false);
-  };
-
-  const handleTeamMouseUp = () => {
-    setTeamDragging(false);
   };
 
   const handleTeamMouseMove = (e: React.MouseEvent) => {

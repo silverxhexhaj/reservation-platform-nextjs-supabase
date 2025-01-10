@@ -28,7 +28,6 @@ export default function CreateBusiness() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
     router.push('/partner/success'); // Update this route if needed
   };
 

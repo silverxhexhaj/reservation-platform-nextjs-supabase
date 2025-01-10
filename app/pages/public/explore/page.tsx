@@ -13,7 +13,6 @@ import { motion } from "framer-motion";
 import { BusinessCategory, businessCategories } from "@/app/models/supabase.models";
 import { containerVariants, itemVariants } from "@/app/models/transitionEffects.models";
 import { categoryBackgrounds, categoryBorders } from "@/lib/color.utils";
-import { loadInitialBusinesses } from "@/app/service/business/business.service";
 
 export default function ExplorePage({
   searchParams,
@@ -23,7 +22,6 @@ export default function ExplorePage({
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
 
-  // Select some popular categories to display
   const popularCategories: BusinessCategory[] = [
     "gym_and_fitness",
     "spa",
@@ -55,7 +53,7 @@ export default function ExplorePage({
           className="space-y-6 md:space-y-8"
         >
           {/* Hero Section */}
-          <motion.div 
+          <motion.div
             variants={itemVariants}
             className={`h-[380px] relative mb-8 transition-colors duration-500 flex flex-col justify-center
               ${selectedCategory ? categoryBackgrounds[selectedCategory as BusinessCategory] : 'bg-gradient-to-r from-neutral-50 to-neutral-100'}`}
@@ -108,8 +106,8 @@ export default function ExplorePage({
                           <Button
                             variant="outline"
                             className={`w-full h-[80px] flex flex-col items-center justify-center p-2 space-y-2 transition-all duration-300 hover:scale-105 border bg-white
-                              ${isActive 
-                                ? `${categoryBorders[category as BusinessCategory]}` 
+                              ${isActive
+                                ? `${categoryBorders[category as BusinessCategory]}`
                                 : 'border-gray-200 hover:bg-gray-50'}`}
                           >
                             <CategoryIcon icon={categoryToIcon[category as BusinessCategory]} className="w-5 h-5" />

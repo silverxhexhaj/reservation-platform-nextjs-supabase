@@ -7,8 +7,6 @@ interface MasonryGalleryProps {
 }
 
 export const MasonryGallery: React.FC<MasonryGalleryProps> = ({ images, businessName }) => {
-  console.log("MasonryGallery images:", images);
-
   // Function to get a random span value for each image
   const getRandomSpan = () => Math.floor(Math.random() * 2) + 1;
 

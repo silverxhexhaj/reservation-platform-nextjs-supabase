@@ -53,6 +53,7 @@ CREATE TYPE notification_type AS ENUM (
     'reward_claimed',
     'schedule_changed'
 );
+
 CREATE TYPE business_category AS ENUM (
     'hair_salon',
     'nail_salon',

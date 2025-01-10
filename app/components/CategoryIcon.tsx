@@ -39,7 +39,6 @@ const iconMap = {
 export function CategoryIcon({ icon, className = "" }: CategoryIconProps) {
   const Icon = iconMap[icon];
   if (!Icon) {
-    console.warn(`Icon not found for category: ${icon}`);
     return <Heart className={className} />; // Fallback icon
   }
   return <Icon className={className} />;

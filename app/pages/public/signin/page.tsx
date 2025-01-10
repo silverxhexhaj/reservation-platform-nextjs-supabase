@@ -36,7 +36,6 @@ function SignInContent() {
         }
 
         if (data?.user) {
-          console.log('Signed in successfully:', data.user);
           router.push(returnTo); // Redirect to the returnTo URL
         }
       } else {
@@ -46,12 +45,10 @@ function SignInContent() {
         });
 
         if (error) {
-          console.error('Error signing up:', error.message);
           return;
         }
 
         if (data?.user) {
-          console.log('Signed up successfully:', data.user);
           router.push(returnTo); // Redirect to the returnTo URL
         }
       }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useSearchParams, useRouter } from "next/navigation"
-import { useCallback, useState } from "react"
+import { useCallback, useState, useEffect } from "react"
 import { Input } from "@/app/components/ui/input"
 import { motion } from "framer-motion"
 import { Search, SlidersHorizontal } from "lucide-react"
@@ -35,7 +35,9 @@ interface FilterState {
 export function ExploreFilters({ categories }: ExploreFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [searchValue, setSearchValue] = useState(searchParams.get("search") ?? "")
   const [tempFilters, setTempFilters] = useState<FilterState>({
     priceRange: searchParams.get("priceRange") ?? "all",
     rating: searchParams.get("rating") ?? "all",
@@ -44,6 +46,10 @@ export function ExploreFilters({ categories }: ExploreFiltersProps) {
     accessible: searchParams.get("accessible") === "true",
     onlineBooking: searchParams.get("onlineBooking") === "true",
   })
+
+  useEffect(() => {
+    setSearchValue(searchParams.get("search") ?? "")
+  }, [searchParams])
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
@@ -98,6 +104,17 @@ export function ExploreFilters({ categories }: ExploreFiltersProps) {
     setIsFilterOpen(false)
   }
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setSearchValue(value)
+    
+    const timeoutId = setTimeout(() => {
+      router.push(`/pages/public/explore?${createQueryString("search", value)}`)
+    }, 1000)
+
+    return () => clearTimeout(timeoutId)
+  }
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: -20 }}
@@ -113,12 +130,11 @@ export function ExploreFilters({ categories }: ExploreFiltersProps) {
       >
         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-500 h-5 w-5" />
         <Input
+          id="search-input"
           placeholder="Search by business name or service..."
           className="w-full pl-12 pr-16 h-12 bg-white border-neutral-200 hover:border-neutral-300 focus:border-neutral-300 focus:ring-neutral-300 text-base rounded-xl shadow-sm"
-          defaultValue={searchParams.get("search") ?? ""}
-          onChange={(e) => {
-            router.push(`/pages/public/explore?${createQueryString("search", e.target.value)}`)
-          }}
+          defaultValue={searchValue}
+          onChange={handleSearchChange}
         />
         <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
           <Button

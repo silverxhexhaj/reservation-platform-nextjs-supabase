@@ -31,12 +31,11 @@ export default function CustomerSignUpPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Add customer registration logic here
-    console.log('Customer signup form submitted:', formData);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header user={user} />
+      <Header />
       <main className="flex-grow flex items-center justify-center py-16 sm:py-20 bg-gradient-to-r from-purple-900 via-blue-900 to-purple-900">
         <div className="relative w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">

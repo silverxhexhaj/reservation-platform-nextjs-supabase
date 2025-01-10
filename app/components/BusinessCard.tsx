@@ -33,7 +33,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
     return (
         <motion.div variants={itemVariants}>
             <Link
-                href={`/pages/private/business/dashboard/${business.id}`}
+                href={`/pages/public/explore/${business.id}`}
                 className="group block h-full"
             >
                 <Card className={`overflow-hidden h-full transition-all duration-300 hover:shadow-lg border ${business.is_premium ? 'border-amber-200 hover:border-amber-300' : 'border-gray-100 hover:border-gray-200'

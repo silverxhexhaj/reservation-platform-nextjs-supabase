@@ -19,7 +19,6 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Add your login logic here
-    console.log('Login form submitted:', formData);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +31,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header user={user} />
+      <Header />
       <main className="flex-grow flex items-center justify-center bg-gray-50 py-12 px-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
