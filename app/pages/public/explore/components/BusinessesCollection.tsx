@@ -7,7 +7,7 @@ import Link from "next/link"
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react"
 import { containerVariants } from "@/app/models/transitionEffects.models";
-import { BusinessCard } from "@/app/components/BusinessCard";
+import { BusinessCard } from "@/app/components/business/BusinessCard";
 
 
 import { fetchBusinessesWithFilters, loadInitialBusinesses } from "@/app/service/business/business.service";

@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog"
-import { ServiceCard } from "./service-card"
+import { ServiceCard } from "./ServiceCard"
 
 interface ServicesModalProps {
   services: Service[]

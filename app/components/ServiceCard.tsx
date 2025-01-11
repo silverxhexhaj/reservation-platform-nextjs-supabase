@@ -1,11 +1,11 @@
 "use client"
 
-import { Service } from "../lib/services"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { Button } from "./ui/button"
+import { SelectedService } from "@/app/models/custom.models"
 
 interface ServiceCardProps {
-  service: Service
+  service: SelectedService
 }
 
 export function ServiceCard({ service }: ServiceCardProps) {

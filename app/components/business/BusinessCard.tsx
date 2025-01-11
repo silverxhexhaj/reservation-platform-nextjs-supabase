@@ -3,12 +3,12 @@
 import Link from 'next/link';
 import Image from 'next/image'
 import { Heart, Crown, Percent, Sparkles, Star, Users, MapPin } from "lucide-react"
-import { Badge } from "./ui/badge"
-import { Card, CardContent} from "./ui/card"
+import { Badge } from "../ui/badge"
+import { Card, CardContent} from "../ui/card"
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { itemVariants } from '../models/transitionEffects.models';
-import { BusinessSummary } from '../models/functions/businessSummary.model';
+import { itemVariants } from '../../models/transitionEffects.models';
+import { BusinessSummary } from '../../models/functions/businessSummary.model';
 
 
 function isNewBusiness(createdAt: Date): boolean {

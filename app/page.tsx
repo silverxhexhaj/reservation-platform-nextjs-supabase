@@ -25,7 +25,7 @@ import {
 } from "@/app/components/ui/command"
 import { Business, BusinessCategory, businessCategories } from '@/app/models/supabase.models';
 import { categoryToIcon } from '@/data';
-import { BusinessCard } from './components/BusinessCard';
+import { BusinessCard } from './components/business/BusinessCard';
 import { OfferCard } from './components/OfferCard';
 import { containerVariants, itemVariants } from '@/app/models/transitionEffects.models';
 import { supabase } from '@/lib/supabase';
@@ -62,73 +62,12 @@ const platformFeatures = [
   }
 ];
 
-const testimonials = [
-  {
-    name: "Sarah Johnson",
-    role: "Regular Customer",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=faces",
-    content: "Nooor has transformed how I book my beauty appointments. The platform is so intuitive and reliable!",
-    rating: 5
-  },
-  {
-    name: "Mark Davis",
-    role: "Fitness Enthusiast",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=faces",
-    content: "Finding the right personal trainer was super easy with Nooor. The booking process is seamless.",
-    rating: 5
-  },
-  {
-    name: "Emma Wilson",
-    role: "Beauty Professional",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=faces",
-    content: "As a salon owner, Nooor has helped me reach more clients and manage my bookings efficiently.",
-    rating: 5
-  }
-];
 
 const socialProof = [
   { platform: "Instagram", followers: "50K+", handle: "@nooor" },
   { platform: "Facebook", followers: "35K+", handle: "NooorOfficial" },
   { platform: "TikTok", followers: "25K+", handle: "@nooor" }
 ];
-
-// Update the businessOffers data with reliable image URLs
-const businessOffers: BusinessOffer[] = [
-  {
-    id: '1',
-    businessId: businesses[0].id,
-    title: 'Summer Spa Package',
-    description: 'Full body massage + facial treatment',
-    originalPrice: 150,
-    discountedPrice: 99,
-    discountPercentage: 34,
-    validUntil: '2024-08-31',
-    imageUrl: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&h=600&fit=crop'
-  },
-  {
-    id: '2',
-    businessId: businesses[1].id,
-    title: 'Hair Transformation',
-    description: 'Haircut + color + treatment',
-    originalPrice: 200,
-    discountedPrice: 149,
-    discountPercentage: 25,
-    validUntil: '2024-07-31',
-    imageUrl: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=800&h=600&fit=crop'
-  },
-  {
-    id: '3',
-    businessId: businesses[2].id,
-    title: 'Fitness Starter Pack',
-    description: '1 month membership + 3 PT sessions',
-    originalPrice: 300,
-    discountedPrice: 199,
-    discountPercentage: 33,
-    validUntil: '2024-06-30',
-    imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop'
-  }
-];
-
 
 
 export default function HomePage() {

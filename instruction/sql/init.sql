@@ -20,6 +20,7 @@ DROP TABLE IF EXISTS reviews CASCADE;
 DROP TABLE IF EXISTS staff_services CASCADE;
 DROP TABLE IF EXISTS points_transactions CASCADE;
 DROP TABLE IF EXISTS profiles CASCADE;
+DROP TABLE IF EXISTS business_favorites CASCADE;
 DROP TYPE IF EXISTS profile_type CASCADE;
 DROP TYPE IF EXISTS business_category CASCADE;
 
@@ -251,10 +252,13 @@ CREATE TABLE campaigns (
 -- Deals table
 CREATE TABLE deals (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
     campaign_id UUID REFERENCES campaigns(id) ON DELETE CASCADE,
     service_id UUID REFERENCES services(id) ON DELETE CASCADE,
-    discount_percentage DECIMAL(5,2),
-    discount_amount DECIMAL(10,2),
+    original_price DECIMAL(10,2),
+    now_price DECIMAL(10,2),
+    description TEXT,
+    title TEXT,
     start_date TIMESTAMP WITH TIME ZONE NOT NULL,
     end_date TIMESTAMP WITH TIME ZONE NOT NULL,
     is_active BOOLEAN DEFAULT true,
@@ -384,8 +388,6 @@ CREATE TABLE business_favorites (
     CONSTRAINT unique_user_business_favorite UNIQUE (user_id, business_id)
 );
 
-
-
 -- Add indexes for business_offers
 CREATE INDEX idx_business_favorites_user ON business_favorites(user_id);
 CREATE INDEX idx_business_favorites_business ON business_favorites(business_id);
@@ -419,6 +421,7 @@ CREATE INDEX idx_business_gallery_business ON business_gallery(business_id);
 CREATE INDEX idx_business_gallery_featured ON business_gallery(business_id, is_featured) WHERE is_featured = true;
 CREATE INDEX idx_business_gallery_order ON business_gallery(business_id, sort_order);
 CREATE INDEX idx_profiles_user ON profiles(user_id);
+CREATE INDEX idx_deals_business_id ON deals(business_id);
 
 
 -- Add triggers for updated_at timestamps

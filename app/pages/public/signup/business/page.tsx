@@ -9,9 +9,9 @@ import { Textarea } from '@/app/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select";
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { categories } from '@/data';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import { businessCategories } from '@/app/models/supabase.models';
 
 type Step = 'account' | 'business' | 'location' | 'additional';
 
@@ -252,7 +252,7 @@ export default function BusinessSignUpPage() {
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => (
+                  {businessCategories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
                     </SelectItem>

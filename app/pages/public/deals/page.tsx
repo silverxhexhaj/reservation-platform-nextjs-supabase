@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
-import { businesses, businessOffers } from "@/data/mock";
+import { businesses } from "@/data/mock";
 import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
 import {
@@ -24,6 +24,7 @@ import {
 import { Slider } from "@/app/components/ui/slider";
 import { Badge } from "@/app/components/ui/badge";
 import { FeaturedDealCard } from "@/app/components/FeaturedDealCard";
+import { businessCategories } from "@/app/models/supabase.models";
 
 // Get unique categories from businesses
 const categories = Array.from(new Set(businesses.map(b => b.category)));
@@ -36,34 +37,7 @@ export default function DealsPage() {
   const [sortBy, setSortBy] = useState<string>("discount");
 
   // Filter and sort deals
-  const filteredDeals = businessOffers
-    .filter(offer => {
-      const business = businesses.find(b => b.id === offer.businessId);
-      if (!business) return false;
-
-      const matchesSearch = 
-        offer.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        offer.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        business.name.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesCategory = !selectedCategory || business.category === selectedCategory;
-      const matchesPrice = offer.discountedPrice >= priceRange[0] && offer.discountedPrice <= priceRange[1];
-      const matchesDiscount = offer.discountPercentage >= minDiscount;
-
-      return matchesSearch && matchesCategory && matchesPrice && matchesDiscount;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "discount":
-          return b.discountPercentage - a.discountPercentage;
-        case "priceAsc":
-          return a.discountedPrice - b.discountedPrice;
-        case "priceDesc":
-          return b.discountedPrice - a.discountedPrice;
-        default:
-          return 0;
-      }
-    });
+  const filteredDeals: never[] = [];
 
   const clearFilters = () => {
     setSelectedCategory("");
@@ -122,7 +96,7 @@ export default function DealsPage() {
                   </SheetHeader>
                   <div className="mt-4 space-y-6">
                     <FilterControls
-                      categories={categories}
+                      businessCategories={businessCategories}
                       selectedCategory={selectedCategory}
                       setSelectedCategory={setSelectedCategory}
                       priceRange={priceRange}
@@ -142,7 +116,7 @@ export default function DealsPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">All Categories</SelectItem>
-                    {categories.map(category => (
+                    {businessCategories.map((category: string) => (
                       <SelectItem key={category} value={category}>
                         {category}
                       </SelectItem>
@@ -199,9 +173,9 @@ export default function DealsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredDeals.map((offer) => (
               <FeaturedDealCard
-                key={offer.id}
-                offer={offer}
-                business={businesses.find(b => b.id === offer.businessId)!}
+                key={null}
+                offer={null}
+                business={null}
               />
             ))}
           </div>
@@ -228,7 +202,7 @@ export default function DealsPage() {
 
 // Filter Controls Component
 function FilterControls({
-  categories,
+  businessCategories,
   selectedCategory,
   setSelectedCategory,
   priceRange,
@@ -236,7 +210,7 @@ function FilterControls({
   minDiscount,
   setMinDiscount,
 }: {
-  categories: string[];
+  businessCategories: string[];
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
   priceRange: number[];
@@ -254,7 +228,7 @@ function FilterControls({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="">All Categories</SelectItem>
-            {categories.map(category => (
+            {businessCategories.map(category => (
               <SelectItem key={category} value={category}>
                 {category}
               </SelectItem>
