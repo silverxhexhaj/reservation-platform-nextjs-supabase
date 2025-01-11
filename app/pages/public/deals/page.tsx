@@ -169,7 +169,7 @@ export default function DealsPage() {
             </div>
           )}
 
-          {/* Deals Grid */}
+          {/* Deals Grid 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredDeals.map((offer) => (
               <FeaturedDealCard
@@ -179,6 +179,7 @@ export default function DealsPage() {
               />
             ))}
           </div>
+            */}
 
           {/* No Results */}
           {filteredDeals.length === 0 && (

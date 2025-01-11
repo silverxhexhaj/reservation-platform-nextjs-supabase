@@ -5,17 +5,19 @@ import Link from "next/link"
 import { formatDate } from "@fullcalendar/core/index.js"
 import { Button } from "./ui/button"
 import Image from "next/image"
-import { Business } from "@/data"
+import { BusinessSummary } from "@/app/models/functions/businessSummary.model"
+import { DealSummary } from "@/app/models/functions/homePageBusinesses.models"
 import { Star } from "lucide-react"
+
 interface OfferCardProps {
-    offer: BusinessOffer,
-    business: Business
+    offer: DealSummary,
+    business: BusinessSummary
 }
 
-export const OfferCard: React.FC<OfferCardProps> = ({ offer, business }) => {
+export function OfferCard({ offer, business }: OfferCardProps) {
     return <>
         <Link
-            href={`/pages/private/business/dashboard/${offer.businessId}?offer=${offer.id}`}
+            href={`/pages/public/explore/${business.id}?offer=${offer.id}`}
             key={offer.id}
             className="group block"
         >
@@ -23,13 +25,13 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, business }) => {
                 {/* Image and Discount Badge */}
                 <div className="relative aspect-[16/9] overflow-hidden">
                     <Image
-                        src={offer.imageUrl}
+                        src={offer.image_url}
                         alt={offer.title}
                         fill
                         className="object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                     <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                        {offer.discountPercentage}% OFF
+                        {Math.round(((offer.original_price - offer.now_price) / offer.original_price) * 100)}% OFF
                     </div>
                     {business && (
                         <div className="absolute bottom-4 left-4 right-4">
@@ -37,7 +39,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, business }) => {
                                 <p className="text-sm font-medium text-gray-900">{business.name}</p>
                                 <div className="flex items-center space-x-1">
                                     <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                                    <span className="text-xs text-gray-600">{business.rating}</span>
+                                    <span className="text-xs text-gray-600">{business.review_average}</span>
                                 </div>
                             </div>
                         </div>
@@ -54,8 +56,8 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, business }) => {
                     {/* Price and CTA */}
                     <div className="flex items-end justify-between">
                         <div className="space-y-1">
-                            <p className="text-sm text-gray-500 line-through">${offer.originalPrice}</p>
-                            <p className="text-xl font-bold text-gray-900">${offer.discountedPrice}</p>
+                            <p className="text-sm text-gray-500 line-through">${offer.original_price}</p>
+                            <p className="text-xl font-bold text-gray-900">${offer.now_price}</p>
                         </div>
                         <Button
                             variant="outline"
@@ -68,7 +70,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({ offer, business }) => {
                     {/* Valid Until */}
                     <div className="mt-4 pt-4 border-t border-gray-100">
                         <p className="text-xs text-gray-500">
-                            Valid until {formatDate(offer.validUntil)}
+                            Valid until {formatDate(offer.end_date)}
                         </p>
                     </div>
                 </div>

@@ -259,6 +259,7 @@ CREATE TABLE deals (
     now_price DECIMAL(10,2),
     description TEXT,
     title TEXT,
+    image_url TEXT,
     start_date TIMESTAMP WITH TIME ZONE NOT NULL,
     end_date TIMESTAMP WITH TIME ZONE NOT NULL,
     is_active BOOLEAN DEFAULT true,

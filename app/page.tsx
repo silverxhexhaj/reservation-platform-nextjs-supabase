@@ -1,18 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef, ReactElement, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { Header } from './components/Header';
 import { Button } from "./components/ui/button";
-import { Search, Star, X,  LayoutGrid, Music, Instagram, Facebook } from 'lucide-react';
+import { Search, Star, X, LayoutGrid, Music, Instagram, Facebook } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image'
-import { businesses } from '@/data/mock';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "./components/ui/dialog"
 import { Calendar, Shield, CheckCircle, Lock } from 'lucide-react';
 import { CategoryIcon } from './components/CategoryIcon';
 import { motion } from 'framer-motion'
@@ -23,20 +16,14 @@ import {
   CommandItem,
   CommandList,
 } from "@/app/components/ui/command"
-import { Business, BusinessCategory, businessCategories } from '@/app/models/supabase.models';
-import { categoryToIcon } from '@/data';
+import { businessCategories } from '@/app/models/supabase.models';
+import { categoryToIcon, testimonials } from '@/data';
 import { BusinessCard } from './components/business/BusinessCard';
 import { OfferCard } from './components/OfferCard';
 import { containerVariants, itemVariants } from '@/app/models/transitionEffects.models';
-import { supabase } from '@/lib/supabase';
+import { fetchHomePageBusinesses } from './service/business/business.service';
+import { HomePageBusinesses } from './models/functions/homePageBusinesses.models';
 
-// Add these statistics
-const platformStats = [
-  { label: 'Active Users', value: '10,000+' },
-  { label: 'Partner Businesses', value: '500+' },
-  { label: 'Cities Covered', value: '15+' },
-  { label: 'Bookings Made', value: '50,000+' }
-];
 
 // Add these features
 const platformFeatures = [
@@ -62,39 +49,37 @@ const platformFeatures = [
   }
 ];
 
-
 const socialProof = [
   { platform: "Instagram", followers: "50K+", handle: "@nooor" },
   { platform: "Facebook", followers: "35K+", handle: "NooorOfficial" },
   { platform: "TikTok", followers: "25K+", handle: "@nooor" }
 ];
 
-
 export default function HomePage() {
-  const [user, setUser] = useState<{ username: string } | null>(null);
+
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredBusinesses, setFilteredBusinesses] = useState<Business[]>(businesses);
-  const [placeholderIndex, setPlaceholderIndex] = useState(0);
-  const [placeholder, setPlaceholder] = useState('Search businesses...');
-  const [fadeOut, setFadeOut] = useState(false);
-  const placeholderTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [isInputFocused, setIsInputFocused] = useState(false);
-  const [showAllCategories, setShowAllCategories] = useState(false);
-  const [isClientSide, setIsClientSide] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [homePageBusinesses, setHomePageBusinesses] = useState<HomePageBusinesses | null>(null);
   const [showCategorySearch, setShowCategorySearch] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
-  // Add click outside handler
   useEffect(() => {
+    const fetchBusinesses = async () => {
+      try {
+        const businesses = await fetchHomePageBusinesses();
+        setHomePageBusinesses(businesses);
+      } catch (error) {
+        console.error('Error fetching businesses:', error);
+      }
+    };
+
     function handleClickOutside(event: MouseEvent) {
       if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
         setShowCategorySearch(false);
       }
     }
+
+    fetchBusinesses();
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
@@ -102,65 +87,8 @@ export default function HomePage() {
     };
   }, []);
 
-  // Add this effect to handle client-side initialization
-  useEffect(() => {
-    setIsClientSide(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isClientSide) return;
-
-    const changePlaceholder = () => {
-      if (!isInputFocused) {
-        setFadeOut(true);
-        placeholderTimeoutRef.current = setTimeout(() => {
-          setPlaceholderIndex((prevIndex) => (prevIndex + 1) % businessCategories.length);
-          setPlaceholder(`Search for ${businessCategories[(placeholderIndex + 1) % businessCategories.length]}...`);
-          setFadeOut(false);
-        }, 200);
-      }
-    };
-
-    const intervalId = setInterval(changePlaceholder, 1500);
-
-    return () => {
-      clearInterval(intervalId);
-      if (placeholderTimeoutRef.current) {
-        clearTimeout(placeholderTimeoutRef.current);
-      }
-    };
-  }, [placeholderIndex, isInputFocused, isClientSide]);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUser({ username: user.user_metadata.username || user.email });
-      }
-    };
-
-    fetchUser();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        setUser({ username: session.user.user_metadata.username || session.user.email });
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-      }
-    });
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
-
   const handleSearch = () => {
-    const filtered = businesses.filter(business => 
-      business?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      business?.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (selectedCategory && business?.category?.toLowerCase() === selectedCategory.toLowerCase())
-    );
-    setFilteredBusinesses(filtered);
+
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -172,26 +100,16 @@ export default function HomePage() {
   const clearSearch = () => {
     setSearchTerm('');
     setSelectedCategory(null);
-    setFilteredBusinesses(businesses);
+    setHomePageBusinesses(null);
   };
 
   const handleInputFocus = () => {
-    setIsInputFocused(true);
     setShowCategorySearch(true);
   };
 
   const handleInputBlur = () => {
-    setIsInputFocused(false);
+
   };
-
-  useEffect(() => {
-    if (searchTerm === '') {
-      setFilteredBusinesses(businesses);
-    }
-  }, [searchTerm]);
-
-  const topBusinesses = filteredBusinesses.sort((a, b) => b?.rating - a?.rating).slice(0, 5);
-
 
   return (
     <div className="min-h-screen font-sans bg-white flex flex-col">
@@ -199,14 +117,14 @@ export default function HomePage() {
       <main className="relative">
         {/* Hero Section */}
         <div className="p-8 flex relative h-screen">
-          <motion.div 
+          <motion.div
             className='relative z-10 flex flex-col space-y-6 max-w-screen-2xl mx-auto'
-            variants={containerVariants}
+            variants={itemVariants}
             initial="hidden"
             animate="visible"
           >
             <div className='flex flex-col justify-end items-center mx-auto space-y-4 flex-1'>
-              <motion.div 
+              <motion.div
                 variants={itemVariants}
                 className="flex justify-center"
               >
@@ -232,7 +150,7 @@ export default function HomePage() {
                         onFocus={handleInputFocus}
                         onBlur={handleInputBlur}
                         className="flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                        placeholder={isClientSide ? placeholder : 'Search businesses...'}
+                        placeholder={'Search businesses...'}
                       />
                       {(searchTerm || selectedCategory) && (
                         <button
@@ -271,7 +189,7 @@ export default function HomePage() {
                       </div>
                     )}
                   </Command>
-                  <Button 
+                  <Button
                     onClick={handleSearch}
                     className="absolute right-1.5 bg-black hover:bg-gray-900 text-white font-medium px-5 rounded-full"
                   >
@@ -281,7 +199,7 @@ export default function HomePage() {
               </motion.div>
             </div>
             {/* Categories Section */}
-            <motion.div 
+            <motion.div
               variants={itemVariants}
               className="max-w-screen-2xl mx-auto flex-1 pt-16 w-full flex justify-center items-end md:items-start"
             >
@@ -295,7 +213,7 @@ export default function HomePage() {
                         variants={itemVariants}
                         custom={index}
                       >
-                        <Link 
+                        <Link
                           href={`/pages/public/explore?category=${slug}`}
                           className="w-full h-[60px] flex items-center justify-center group bg-white bg-opacity-10 backdrop-blur-xs hover:bg-opacity-20 border border-white border-opacity-20 rounded-lg p-4 transition-all duration-300 hover:scale-105"
                         >
@@ -309,8 +227,8 @@ export default function HomePage() {
                     );
                   })}
                 </div>
-                
-                <motion.div 
+
+                <motion.div
                   variants={itemVariants}
                   className="flex justify-center"
                 >
@@ -324,50 +242,6 @@ export default function HomePage() {
                   </Link>
                 </motion.div>
 
-                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                  <DialogContent className="max-w-4xl w-full h-[100dvh] p-0 md:h-auto md:max-h-[80vh] md:p-6 overflow-y-auto bg-white">
-                    <div className="flex flex-col h-full md:h-auto">
-                      {/* Header - Fixed at top */}
-                      <DialogHeader className="sticky top-0 z-10 bg-white border-b p-4 md:p-0 md:border-none">
-                        <div className="flex items-center justify-between">
-                          <DialogTitle className="text-xl font-bold">All Categories</DialogTitle>
-                          <button
-                            onClick={() => setIsModalOpen(false)}
-                            className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
-                          >
-                            <X className="h-5 w-5 text-gray-500" />
-                          </button>
-                        </div>
-                      </DialogHeader>
-
-                      {/* Content - Scrollable */}
-                      <div className="flex-1 overflow-y-auto p-4 md:p-0">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                          {businessCategories.map(category => {
-                            const slug = category.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-');
-                            return (
-                              <Link 
-                                key={category}
-                                href={`/explore/${slug}`}
-                                onClick={() => setIsModalOpen(false)}
-                                className="flex items-center p-4 group bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-300 hover:scale-105 border border-gray-100 hover:border-gray-200"
-                              >
-                                <div className="flex items-center space-x-4">
-                                  <span className="w-12 h-12 flex items-center justify-center bg-white rounded-xl shadow-sm group-hover:shadow-md transition-all duration-300">
-                                    <CategoryIcon icon={categoryToIcon[category as BusinessCategory]} />
-                                  </span>
-                                  <span className="font-medium text-gray-900">
-                                    {category}
-                                  </span>
-                                </div>
-                              </Link>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
               </div>
             </motion.div>
           </motion.div>
@@ -376,20 +250,20 @@ export default function HomePage() {
               <Suspense fallback={
                 <div className="absolute inset-0 bg-gradient-to-b from-red-700/40 to-pink-700/40" />
               }>
-                <video 
+                <video
                   preload="auto"
-                  className="absolute inset-0 w-full h-full object-cover" 
-                  crossOrigin="" 
-                  playsInline 
-                  muted 
+                  className="absolute inset-0 w-full h-full object-cover"
+                  crossOrigin=""
+                  playsInline
+                  muted
                   autoPlay
                   loop
-                  src="/video/nooor_home_cover_video.mp4" 
+                  src="/video/nooor_home_cover_video.mp4"
                 >
                   <track kind="metadata" label="cuepoints" />
                 </video>
               </Suspense>
-              <div 
+              <div
                 className="absolute inset-0 mix-blend-overlay opacity-40"
                 style={{
                   backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
@@ -401,36 +275,9 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Platform Statistics Section - Commented out
-        <motion.section 
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="bg-gradient-to-r from-pink-600 to-red-600 py-16"
-        >
-          <div className="px-8">
-            <motion.h2 
-              variants={itemVariants}
-              className="text-3xl font-bold text-center mb-12 text-white"
-            >
-              Platform Statistics
-            </motion.h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {platformStats.map((stat, index) => (
-                <motion.div key={index} variants={itemVariants} className="text-center">
-                  <h3 className="text-4xl font-bold text-white mb-2">{stat.value}</h3>
-                  <p className="text-white/80">{stat.label}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.section>
-        */}
-
         {/* Platform Features Section */}
-        <motion.section 
-          variants={containerVariants}
+        <motion.section
+          variants={itemVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -439,8 +286,8 @@ export default function HomePage() {
           <div className="px-8">
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {platformFeatures.map((feature, index) => (
-                <motion.div 
-                  key={index} 
+                <motion.div
+                  key={index}
                   variants={itemVariants}
                   className="p-6 hover:bg-gray-50 transition-colors duration-200 rounded-lg border border-gray-100"
                 >
@@ -463,20 +310,20 @@ export default function HomePage() {
         <div className="px-8 py-16 max-w-screen-2xl mx-auto">
           <div className="space-y-12">
             <motion.section
-              variants={containerVariants}
+              variants={itemVariants}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
             >
               <div className="">
-                <motion.h2 
+                <motion.h2
                   variants={itemVariants}
                   className="text-3xl font-bold mb-6 text-neutral-900"
                 >
                   Our Top Businesses
                 </motion.h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                  {topBusinesses.map((business, index) => (
+                  {homePageBusinesses?.top_businesses?.map((business) => (
                     <motion.div key={business.id} variants={itemVariants}>
                       <BusinessCard business={business} />
                     </motion.div>
@@ -486,22 +333,22 @@ export default function HomePage() {
             </motion.section>
 
             <motion.section
-              variants={containerVariants}
+              variants={itemVariants}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
             >
               <div className="">
-                <motion.h2 
+                <motion.h2
                   variants={itemVariants}
                   className="text-3xl font-bold mb-6 text-neutral-900"
                 >
                   Special Offers
                 </motion.h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {businessOffers.map((offer, index) => (
-                    <motion.div key={offer.id} variants={itemVariants}>
-                      <OfferCard offer={offer} business={businesses.find(business => business.id === offer.businessId)} />
+                  {homePageBusinesses?.special_offers?.map((offer) => (
+                    <motion.div key={offer?.deal?.id} variants={itemVariants}>
+                      <OfferCard offer={offer?.deal} business={offer?.business} />
                     </motion.div>
                   ))}
                 </div>
@@ -509,49 +356,43 @@ export default function HomePage() {
             </motion.section>
 
             <motion.section
-              variants={containerVariants}
+              variants={itemVariants}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
             >
               <div className="">
-                <motion.h2 
+                <motion.h2
                   variants={itemVariants}
                   className="text-3xl font-bold mb-6 text-neutral-900"
                 >
                   New on Platform
                 </motion.h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                  {filteredBusinesses
-                    .sort((a, b) => b.id.localeCompare(a.id))
-                    .slice(0, 5)
-                    .map((business, index) => (
-                      <motion.div key={business.id} variants={itemVariants}>
-                        <BusinessCard business={business} />
-                      </motion.div>
-                    ))}
+                  {homePageBusinesses?.new_businesses?.map((business, index) => (
+                    <motion.div key={business.id} variants={itemVariants}>
+                      <BusinessCard business={business} />
+                    </motion.div>
+                  ))}
                 </div>
               </div>
             </motion.section>
 
             <motion.section
-              variants={containerVariants}
+              variants={itemVariants}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
             >
               <div className="">
-                <motion.h2 
+                <motion.h2
                   variants={itemVariants}
                   className="text-3xl font-bold mb-6 text-neutral-900"
                 >
                   Best Rated
                 </motion.h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                  {filteredBusinesses
-                    .filter(business => business.rating >= 4.5)
-                    .slice(0, 5)
-                    .map((business, index) => (
+                  {homePageBusinesses?.best_rated?.map((business, index) => (
                       <motion.div key={business.id} variants={itemVariants}>
                         <BusinessCard business={business} />
                       </motion.div>
@@ -564,15 +405,15 @@ export default function HomePage() {
         </div>
 
         {/* Testimonials Section */}
-        <motion.section 
-          variants={containerVariants}
+        <motion.section
+          variants={itemVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           className="py-16 bg-gradient-to-br from-purple-50 to-indigo-50"
         >
           <div className="max-w-screen-2xl mx-auto px-8">
-            <motion.h2 
+            <motion.h2
               variants={itemVariants}
               className="text-3xl font-bold text-center mb-12 text-neutral-900"
             >
@@ -580,8 +421,8 @@ export default function HomePage() {
             </motion.h2>
             <div className="grid md:grid-cols-3 gap-8">
               {testimonials.map((testimonial, index) => (
-                <motion.div 
-                  key={index} 
+                <motion.div
+                  key={index}
                   variants={itemVariants}
                   className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all"
                 >
@@ -611,15 +452,15 @@ export default function HomePage() {
         </motion.section>
 
         {/* Social Proof Section */}
-        <motion.section 
-          variants={containerVariants}
+        <motion.section
+          variants={itemVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           className="py-16 bg-white"
         >
           <div className="max-w-screen-2xl mx-auto px-8">
-            <motion.h2 
+            <motion.h2
               variants={itemVariants}
               className="text-3xl font-bold text-center mb-12 text-neutral-900"
             >
@@ -627,8 +468,8 @@ export default function HomePage() {
             </motion.h2>
             <div className="grid md:grid-cols-3 gap-8">
               {socialProof.map((social, index) => (
-                <motion.div 
-                  key={index} 
+                <motion.div
+                  key={index}
                   variants={itemVariants}
                   className="text-center p-6 rounded-xl border border-gray-200 hover:border-red-500 transition-colors"
                 >
@@ -643,15 +484,15 @@ export default function HomePage() {
                 </motion.div>
               ))}
             </div>
-            <motion.div 
+            <motion.div
               variants={itemVariants}
-              className="mt-12 text-center"
+              className="mt-12 text-center flex gap-3 justify-center items-center sm:flex-row flex-col"
             >
-              <Button variant="outline" className="mr-4">
+              <Button variant="outline" >
                 <Instagram className="w-4 h-4 mr-2" />
                 Follow on Instagram
               </Button>
-              <Button variant="outline" className="mr-4">
+              <Button variant="outline">
                 <Facebook className="w-4 h-4 mr-2" />
                 Like on Facebook
               </Button>
@@ -664,21 +505,21 @@ export default function HomePage() {
         </motion.section>
 
         {/* Newsletter Section */}
-        <motion.section 
-          variants={containerVariants}
+        <motion.section
+          variants={itemVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           className="py-16 bg-gradient-to-br from-purple-50 to-indigo-50"
         >
           <div className="max-w-screen-2xl mx-auto px-8">
-            <motion.h2 
+            <motion.h2
               variants={itemVariants}
               className="text-3xl font-bold text-center mb-12 text-neutral-900"
             >
               Stay Updated
             </motion.h2>
-            <motion.div 
+            <motion.div
               variants={itemVariants}
               className="max-w-2xl mx-auto text-center"
             >

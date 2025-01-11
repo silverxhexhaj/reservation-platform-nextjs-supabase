@@ -29,7 +29,7 @@ BEGIN
                     'country', l.country
                 ),
                 'review_count', (SELECT COUNT(*) FROM reviews r WHERE r.business_id = b.id),
-                'review_average', (SELECT COALESCE(AVG(rating), 0) FROM reviews r WHERE r.business_id = b.id)
+                'review_average', ROUND(CAST((SELECT COALESCE(AVG(rating), 0) FROM reviews r WHERE r.business_id = b.id) AS NUMERIC), 1)
             ))
             FROM businesses b
             LEFT JOIN locations l ON b.location_id = l.id
@@ -42,6 +42,7 @@ BEGIN
             SELECT ARRAY_AGG(json_build_object(
                 'deal', json_build_object(
                     'id', d.id,
+                    'image_url', d.image_url,
                     'description', d.description,
                     'title', d.title,
                     'start_date', d.start_date,
@@ -67,14 +68,14 @@ BEGIN
                         'country', l.country
                     ),
                     'review_count', (SELECT COUNT(*) FROM reviews r WHERE r.business_id = b.id),
-                    'review_average', (SELECT COALESCE(AVG(rating), 0) FROM reviews r WHERE r.business_id = b.id)
+                    'review_average', ROUND(CAST((SELECT COALESCE(AVG(rating), 0) FROM reviews r WHERE r.business_id = b.id) AS NUMERIC), 1)
                 )
             ))
             FROM deals d
             INNER JOIN businesses b ON d.business_id = b.id
             LEFT JOIN locations l ON b.location_id = l.id
-            WHERE d.valid_from <= CURRENT_DATE 
-            AND d.valid_until >= CURRENT_DATE
+            WHERE d.start_date <= CURRENT_DATE 
+            AND d.end_date >= CURRENT_DATE
             LIMIT 5
         ),
         
@@ -99,7 +100,7 @@ BEGIN
                     'country', l.country
                 ),
                 'review_count', (SELECT COUNT(*) FROM reviews r WHERE r.business_id = b.id),
-                'review_average', (SELECT COALESCE(AVG(rating), 0) FROM reviews r WHERE r.business_id = b.id)
+                'review_average', ROUND(CAST((SELECT COALESCE(AVG(rating), 0) FROM reviews r WHERE r.business_id = b.id) AS NUMERIC), 1)
             ))
             FROM businesses b
             LEFT JOIN locations l ON b.location_id = l.id
@@ -109,6 +110,17 @@ BEGIN
         
         -- Best rated businesses (4+ stars)
         'best_rated', (
+            WITH review_stats AS (
+                SELECT 
+                    business_id,
+                    COUNT(*) as review_count,
+                    ROUND(CAST(AVG(rating) AS NUMERIC), 1) as review_avg
+                FROM reviews
+                GROUP BY business_id
+                HAVING AVG(rating) >= 4.5
+                ORDER BY AVG(rating) DESC
+                LIMIT 5
+            )
             SELECT ARRAY_AGG(json_build_object(
                 'id', b.id,
                 'name', b.name,
@@ -127,22 +139,12 @@ BEGIN
                     'state', l.state,
                     'country', l.country
                 ),
-                'review_count', review_count,
-                'review_average', review_avg
+                'review_count', r.review_count,
+                'review_average', r.review_avg
             ))
-            FROM businesses b
+            FROM review_stats r
+            INNER JOIN businesses b ON b.id = r.business_id
             LEFT JOIN locations l ON b.location_id = l.id
-            INNER JOIN (
-                SELECT 
-                    business_id,
-                    COUNT(*) as review_count,
-                    AVG(rating) as review_avg
-                FROM reviews
-                GROUP BY business_id
-                HAVING AVG(rating) >= 4
-            ) r ON b.id = r.business_id
-            ORDER BY r.review_avg DESC
-            LIMIT 5
         )
     );
 END;

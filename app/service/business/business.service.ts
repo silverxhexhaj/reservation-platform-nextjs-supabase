@@ -1,6 +1,7 @@
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { BusinessSummary, LoadInitialBusinessesResponse } from '@/app/models/functions/businessSummary.model'
+import { HomePageBusinesses } from '@/app/models/functions/homePageBusinesses.models'
 
 interface FetchBusinessesParams {
   searchTerm?: string | null
@@ -47,4 +48,21 @@ export async function loadInitialBusinesses(): Promise<LoadInitialBusinessesResp
   }
 
   return data as LoadInitialBusinessesResponse
+}
+
+
+export async function fetchHomePageBusinesses() {
+  const { data, error } = await supabase.rpc('fetch_home_page_businesses')
+
+  if (error) {
+    return {
+      top_businesses: [],
+      special_offers: [],
+      new_businesses: [], 
+      best_rated: []
+    }
+  }
+
+  return data as HomePageBusinesses
+
 }
