@@ -17,6 +17,7 @@ import { BookingModal } from "./components/BookingModal";
 import { StaffDetailModal } from './components/StaffDetailModal';
 import { Reviews } from './components/Reviews';
 import { BookingItem, SelectedService } from '@/app/models/custom.models';
+import { BusinessDetails } from '@/app/models/functions/businessDetails.model';
 
 const scrollbarHideStyles = `
   .scrollbar-hide {
@@ -59,7 +60,7 @@ export default function BusinessDetailPage() {
   });
 
   // State hooks
-  const [business, setBusiness] = useState<Business | null>(null);
+  const [business, setBusiness] = useState<BusinessDetails | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState('');
   const [bookingItems, setBookingItems] = useState<BookingItem[]>([]);

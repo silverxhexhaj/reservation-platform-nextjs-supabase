@@ -2,6 +2,7 @@
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { BusinessSummary, LoadInitialBusinessesResponse } from '@/app/models/functions/businessSummary.model'
 import { HomePageBusinesses } from '@/app/models/functions/homePageBusinesses.models'
+import { BusinessDetails } from '@/app/models/functions/businessDetails.model'
 
 interface FetchBusinessesParams {
   searchTerm?: string | null
@@ -64,5 +65,10 @@ export async function fetchHomePageBusinesses() {
   }
 
   return data as HomePageBusinesses
+  
+}
 
+export async function fetchBusinessDetails(businessId: string): Promise<BusinessDetails> {
+  const { data, error } = await supabase.rpc('get_business_by_id', { business_id: businessId })
+  return data as BusinessDetails
 }

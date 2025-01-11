@@ -1,5 +1,8 @@
--- Drop tables if they exist (in reverse order of creation to handle dependencies)
+-- deprecated keeping for backwards compatibility
 DROP TABLE IF EXISTS staff_working_hours CASCADE;
+
+-- Drop tables if they exist (in reverse order of creation to handle dependencies)
+DROP TABLE IF EXISTS working_hours CASCADE;
 DROP TABLE IF EXISTS payments CASCADE;
 DROP TABLE IF EXISTS bookings CASCADE;
 DROP TABLE IF EXISTS redeemed_rewards CASCADE;
@@ -21,6 +24,8 @@ DROP TABLE IF EXISTS staff_services CASCADE;
 DROP TABLE IF EXISTS points_transactions CASCADE;
 DROP TABLE IF EXISTS profiles CASCADE;
 DROP TABLE IF EXISTS business_favorites CASCADE;
+DROP TABLE IF EXISTS additional_info CASCADE;
+DROP TABLE IF EXISTS business_story CASCADE;
 DROP TYPE IF EXISTS profile_type CASCADE;
 DROP TYPE IF EXISTS business_category CASCADE;
 
@@ -186,10 +191,32 @@ CREATE TABLE business_staff (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Staff working hours table
-CREATE TABLE staff_working_hours (
+-- Additional info table
+CREATE TABLE additional_info (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    staff_id UUID REFERENCES business_staff(id) ON DELETE CASCADE,
+    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
+    is_available BOOLEAN DEFAULT true,
+    description TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Business story table
+CREATE TABLE business_story (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    image_url TEXT NOT NULL,
+    is_available BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Working hours table
+CREATE TABLE working_hours (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    staff_id UUID REFERENCES business_staff(id) ON DELETE CASCADE DEFAULT NULL,
+    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE DEFAULT NULL,
     day_of_week INTEGER NOT NULL CHECK (day_of_week BETWEEN 0 AND 6), -- 0 = Sunday, 6 = Saturday
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
@@ -197,8 +224,7 @@ CREATE TABLE staff_working_hours (
     is_available BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT valid_time_range CHECK (start_time < end_time),
-    UNIQUE(staff_id, day_of_week) -- One schedule per day per staff
+    CONSTRAINT valid_time_range CHECK (start_time < end_time)
 );
 
 -- Services table
@@ -365,6 +391,9 @@ CREATE TABLE profiles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     profile_type profile_type NOT NULL,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    profile_picture TEXT,
     bio TEXT,
     date_of_birth DATE,
     gender VARCHAR(50),
@@ -403,7 +432,8 @@ CREATE INDEX idx_bookings_business ON bookings(business_id);
 CREATE INDEX idx_bookings_staff ON bookings(staff_id);
 CREATE INDEX idx_payments_booking ON payments(booking_id);
 CREATE INDEX idx_loyalty_points_user ON loyalty_points(user_id);
-CREATE INDEX idx_staff_working_hours ON staff_working_hours(staff_id, day_of_week);
+CREATE INDEX idx_staff_working_hours ON working_hours(staff_id, day_of_week);
+CREATE INDEX idx_working_hours_business ON working_hours(business_id);
 CREATE INDEX idx_clients_user ON clients(user_id);
 CREATE INDEX idx_notifications_user ON notifications(user_id);
 CREATE INDEX idx_notifications_type ON notifications(type);
@@ -423,6 +453,10 @@ CREATE INDEX idx_business_gallery_featured ON business_gallery(business_id, is_f
 CREATE INDEX idx_business_gallery_order ON business_gallery(business_id, sort_order);
 CREATE INDEX idx_profiles_user ON profiles(user_id);
 CREATE INDEX idx_deals_business_id ON deals(business_id);
+CREATE INDEX idx_additional_info_business_id ON additional_info(business_id);
+CREATE INDEX idx_additional_info_is_available ON additional_info(is_available);
+CREATE INDEX idx_business_story_business ON business_story(business_id);
+CREATE INDEX idx_business_story_available ON business_story(business_id, is_available) WHERE is_available = true;
 
 
 -- Add triggers for updated_at timestamps
@@ -479,8 +513,8 @@ CREATE TRIGGER update_payments_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_staff_working_hours_updated_at
-    BEFORE UPDATE ON staff_working_hours
+CREATE TRIGGER update_working_hours_updated_at
+    BEFORE UPDATE ON working_hours
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
@@ -521,5 +555,15 @@ CREATE TRIGGER update_profiles_updated_at
     
 CREATE TRIGGER update_business_favorites_updated_at
     BEFORE UPDATE ON business_favorites
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_additional_info_updated_at
+    BEFORE UPDATE ON additional_info
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_business_story_updated_at
+    BEFORE UPDATE ON business_story
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();

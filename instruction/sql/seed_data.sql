@@ -1,7 +1,7 @@
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-DELETE FROM staff_working_hours;
+DELETE FROM working_hours;
 DELETE FROM payments;
 DELETE FROM bookings;
 DELETE FROM redeemed_rewards;
@@ -170,10 +170,56 @@ INSERT INTO rewards (id, business_id, name, description, points_required, is_act
 (uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Beauty Bundle', 'Complete beauty treatment package', 200, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'VIP Treatment', 'Full day of premium services', 250, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- Insert seed data for staff_working_hours
-INSERT INTO staff_working_hours (id, staff_id, day_of_week, start_time, end_time, hourly_rate, is_available, created_at, updated_at) VALUES
+-- Insert seed data for working_hours staff
+INSERT INTO working_hours (id, staff_id, day_of_week, start_time, end_time, hourly_rate, is_available, created_at, updated_at) VALUES
 (uuid_generate_v4(), (SELECT id FROM business_staff LIMIT 1 OFFSET 0), 0, '09:00', '17:00', 25.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (uuid_generate_v4(), (SELECT id FROM business_staff LIMIT 1 OFFSET 1), 1, '09:00', '17:00', 22.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (uuid_generate_v4(), (SELECT id FROM business_staff LIMIT 1 OFFSET 2), 2, '09:00', '17:00', 20.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (uuid_generate_v4(), (SELECT id FROM business_staff LIMIT 1 OFFSET 3), 3, '09:00', '17:00', 23.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (uuid_generate_v4(), (SELECT id FROM business_staff LIMIT 1 OFFSET 4), 4, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+
+-- Insert seed data for working_hours business
+INSERT INTO working_hours (id, business_id, day_of_week, start_time, end_time, hourly_rate, is_available, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 0, '09:00', '17:00', 25.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 1, '09:00', '17:00', 22.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 2, '09:00', '17:00', 20.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 3, '09:00', '17:00', 23.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 4, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 5, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 0, '09:00', '17:00', 25.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 1, '09:00', '17:00', 22.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 2, '09:00', '17:00', 20.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 3, '09:00', '17:00', 23.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 4, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 5, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 0, '09:00', '17:00', 25.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 1, '09:00', '17:00', 22.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 2, '09:00', '17:00', 20.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 3, '09:00', '17:00', 23.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 4, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 5, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 0, '09:00', '17:00', 25.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 1, '09:00', '17:00', 22.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 2, '09:00', '17:00', 20.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 3, '09:00', '17:00', 23.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 4, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 5, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 0, '09:00', '17:00', 25.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 1, '09:00', '17:00', 22.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 2, '09:00', '17:00', 20.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 3, '09:00', '17:00', 23.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 4, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 5, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 0, '09:00', '17:00', 25.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 1, '09:00', '17:00', 22.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 2, '09:00', '17:00', 20.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 3, '09:00', '17:00', 23.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 4, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 5, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
