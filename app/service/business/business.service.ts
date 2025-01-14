@@ -11,7 +11,7 @@ interface FetchBusinessesParams {
   offset?: number
 }
 
-const supabase = createClientComponentClient()
+const supabase = createClientComponentClient();
 
 export async function fetchBusinessesWithFilters({
   searchTerm = null,
@@ -52,7 +52,7 @@ export async function loadInitialBusinesses(): Promise<LoadInitialBusinessesResp
 }
 
 
-export async function fetchHomePageBusinesses() {
+export async function fetchHomePageBusinesses(): Promise<HomePageBusinesses> {
   const { data, error } = await supabase.rpc('fetch_home_page_businesses')
 
   if (error) {
@@ -68,7 +68,10 @@ export async function fetchHomePageBusinesses() {
   
 }
 
-export async function fetchBusinessDetails(businessId: string): Promise<BusinessDetails> {
-  const { data, error } = await supabase.rpc('get_business_by_id', { business_id: businessId })
+export async function fetchBusinessById(businessId: string): Promise<BusinessDetails | null> {
+  const { data, error } = await supabase.rpc('get_business_by_id', { b_id: businessId })
+  if (error) {
+    return null
+  }
   return data as BusinessDetails
 }

@@ -1,7 +1,7 @@
 export interface Location {
-    id: string;
     address: string;
     city: string;
+    state: string;
     country: string;
     postal_code: string;
     latitude: number;
@@ -11,44 +11,75 @@ export interface Location {
 export interface GalleryItem {
     id: string;
     image_url: string;
-    thumbnail_url: string | null;
-    alt_text: string | null;
-    caption: string | null;
-    sort_order: number;
-    is_featured: boolean;
-    media_type: string;
+    thumbnail_url: string;
+    description: string;
 }
 
 export interface BusinessFeature {
     id: string;
-    feature_name: string;
+    name: string;
     is_available: boolean;
 }
 
-export interface UserProfile {
+export interface WorkingHours {
+    day_of_week: string;
+    start_time: string;
+    end_time: string;
+    is_available: boolean;
+}
+
+export interface StaffProfile {
     first_name: string;
     last_name: string;
-    profile_picture: string | null;
+    profile_picture: string;
+    years_of_experience: number;
 }
 
-export interface Review {
+export interface StaffService {
     id: string;
-    rating: number;
-    comment: string | null;
-    created_at: string;
-    user_id: string;
-    profile: UserProfile;
+    name: string;
 }
 
-export interface Reviews {
-    average_rating: number;
-    total_reviews: number;
-    reviews: Review[];
+export interface Staff {
+    id: string;
+    position: string;
+    is_active: boolean;
+    user_id: string;
+    profile: StaffProfile;
+    services: StaffService[];
+}
+
+export interface Service {
+    id: string;
+    name: string;
+    description: string;
+    duration: number;
+    base_price: number;
+    is_active: boolean;
+}
+
+export interface Product {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    stock_quantity: number;
+    is_active: boolean;
+}
+
+export interface Offer {
+    id: string;
+    name: string;
+    description: string;
+    start_date: string;
+    end_date: string;
+    original_price: number;
+    now_price: number;
 }
 
 export interface AdditionalInfo {
     id: string;
-    description: string | null;
+    description: string;
     is_available: boolean;
 }
 
@@ -59,28 +90,39 @@ export interface BusinessStory {
     is_available: boolean;
 }
 
-export interface BusinessDetails {
+
+export interface Business {
     id: string;
     name: string;
-    description: string | null;
+    description: string;
     category: string;
-    phone: string | null;
-    email: string | null;
-    website: string | null;
-    external_link_facebook: string | null;
-    external_link_instagram: string | null;
-    external_link_tiktok: string | null;
-    external_link_linkedin: string | null;
-    for_men: boolean | null;
-    for_women: boolean | null;
-    for_both: boolean | null;
-    owner_id: string;
+    price_range: string;
+    phone: string;
+    website_url: string;
+    profile_picture: string;
+    cover_picture: string;
+    is_premium: boolean;
+    tags: string[];
+    external_link_facebook: string;
+    external_link_instagram: string;
+    external_link_tiktok: string;
+    external_link_linkedin: string;
+    for_men: boolean;
+    for_women: boolean;
+    for_both: boolean;
     created_at: string;
-    updated_at: string;
     location: Location;
+}
+
+export interface BusinessDetails {
+    business: Business;
     gallery: GalleryItem[];
     features: BusinessFeature[];
-    reviews: Reviews;
+    working_hours: WorkingHours[];
+    staff: Staff[];
+    services: Service[];
+    products: Product[];
+    offers: Offer[];
     additional_info: AdditionalInfo[];
     business_story: BusinessStory[];
 }

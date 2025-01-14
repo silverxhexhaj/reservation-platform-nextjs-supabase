@@ -83,12 +83,12 @@ INSERT INTO payments (id, booking_id, amount, status, payment_method, stripe_pay
 (uuid_generate_v4(), (SELECT id FROM bookings LIMIT 1 OFFSET 4), 30.00, 'pending', 'credit_card', 'pi_5678901234', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Insert seed data for reviews
-INSERT INTO reviews (id, business_id, rating, comment, review_type, created_at, updated_at) VALUES
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 5, 'Excellent service!', 'business', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 4, 'Very good experience.', 'business', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 3, 'Average service.', 'business', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 4, 'Good service.', 'business', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 5, 'Outstanding!', 'business', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO reviews (id, business_id, user_id, rating, comment, review_type, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), 5, 'Excellent service!', 'business', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), 4, 'Very good experience.', 'business', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), 3, 'Average service.', 'business', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), 4, 'Good service.', 'business', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), 5, 'Outstanding!', 'business', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Insert seed data for loyalty_points
 INSERT INTO loyalty_points (id, user_id, points_balance, total_points_earned, total_points_spent, created_at, updated_at) VALUES
@@ -131,12 +131,12 @@ INSERT INTO notifications (id, user_id, type, title, message, reference_id, refe
 (uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), 'points_earned', 'Points Earned', 'You have earned loyalty points.', (SELECT id FROM loyalty_points LIMIT 1 OFFSET 4), 'loyalty_points', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Insert seed data for profiles
-INSERT INTO profiles (id, user_id, profile_type, bio, date_of_birth, gender, preferred_language, specialties, years_of_experience, education, certifications, languages, created_at, updated_at) VALUES
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), 'client', 'Bio for user 1', '1990-01-01', 'female', 'en', NULL, NULL, NULL, NULL, ARRAY['English'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), 'staff', 'Experienced hairstylist', '1985-03-15', 'male', 'en', ARRAY['Hair Cutting', 'Hair Coloring'], 8, ARRAY['Cosmetology School'], ARRAY['Licensed Cosmetologist'], ARRAY['English', 'Spanish'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), 'client', 'Bio for user 3', '1995-06-20', 'male', 'es', NULL, NULL, NULL, NULL, ARRAY['Spanish', 'English'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), 'staff', 'Professional massage therapist', '1988-09-10', 'female', 'en', ARRAY['Swedish Massage', 'Deep Tissue'], 5, ARRAY['Massage Therapy Institute'], ARRAY['Licensed Massage Therapist'], ARRAY['English'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), 'client', 'Bio for user 5', '1992-12-25', 'female', 'fr', NULL, NULL, NULL, NULL, ARRAY['French', 'English'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO profiles (id, user_id, first_name, last_name, profile_type, bio, date_of_birth, gender, preferred_language, specialties, years_of_experience, education, certifications, languages, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), 'John', 'Doe', 'client', 'Bio for user 1', '1990-01-01', 'male', 'en', NULL, NULL, NULL, NULL, ARRAY['English'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), 'Jane', 'Smith', 'staff', 'Experienced hairstylist', '1985-03-15', 'female', 'en', ARRAY['Hair Cutting', 'Hair Coloring'], 8, ARRAY['Cosmetology School'], ARRAY['Licensed Cosmetologist'], ARRAY['English', 'Spanish'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), 'Alice', 'Johnson', 'client', 'Bio for user 3', '1995-06-20', 'female', 'es', NULL, NULL, NULL, NULL, ARRAY['Spanish', 'English'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), 'Bob', 'Brown', 'staff', 'Professional massage therapist', '1988-09-10', 'male', 'en', ARRAY['Swedish Massage', 'Deep Tissue'], 5, ARRAY['Massage Therapy Institute'], ARRAY['Licensed Massage Therapist'], ARRAY['English'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), 'Alice', 'Johnson', 'client', 'Bio for user 5', '1992-12-25', 'female', 'fr', NULL, NULL, NULL, NULL, ARRAY['French', 'English'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Insert seed data for staff_services
 INSERT INTO staff_services (id, staff_id, service_id, created_at) VALUES

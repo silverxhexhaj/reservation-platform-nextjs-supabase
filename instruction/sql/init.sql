@@ -26,6 +26,7 @@ DROP TABLE IF EXISTS profiles CASCADE;
 DROP TABLE IF EXISTS business_favorites CASCADE;
 DROP TABLE IF EXISTS additional_info CASCADE;
 DROP TABLE IF EXISTS business_story CASCADE;
+DROP TABLE IF EXISTS staff_blocked_periods CASCADE;
 DROP TYPE IF EXISTS profile_type CASCADE;
 DROP TYPE IF EXISTS business_category CASCADE;
 
@@ -128,6 +129,9 @@ CREATE TABLE locations (
     )
 );
 
+
+-- user_roles
+
 -- Businesses table
 CREATE TABLE businesses (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -181,6 +185,7 @@ CREATE TABLE business_gallery (
 );
 
 
+
 CREATE TABLE business_staff (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
@@ -190,6 +195,20 @@ CREATE TABLE business_staff (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+
+CREATE TABLE staff_blocked_periods (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  staff_id UUID REFERENCES business_staff(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  start_time TIMESTAMP WITH TIME ZONE NOT NULL,
+  end_time TIMESTAMP WITH TIME ZONE NOT NULL,
+  reason TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+
 
 -- Additional info table
 CREATE TABLE additional_info (
@@ -369,13 +388,13 @@ CREATE TABLE payments (
 -- Reviews table
 CREATE TABLE reviews (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
-    staff_id UUID REFERENCES business_staff(id) ON DELETE CASCADE,
+    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE DEFAULT null,
+    staff_id UUID REFERENCES business_staff(id) ON DELETE CASCADE DEFAULT null,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    booking_id UUID REFERENCES bookings(id) ON DELETE SET NULL,
+    booking_id UUID REFERENCES bookings(id) ON DELETE SET NULL DEFAULT null,
     rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
     comment TEXT,
-    review_type VARCHAR(20) NOT NULL CHECK (review_type IN ('business', 'staff')),
+    review_type VARCHAR(20) NOT NULL CHECK (review_type IN ('business', 'staff')) DEFAULT null,
     is_published BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -457,7 +476,7 @@ CREATE INDEX idx_additional_info_business_id ON additional_info(business_id);
 CREATE INDEX idx_additional_info_is_available ON additional_info(is_available);
 CREATE INDEX idx_business_story_business ON business_story(business_id);
 CREATE INDEX idx_business_story_available ON business_story(business_id, is_available) WHERE is_available = true;
-
+CREATE INDEX idx_staff_blocked_periods_staff_id ON staff_blocked_periods(staff_id);
 
 -- Add triggers for updated_at timestamps
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -565,5 +584,10 @@ CREATE TRIGGER update_additional_info_updated_at
 
 CREATE TRIGGER update_business_story_updated_at
     BEFORE UPDATE ON business_story
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_staff_blocked_periods_updated_at
+    BEFORE UPDATE ON staff_blocked_periods
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
