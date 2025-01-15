@@ -225,6 +225,7 @@ CREATE TABLE business_story (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
+    description TEXT,
     image_url TEXT NOT NULL,
     is_available BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

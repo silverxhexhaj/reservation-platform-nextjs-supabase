@@ -32,12 +32,21 @@ export interface StaffProfile {
     first_name: string;
     last_name: string;
     profile_picture: string;
+    bio: string;
+    preferred_language: string;
+    specialties: string[];
     years_of_experience: number;
+    education: string;
+    certifications: string;
+    languages: string;
 }
 
 export interface StaffService {
     id: string;
     name: string;
+    description: string;
+    duration: number;
+    base_price: number;
 }
 
 export interface Staff {
@@ -86,7 +95,9 @@ export interface AdditionalInfo {
 export interface BusinessStory {
     id: string;
     title: string;
+    description: string;
     image_url: string;
+    created_at: string;
     is_available: boolean;
 }
 

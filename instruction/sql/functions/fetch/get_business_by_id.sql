@@ -94,7 +94,13 @@ BEGIN
                             'first_name', p.first_name,
                             'last_name', p.last_name,
                             'profile_picture', p.profile_picture,
-                            'years_of_experience', p.years_of_experience
+                            'bio', p.bio,
+                            'preferred_language', p.preferred_language,
+                            'specialties', p.specialties,
+                            'years_of_experience', p.years_of_experience,
+                            'education', p.education,
+                            'certifications', p.certifications,
+                            'languages', p.languages
                         )
                         FROM profiles p
                         WHERE p.user_id = bs.user_id
@@ -103,7 +109,10 @@ BEGIN
                         SELECT json_agg(
                             json_build_object(
                                 'id', s.id,
-                                'name', s.name
+                                'name', s.name,
+                                'description', s.description,
+                                'duration', s.duration,
+                                'base_price', s.base_price
                             )
                         )
                         FROM staff_services ss
@@ -175,6 +184,7 @@ BEGIN
                     'id', bs.id,
                     'title', bs.title,
                     'image_url', bs.image_url,
+                    'created_at', bs.created_at,
                     'is_available', bs.is_available
                 )
             )

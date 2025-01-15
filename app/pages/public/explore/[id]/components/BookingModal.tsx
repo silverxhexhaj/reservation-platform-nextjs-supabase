@@ -5,6 +5,7 @@ import { format, isToday, isSameDay } from 'date-fns';
 import { cn } from "@/lib/utils";
 import { X, Clock, AlertCircle, ChevronDown, ArrowLeft, ArrowRight } from "lucide-react";
 import { useState, useRef } from "react";
+import { Service } from "@/data";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -31,12 +32,12 @@ interface BookingModalProps {
   handleDateMouseUp: () => void;
   handleDateMouseMove: (e: React.MouseEvent) => void;
   dateContainerRef: React.RefObject<HTMLDivElement>;
-  services: any[];
+  services: Service[];
   categories: string[];
   addToBooking: (service: any, categoryName: string) => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  filteredServices: any[];
+  filteredServices: Service[];
 }
 
 const STEPS = {

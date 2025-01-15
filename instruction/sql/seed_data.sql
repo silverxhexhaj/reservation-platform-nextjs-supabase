@@ -223,3 +223,133 @@ INSERT INTO working_hours (id, business_id, day_of_week, start_time, end_time, h
 (uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 4, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 5, '09:00', '17:00', 21.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
+
+-- Insert seed data for business_gallery
+INSERT INTO business_gallery (id, business_id, image_url, thumbnail_url, alt_text, caption, sort_order, is_featured, media_type, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f', 'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=400', 'Modern salon interior', 'Our main salon area', 1, true, 'image', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'https://images.unsplash.com/photo-1560066984-138dadb4c035', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400', 'Styling station', 'Professional styling area', 2, false, 'image', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e', 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400', 'Spa treatment room', 'Relaxation area', 3, false, 'image', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'https://images.unsplash.com/photo-1600948836101-f9ffda59d250', 'https://images.unsplash.com/photo-1600948836101-f9ffda59d250?w=400', 'Nail salon setup', 'Manicure station', 1, true, 'image', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'https://images.unsplash.com/photo-1632345031435-8727f6897d53', 'https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=400', 'Pedicure chairs', 'Luxury pedicure area', 2, false, 'image', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'https://images.unsplash.com/photo-1540555700478-4be289fbecef', 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=400', 'Massage room', 'Therapeutic massage space', 1, true, 'image', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874', 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400', 'Spa reception', 'Welcome area', 2, false, 'image', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'https://images.unsplash.com/photo-1470259078422-826894b933aa', 'https://images.unsplash.com/photo-1470259078422-826894b933aa?w=400', 'Barbershop interior', 'Classic barbershop', 1, true, 'image', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1', 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400', 'Barber tools', 'Professional equipment', 2, false, 'image', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388', 'https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?w=400', 'Beauty salon', 'Modern beauty space', 1, true, 'image', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'https://images.unsplash.com/photo-1487412912498-0447578fcca8', 'https://images.unsplash.com/photo-1487412912498-0447578fcca8?w=400', 'Makeup station', 'Professional makeup area', 2, false, 'image', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937', 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=400', 'Wellness center', 'Holistic healing space', 1, true, 'image', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1', 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=400', 'Meditation room', 'Peaceful environment', 2, false, 'image', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+
+-- Insert seed data for business_features
+INSERT INTO business_features (id, business_id, feature_name, is_available, created_at, updated_at) VALUES
+-- Business 1 (Hair Salon)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Free WiFi', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Parking Available', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Card Payment', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Wheelchair Accessible', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Kids Friendly', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Business 2 (Nail Salon)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Free WiFi', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Card Payment', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Walk-ins Welcome', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Complimentary Drinks', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Business 3 (Spa)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Free WiFi', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Private Rooms', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Shower Facilities', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Locker Room', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Sauna', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Business 4 (Barbershop)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Free WiFi', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Card Payment', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Walk-ins Welcome', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Beer Service', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'TV Available', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Business 5 (Beauty Salon)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Free WiFi', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Parking Available', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Card Payment', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Product Sales', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Business 6 (Wellness Center)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 'Free WiFi', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 'Meditation Room', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 'Herbal Tea Service', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 'Consultation Room', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 'Yoga Studio', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+
+-- Insert seed data for business_story
+INSERT INTO business_story (id, business_id, title, image_url, is_available, created_at, updated_at) VALUES
+-- Business 1 (Hair Salon)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Our Journey', 'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Meet Our Team', 'https://images.unsplash.com/photo-1562322140-8baeececf3df', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Business 2 (Nail Salon)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Latest Designs', 'https://images.unsplash.com/photo-1519014816548-bf5fe059798b', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Nail Art Showcase', 'https://images.unsplash.com/photo-1604654894610-df63bc536371', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Business 3 (Spa)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Relaxation Journey', 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Spa Experience', 'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Business 4 (Barbershop)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Classic Cuts', 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Barbershop Culture', 'https://images.unsplash.com/photo-1517832606299-7ae9b720a186', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Business 5 (Beauty Salon)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Beauty Transformations', 'https://images.unsplash.com/photo-1560066984-138dadb4c035', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Makeup Artistry', 'https://images.unsplash.com/photo-1487412912498-0447578fcca8', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Business 6 (Wellness Center)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 'Wellness Journey', 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), 'Holistic Healing', 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+
+-- Insert seed data for additional_info
+INSERT INTO additional_info (id, business_id, is_available, description, created_at, updated_at) VALUES
+-- Business 1 (Hair Salon)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), true, 'Free Consultation', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), true, 'Professional Hair Products Available', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), true, 'Color Specialist On Staff', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), false, 'Student Discount', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Business 2 (Nail Salon) 
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), true, 'Gel Polish Available', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), true, 'Custom Nail Art', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), true, 'Pedicure Stations', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), false, 'Group Bookings', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Business 3 (Spa)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), true, 'Couples Massage Available', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), true, 'Steam Room Access', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), true, 'Aromatherapy Services', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), false, 'Pool Access', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Business 4 (Barbershop)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), true, 'Hot Towel Service', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), true, 'Beard Grooming', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), true, 'Traditional Straight Razor Shaves', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), false, 'Hair Coloring', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Business 5 (Beauty Salon)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), true, 'Makeup Services', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), true, 'Waxing Services', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), true, 'Eyelash Extensions', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), false, 'Microblading', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Business 6 (Wellness Center)
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), true, 'Nutritional Counseling', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), true, 'Acupuncture', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), true, 'Holistic Treatments', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 5), false, 'Physical Therapy', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

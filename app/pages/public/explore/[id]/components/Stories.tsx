@@ -10,77 +10,23 @@ import { cn } from "@/lib/utils";
 import { format } from 'date-fns';
 import { ChevronLeft, ChevronRight, X, Clock } from 'lucide-react';
 import Image from 'next/image';
+import { BusinessStory } from '@/app/models/functions/businessDetails.model';
 
-interface Story {
-  id: string;
-  imageUrl: string;
-  title: string;
-  caption?: string;
-  timestamp: Date;
-  viewed: boolean;
-}
 
 interface StoriesProps {
-  businessId: string;
-  businessName: string;
+  stories: BusinessStory[];
 }
-
-const mockStories: Story[] = [
-  {
-    id: '1',
-    imageUrl: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=800&q=80',
-    title: 'Summer Styles',
-    caption: 'Summer styles inspiration 🌞',
-    timestamp: new Date(),
-    viewed: false
-  },
-  {
-    id: '2',
-    imageUrl: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=800&q=80',
-    title: 'New Products',
-    caption: 'New products just arrived! 🎉',
-    timestamp: new Date(Date.now() - 1000 * 60 * 30),
-    viewed: false
-  },
-  {
-    id: '3',
-    imageUrl: 'https://images.unsplash.com/photo-1582095133179-bfd08e2fc6b3?auto=format&fit=crop&w=800&q=80',
-    title: 'Meet Our Team',
-    caption: 'Meet our amazing team! 👋',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60),
-    viewed: true
-  },
-  {
-    id: '4',
-    imageUrl: 'https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=800&q=80',
-    title: 'Spa Day',
-    caption: 'Relax and rejuvenate 💆‍♀️',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
-    viewed: false
-  },
-  {
-    id: '5',
-    imageUrl: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80',
-    title: 'Special Offer',
-    caption: '20% off all services this week! 🎉',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3),
-    viewed: true
-  }
-];
 
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=800&q=80";
 
-export function Stories({ businessId, businessName }: StoriesProps) {
-  const [stories, setStories] = useState<Story[]>(mockStories);
+export function Stories({ stories }: StoriesProps) {
+
   const [selectedStoryIndex, setSelectedStoryIndex] = useState<number | null>(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
 
   const openStory = (index: number) => {
     setSelectedStoryIndex(index);
     setIsViewerOpen(true);
-    setStories(prev => prev.map((story, i) => 
-      i === index ? { ...story, viewed: true } : story
-    ));
   };
 
   const closeStory = () => {
@@ -96,9 +42,6 @@ export function Stories({ businessId, businessName }: StoriesProps) {
       : Math.max(selectedStoryIndex - 1, 0);
     
     setSelectedStoryIndex(newIndex);
-    setStories(prev => prev.map((story, i) => 
-      i === newIndex ? { ...story, viewed: true } : story
-    ));
   };
 
   // Function to check if story is new (less than 24 hours old)
@@ -108,18 +51,6 @@ export function Stories({ businessId, businessName }: StoriesProps) {
     const hours = diff / (1000 * 60 * 60);
     return hours < 24;
   };
-
-  // Function to get gradient border class
-  const getStoryBorderClass = (story: Story) => {
-    if (!story.viewed && isNewStory(story.timestamp)) {
-      return "border-[3px] border-gradient-to-tr from-orange-500 via-red-500 to-purple-500 animate-pulse";
-    }
-    return cn(
-      "border-2",
-      story.viewed ? "border-gray-300" : "border-blue-500"
-    );
-  };
-
   // Add error handling for images
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     e.currentTarget.src = FALLBACK_IMAGE;
@@ -140,15 +71,13 @@ export function Stories({ businessId, businessName }: StoriesProps) {
               >
                 <div className={cn(
                   "absolute inset-0 rounded-full",
-                  !story.viewed && isNewStory(story.timestamp) 
+                  isNewStory(new Date(story.created_at)) 
                     ? "bg-gradient-to-tr from-orange-500 via-red-500 to-purple-500 p-[2px]"
-                    : story.viewed 
-                      ? "border-2 border-gray-300" 
-                      : "border-2 border-blue-500"
+                    : "border-2 border-gray-300" 
                 )}>
                   <div className="w-full h-full rounded-full overflow-hidden bg-white">
                     <Image
-                      src={story.imageUrl}
+                      src={story.image_url}
                       alt={story.title}
                       width={80}
                       height={80}
@@ -158,7 +87,7 @@ export function Stories({ businessId, businessName }: StoriesProps) {
                     />
                   </div>
                 </div>
-                {isNewStory(story.timestamp) && !story.viewed && (
+                {isNewStory(new Date(story.created_at)) && (
                   <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg">
                     NEW
                   </div>
@@ -197,8 +126,8 @@ export function Stories({ businessId, businessName }: StoriesProps) {
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/20">
                     <Image
-                      src={stories[selectedStoryIndex].imageUrl}
-                      alt={businessName}
+                      src={stories[selectedStoryIndex].image_url}
+                      alt={stories[selectedStoryIndex].title}
                       width={32}
                       height={32}
                       className="w-full h-full object-cover"
@@ -207,10 +136,10 @@ export function Stories({ businessId, businessName }: StoriesProps) {
                     />
                   </div>
                   <div>
-                    <div className="font-semibold text-sm text-white">{businessName}</div>
+                    <div className="font-semibold text-sm text-white">{stories[selectedStoryIndex].title}</div>
                     <div className="flex items-center text-[10px] text-gray-300 gap-1">
                       <Clock className="w-3 h-3" />
-                      {format(stories[selectedStoryIndex].timestamp, 'PP')}
+                      {format(stories[selectedStoryIndex].created_at, 'PP')}
                     </div>
                   </div>
                 </div>
@@ -227,7 +156,7 @@ export function Stories({ businessId, businessName }: StoriesProps) {
               {/* Main Content */}
               <div className="flex-1 flex items-center justify-center relative bg-black/20">
                 <Image
-                  src={stories[selectedStoryIndex].imageUrl}
+                  src={stories[selectedStoryIndex].image_url}
                   alt={stories[selectedStoryIndex].title}
                   width={430}
                   height={760}
@@ -267,10 +196,10 @@ export function Stories({ businessId, businessName }: StoriesProps) {
               </div>
 
               {/* Caption */}
-              {stories[selectedStoryIndex].caption && (
+              {stories[selectedStoryIndex].description && (
                 <div className="relative z-10 p-4 bg-gradient-to-t from-black/80 to-transparent h-16">
                   <p className="text-white text-sm font-medium">
-                    {stories[selectedStoryIndex].caption}
+                    {stories[selectedStoryIndex].description}
                   </p>
                 </div>
               )}

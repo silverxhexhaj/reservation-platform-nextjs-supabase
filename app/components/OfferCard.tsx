@@ -1,6 +1,5 @@
 "use client"
 
-import { BusinessOffer } from "@/app/models/custom.models"
 import Link from "next/link"
 import { formatDate } from "@fullcalendar/core/index.js"
 import { Button } from "./ui/button"
