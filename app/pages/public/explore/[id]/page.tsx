@@ -8,15 +8,17 @@ import { useLoadScript, GoogleMap, MarkerF } from '@react-google-maps/api';
 import Image from 'next/image';
 import { Button } from "@/app/components/ui/button";
 import { StarIcon, CheckCircle, Clock, Camera, ChevronDown, XCircle } from "lucide-react";
-import { Stories } from './components/Stories';
-import { BookingModal } from "./components/BookingModal";
-import { StaffDetailModal } from './components/StaffDetailModal';
-import { Reviews } from './components/Reviews';
+import { Stories } from '../../../../components/business/Stories';
+import { BookingModal } from "../../../../components/business/BookingModal";
+import { StaffDetailModal } from '../../../../components/business/StaffDetailModal';
+import { Reviews } from '../../../../components/business/Reviews';
 import { BookingItem, SelectedService } from '@/app/models/custom.models';
 import { BusinessDetails, Staff } from '@/app/models/functions/businessDetails.model';
 import { fetchBusinessById } from '@/app/service/business/business.service';
 import { businessCategories } from '@/app/models/supabase.models';
-import { ServiceItem } from './components/ServiceItem';
+import { ServiceItem } from '../../../../components/business/ServiceItem';
+import { ServiceOffer } from '@/app/components/ServiceOffer';
+import { BusinessGallery } from '@/app/components/business/BusinessGallery';
 
 const scrollbarHideStyles = `
   .scrollbar-hide {
@@ -45,6 +47,7 @@ export default function BusinessDetailPage() {
 
   // State hooks
   const [business, setBusiness] = useState<BusinessDetails | null>(null);
+  const [isBusinessOpen, setIsBusinessOpen] = useState<boolean>(false);
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -55,18 +58,30 @@ export default function BusinessDetailPage() {
   const [activeTab, setActiveTab] = useState<string>('Featured');
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [isOpeningHoursOpen, setIsOpeningHoursOpen] = useState(false);
-  const [isBusinessOpen, setIsBusinessOpen] = useState(false);
+
   const [isValidBookingTime, setIsValidBookingTime] = useState(false);
   const [dateDragging, setDateDragging] = useState(false);
   const [dateStartX, setDateStartX] = useState(0);
   const [dateScrollLeft, setDateScrollLeft] = useState(0);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
+  const today = new Date().getDay(); // 0 is Sunday, 1 is Monday, etc.
 
   useEffect(() => {
     const fetchBusinessDetails = async () => {
       const businessData = await fetchBusinessById(id as string);
 
+      if (businessData?.working_hours) {
+        const now = new Date();
+        const currentEndTime = businessData.working_hours.find(hours => hours.day_of_week === today)?.end_time;
+
+        if (currentEndTime) {
+          const [endHour, endMinute] = currentEndTime.split(':').map(Number);
+          const currentTotalMinutes = now.getHours() * 60 + now.getMinutes();
+          const endTotalMinutes = (endHour * 60) + endMinute;
+          setIsBusinessOpen(currentTotalMinutes < endTotalMinutes);
+        }
+      }
       setBusiness(businessData);
     };
 
@@ -87,7 +102,7 @@ export default function BusinessDetailPage() {
     return dates;
   }, []);
 
- 
+
   const availableTimeSlots = useMemo(() => {
     if (!selectedDate || !business?.working_hours) return [];
 
@@ -119,37 +134,10 @@ export default function BusinessDetailPage() {
     return slots;
   }, [selectedDate, business?.working_hours]);
 
-  // Effects
-  useEffect(() => {
-    checkBusinessOpen();
-    const interval = setInterval(checkBusinessOpen, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
   useEffect(() => {
     validateBookingTime();
   }, [selectedDate, selectedTime]);
 
-  const checkBusinessOpen = () => {
-    if (!business?.working_hours) return;
-
-    const now = new Date();
-    const day = now.getDay();
-    const time = now.getHours() * 100 + now.getMinutes();
-
-    const todayHours = business.working_hours[day === 0 ? 6 : day - 1]?.start_time;
-    if (!todayHours || todayHours === 'Closed') {
-      setIsBusinessOpen(false);
-      return;
-    }
-
-    const [openTime, closeTime] = todayHours.split(' - ').map((t: string) => {
-      const [hours, minutes] = t.split(':').map(Number);
-      return hours * 100 + minutes;
-    });
-
-    setIsBusinessOpen(time >= openTime && time < closeTime);
-  };
 
   const validateBookingTime = useCallback(() => {
     if (!selectedDate || !selectedTime || !business?.working_hours) {
@@ -166,7 +154,7 @@ export default function BusinessDetailPage() {
       return;
     }
 
-    const [openTime, closeTime] = todayHours.split(' - ').map((t: string)  => {
+    const [openTime, closeTime] = todayHours.split(' - ').map((t: string) => {
       const [hours, minutes] = t.split(':').map(Number);
       return hours * 60 + minutes;
     });
@@ -219,8 +207,6 @@ export default function BusinessDetailPage() {
       }, 5000);
     }
   };
-
-  const today = new Date().getDay(); // 0 is Sunday, 1 is Monday, etc.
 
   const handleDateMouseDown = (e: React.MouseEvent) => {
     setDateDragging(true);
@@ -287,13 +273,8 @@ export default function BusinessDetailPage() {
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <Button
-                      variant="outline"
-                      className="bg-white/20 hover:bg-white/30 text-white border-white/40 text-sm lg:text-base"
-                    >
-                      <Camera className="w-4 lg:w-5 h-4 lg:h-5 mr-2" />
-                      View Gallery
-                    </Button>
+                    <BusinessGallery gallery={business?.gallery ?? []} />
+
                     <div className={`flex items-center bg-white/20 rounded-full px-3 py-1 ${isBusinessOpen ? 'text-green-400' : 'text-red-400'}`}>
                       <Clock className="mr-1 w-4 lg:w-5 h-4 lg:h-5" />
                       <span className="text-sm lg:text-base font-semibold">
@@ -324,18 +305,19 @@ export default function BusinessDetailPage() {
                   <div className="relative">
                     <div className="flex items-center space-x-2 overflow-x-auto scrollbar-hide">
                       {/* todo get categories from services */}
-                      {businessCategories.slice(0, 3).map((category, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setActiveTab(category)}
-                          className={`flex-none px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 
+                      {
+                        business?.business?.category.map((category, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setActiveTab(category)}
+                            className={`flex-none px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 
                               ${activeTab === category
-                              ? 'bg-black text-white'
-                              : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'}`}
-                        >
-                          {category}
-                        </button>
-                      ))}
+                                ? 'bg-black text-white'
+                                : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'}`}
+                          >
+                            {category}
+                          </button>
+                        ))}
                     </div>
                   </div>
                 </div>
@@ -344,41 +326,41 @@ export default function BusinessDetailPage() {
                 {activeTab === 'Featured' ? (
                   <div className="flex flex-col gap-4 pt-6">
                     {business?.services?.map((service, serviceIndex) => {
-                        const isSelected = selectedServices.some(s => s.name === service.name);
-                        return (
-                          <ServiceItem
-                            key={serviceIndex}
-                            name={service.name}
-                            price={service.base_price}
-                            description={service.description}
-                            duration={service.duration}
-                            isSelected={isSelected}
-                            onToggle={() => isSelected
-                              ? removeFromBooking(service.name)
-                              : addToBooking(service, activeTab)
-                            }
-                          />
-                        );
+                      const isSelected = selectedServices.some(s => s.name === service.name);
+                      return (
+                        <ServiceItem
+                          key={serviceIndex}
+                          name={service.name}
+                          price={service.base_price}
+                          description={service.description}
+                          duration={service.duration}
+                          isSelected={isSelected}
+                          onToggle={() => isSelected
+                            ? removeFromBooking(service.name)
+                            : addToBooking(service, activeTab)
+                          }
+                        />
+                      );
                     })}
                   </div>
                 ) : (
                   <div className="flex flex-col gap-4 pt-6">
-                      {business?.services?.map((service, serviceIndex) => {
-                        const isSelected = selectedServices.some(s => s.name === service.name);
-                        return (
-                          <ServiceItem
-                            key={service.name}
-                            name={service.name}
-                            price={service.base_price}
-                            description={service.description}
-                            duration={service.duration}
-                            isSelected={isSelected}
-                            onToggle={() => isSelected
-                              ? removeFromBooking(service.name)
-                              : addToBooking(service, activeTab)
-                            }
-                          />
-                        );
+                    {business?.services?.map((service, serviceIndex) => {
+                      const isSelected = selectedServices.some(s => s.name === service.name);
+                      return (
+                        <ServiceItem
+                          key={service.name}
+                          name={service.name}
+                          price={service.base_price}
+                          description={service.description}
+                          duration={service.duration}
+                          isSelected={isSelected}
+                          onToggle={() => isSelected
+                            ? removeFromBooking(service.name)
+                            : addToBooking(service, activeTab)
+                          }
+                        />
+                      );
                     })}
                   </div>
                 )}
@@ -388,8 +370,7 @@ export default function BusinessDetailPage() {
               <section>
                 <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6">Our Team</h2>
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
-                  {business?.staff?.map((member, index) => {
-    
+                  {business?.staff?.map((member) => {
                     return (
                       <div
                         key={member.id}
@@ -401,7 +382,7 @@ export default function BusinessDetailPage() {
                         </div>
                         <p className="text-sm font-medium text-center text-gray-700 truncate w-full group-hover:text-gray-900">
                           {member?.profile?.first_name ?? '' + ' ' + member?.profile?.last_name ?? ''}
-                        </p>  
+                        </p>
                         <p className="text-xs text-center text-gray-500 truncate w-full">
                           {member?.position}
                         </p>
@@ -458,23 +439,20 @@ export default function BusinessDetailPage() {
                   <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6">Opening Hours</h2>
                   <div className="bg-white rounded-lg border border-gray-200 p-6">
                     <div className="space-y-2">
-                      {business?.working_hours?.map((item, index) => {
-                        const isToday = index === (today === 0 ? 6 : today - 1);
-                        const isSunday = index === 6;
-                        return (
-                          <div
-                            key={item.day_of_week}
-                            className={`flex justify-between items-center py-2 ${isSunday ? 'text-gray-400' : ''}`}
-                          >
-                            <span className={`${isToday ? 'font-bold' : ''} ${isSunday ? '' : 'text-gray-600'}`}>
-                              {item.day_of_week}
+                      {business?.working_hours?.map((item, index) => (
+                        <div key={item.day_of_week} className={`${today === item.day_of_week ? 'font-bold' : ''} flex justify-between text-sm`}>
+                          <span className="text-gray-600">
+                            {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][item.day_of_week]}
+                          </span>
+                          {item.is_available ? (
+                            <span className="text-gray-900">
+                              {item.start_time.slice(0, -3)} - {item.end_time.slice(0, -3)}
                             </span>
-                            <span className={`${isToday ? 'font-bold' : ''} ${item.start_time === 'Closed' ? 'text-red-500' : (isSunday ? '' : 'text-gray-800')}`}>
-                              {item.start_time}
-                            </span>
-                          </div>
-                        );
-                      })}
+                          ) : (
+                            <span className="text-red-500">Closed</span>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </section>
@@ -501,40 +479,25 @@ export default function BusinessDetailPage() {
                 )}
               </div>
 
-              { /*
-                {business?.offers?.length > 0 && (
-                  <section className="mt-20">
-                    <h2 className="text-xl uppercase font-bold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">
-                      Special Offers
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {business?.offers?.map((offer) => (
-                        <ServiceOffer
-                          key={offer.id}
-                          {...offer}
-                          onBook={() => {
-                            setSelectedServices(prev => [
-                              ...prev,
-                              {
-                                name: offer.title,
-                                price: offer.discountedPrice,
-                                categoryName: offer.category
-                              }
-                            ]);
-                            setBookingItems(prev => [
-                              ...prev,
-                              {
-                                name: offer.title,
-                                price: offer.discountedPrice
-                              }
-                            ]);
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                )}
-                */ }
+              {(business?.offers?.length ?? 0) > 0 && (
+                <section className="mt-20">
+                  <h2 className="text-xl uppercase font-bold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">
+                    Special Offers
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {business?.offers?.map((offer) => (
+                      <ServiceOffer
+                        key={offer.id}
+                        offer={offer}
+                        onBook={() => {
+                          setSelectedServices(prev => [...prev, { name: offer.name, price: offer.now_price, categoryName: offer.category }]);
+                          setBookingItems(prev => [...prev, { name: offer.name, price: offer.now_price }]);
+                        }}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
             </div>
 
             {/* Booking Section */}
@@ -561,15 +524,15 @@ export default function BusinessDetailPage() {
                     <div className='flex justify-between w-full'>
                       <div className="flex flex-col">
                         <div className="flex items-center space-x-2">
-                          {/* <span className={business?.isOpen ? "text-green-600 font-medium" : "text-red-500 font-medium"}>
-                            {business?.isOpen ? 'Open' : 'Closed'}
+                          <span className={isBusinessOpen ? "text-green-600 font-medium" : "text-red-500 font-medium"}>
+                            {isBusinessOpen ? 'Open' : 'Closed'}
                           </span>
-                          {business?.isOpen && (
+                          {isBusinessOpen && (
                             <>
                               <span className="text-gray-600">•</span>
-                              <span className="text-gray-600">Closes at {business?.closingTime}</span>
+                              <span className="text-gray-600">Closes at {business?.working_hours?.find(hours => hours.day_of_week === today)?.end_time}</span>
                             </>
-                          )} */}
+                          )}
                         </div>
                         <button
                           onClick={() => setIsOpeningHoursOpen(!isOpeningHoursOpen)}
@@ -584,14 +547,18 @@ export default function BusinessDetailPage() {
 
                   {isOpeningHoursOpen && business?.working_hours && (
                     <div className="mt-2 space-y-1 pl-8">
-                      {business?.working_hours.map((item, index) => (
-                        <div key={item.day_of_week} className="flex justify-between text-sm">
-                          <span className={`${index === today - 1 ? 'font-medium' : ''} text-gray-600`}>
-                            {item.day_of_week}
+                      {business?.working_hours?.map((item, index) => (
+                        <div key={item.day_of_week} className={`${today === item.day_of_week ? 'font-bold' : ''} flex justify-between text-sm`}>
+                          <span className="text-gray-600">
+                            {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][item.day_of_week]}
                           </span>
-                          <span className={`${item.start_time === 'Closed' ? 'text-red-500' : 'text-gray-900'}`}>
-                            {item.start_time}
-                          </span>
+                          {item.is_available ? (
+                            <span className="text-gray-900">
+                              {item.start_time.slice(0, -3)} - {item.end_time.slice(0, -3)}
+                            </span>
+                          ) : (
+                            <span className="text-red-500">Closed</span>
+                          )}
                         </div>
                       ))}
                     </div>

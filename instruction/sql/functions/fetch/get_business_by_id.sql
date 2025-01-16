@@ -161,7 +161,9 @@ BEGIN
                     'start_date', d.start_date,
                     'end_date', d.end_date,
                     'original_price', d.original_price,
-                    'now_price', d.now_price
+                    'image_url', d.image_url,
+                    'now_price', d.now_price,
+                    'category', d.category
                 )
             )
             FROM deals d

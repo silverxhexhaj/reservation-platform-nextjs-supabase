@@ -2,8 +2,8 @@
 
 import { useState, Suspense, useEffect } from "react"
 import { Header } from "@/app/components/Header"
-import { BusinessesCollection } from "./components/BusinessesCollection"
-import { ExploreFilters } from "./components/ExploreFilters"
+import { BusinessesCollection } from "../../../components/business/BusinessesCollection"
+import { ExploreFilters } from "../../../components/business/ExploreFilters"
 import { categoryToIcon } from "@/data";
 
 import { Button } from "@/app/components/ui/button";

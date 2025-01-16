@@ -1,3 +1,5 @@
+import { BusinessCategory } from "../supabase.models";
+
 export interface Location {
     address: string;
     city: string;
@@ -22,7 +24,7 @@ export interface BusinessFeature {
 }
 
 export interface WorkingHours {
-    day_of_week: string;
+    day_of_week: number;
     start_time: string;
     end_time: string;
     is_available: boolean;
@@ -84,6 +86,8 @@ export interface Offer {
     end_date: string;
     original_price: number;
     now_price: number;
+    image_url: string;
+    category: BusinessCategory;
 }
 
 export interface AdditionalInfo {
@@ -106,7 +110,7 @@ export interface Business {
     id: string;
     name: string;
     description: string;
-    category: string;
+    category: BusinessCategory[];
     price_range: string;
     phone: string;
     website_url: string;

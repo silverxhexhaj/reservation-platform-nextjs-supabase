@@ -32,7 +32,12 @@ export type BusinessCategory =
   | 'meditation_centre'
   | 'wellness_centre'
   | 'makeup_artist'
-  | 'hair_removal';
+  | 'hair_removal'
+  | 'cosmetics'
+  | 'hair_stylist'
+  | 'manicure'
+  | 'weight_loss';
+  
 
 export const businessCategories: BusinessCategory[] = [
   'hair_salon',
@@ -59,7 +64,11 @@ export const businessCategories: BusinessCategory[] = [
   'meditation_centre',
   'wellness_centre',
   'makeup_artist',
-  'hair_removal'
+  'hair_removal',
+  'cosmetics',
+  'hair_stylist',
+  'manicure',
+  'weight_loss'
 ];
 
 
