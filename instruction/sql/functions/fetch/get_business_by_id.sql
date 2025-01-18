@@ -11,7 +11,12 @@ BEGIN
                 'id', b.id,
                 'name', b.name,
                 'description', b.description,
-                'category', b.category,
+                'category', json_build_object(
+                    'id', bc.id,
+                    'name', bc.name,
+                    'display_name', bc.display_name,
+                    'sub_categories', bc.sub_categories
+                ),
                 'price_range', b.price_range,
                 'phone', b.phone,
                 'website_url', b.website_url,
@@ -41,6 +46,7 @@ BEGIN
             )
             FROM businesses b
             LEFT JOIN locations l ON b.location_id = l.id
+            LEFT JOIN business_categories bc ON b.category = bc.id
             WHERE b.id = b_id
         ),
                     
@@ -163,10 +169,16 @@ BEGIN
                     'original_price', d.original_price,
                     'image_url', d.image_url,
                     'now_price', d.now_price,
-                    'category', d.category
+                    'category', json_build_object(
+                        'id', bc.id,
+                        'name', bc.name,
+                        'display_name', bc.display_name,
+                        'sub_categories', bc.sub_categories
+                    )
                 )
             )
             FROM deals d
+            LEFT JOIN business_categories bc ON d.category = bc.id
             WHERE d.business_id = b_id and d.is_active
         ),
         'additional_info', (    

@@ -17,7 +17,6 @@ function isNewBusiness(createdAt: Date): boolean {
     return createdAt > thirtyDaysAgo;
 }
 
-
 interface BusinessCardProps {
     business: BusinessSummary
 }
@@ -61,7 +60,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
                                 variant="secondary"
                                 className="bg-white/90 backdrop-blur-sm text-neutral-900 border-neutral-200/50 font-medium text-xs flex items-center px-2 py-1"
                             >
-                                {business.category}
+                                {business.category?.display_name}
                             </Badge>
                         </div>
                         <div className="absolute bottom-3 right-3 z-10 flex flex-row gap-2">

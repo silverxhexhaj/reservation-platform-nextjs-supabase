@@ -27,15 +27,14 @@ DROP TABLE IF EXISTS business_favorites CASCADE;
 DROP TABLE IF EXISTS additional_info CASCADE;
 DROP TABLE IF EXISTS business_story CASCADE;
 DROP TABLE IF EXISTS staff_blocked_periods CASCADE;
+DROP TABLE IF EXISTS business_categories CASCADE;
 DROP TYPE IF EXISTS profile_type CASCADE;
-DROP TYPE IF EXISTS business_category CASCADE;
 
 -- Drop enums if they exist
 DROP TYPE IF EXISTS payment_status CASCADE;
 DROP TYPE IF EXISTS booking_status CASCADE;
 DROP TYPE IF EXISTS campaign_status CASCADE;
 DROP TYPE IF EXISTS notification_type CASCADE;
-
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -45,6 +44,8 @@ CREATE TYPE campaign_status AS ENUM ('draft', 'active', 'inactive', 'expired');
 CREATE TYPE booking_status AS ENUM ('pending', 'confirmed', 'cancelled', 'completed');
 CREATE TYPE payment_status AS ENUM ('pending', 'paid', 'refunded', 'failed');
 CREATE TYPE profile_type AS ENUM ('client', 'staff');
+
+
 CREATE TYPE notification_type AS ENUM (
     'booking_created',
     'booking_confirmed',
@@ -61,38 +62,17 @@ CREATE TYPE notification_type AS ENUM (
     'schedule_changed'
 );
 
-CREATE TYPE business_category AS ENUM (
-  'hair_salon',
-  'nail_salon', 
-  'waxing_salon',
-  'beauty_salon',
-  'barbershop',
-  'eyebrows_and_lashes',
-  'massage',
-  'spa',
-  'gym_and_fitness',
-  'personal_trainer',
-  'therapy_centre',
-  'tattoo_and_piercing',
-  'tanning_studio',
-  'aesthetics',
-  'weight_loss',
-  'yoga_studio',
-  'pilates_studio',
-  'dental_clinic',
-  'chiropractor',
-  'physiotherapy',
-  'acupuncture',
-  'meditation_centre',
-  'wellness_centre',
-  'makeup_artist',
-  'hair_removal',
-  'cosmetics',
-  'hair_stylist',
-  'manicure'
+-- Business Categories table
+CREATE TABLE business_categories (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(50) NOT NULL UNIQUE,
+    display_name VARCHAR(100) NOT NULL,
+    sub_categories TEXT[],
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Clients table
+
 CREATE TABLE clients (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -142,15 +122,12 @@ CREATE TABLE locations (
     )
 );
 
-
--- user_roles
-
 -- Businesses table
 CREATE TABLE businesses (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    category business_category[] DEFAULT NULL,
+    category UUID REFERENCES business_categories(id) ON DELETE CASCADE,
     price_range INTEGER NOT NULL CHECK (price_range BETWEEN 1 AND 4),
     phone VARCHAR(20),
     website_url TEXT,
@@ -197,8 +174,6 @@ CREATE TABLE business_gallery (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-
-
 CREATE TABLE business_staff (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
@@ -208,7 +183,6 @@ CREATE TABLE business_staff (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-
 
 CREATE TABLE staff_blocked_periods (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -220,8 +194,6 @@ CREATE TABLE staff_blocked_periods (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-
-
 
 -- Additional info table
 CREATE TABLE additional_info (
@@ -266,7 +238,7 @@ CREATE TABLE services (
     business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    category business_category DEFAULT NULL,
+    category UUID REFERENCES business_categories(id),
     image_url TEXT DEFAULT NULL,
     duration INTEGER NOT NULL, -- in minutes
     base_price DECIMAL(10,2) NOT NULL,
@@ -321,7 +293,7 @@ CREATE TABLE deals (
     description TEXT,
     title TEXT,
     image_url TEXT,
-    category business_category DEFAULT NULL,
+    category UUID REFERENCES business_categories(id),
     start_date TIMESTAMP WITH TIME ZONE NOT NULL,
     end_date TIMESTAMP WITH TIME ZONE NOT NULL,
     is_active BOOLEAN DEFAULT true,
@@ -400,7 +372,6 @@ CREATE TABLE payments (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-
 
 -- Reviews table
 CREATE TABLE reviews (
@@ -494,6 +465,7 @@ CREATE INDEX idx_additional_info_is_available ON additional_info(is_available);
 CREATE INDEX idx_business_story_business ON business_story(business_id);
 CREATE INDEX idx_business_story_available ON business_story(business_id, is_available) WHERE is_available = true;
 CREATE INDEX idx_staff_blocked_periods_staff_id ON staff_blocked_periods(staff_id);
+CREATE INDEX idx_business_categories_name ON business_categories(name);
 
 -- Add triggers for updated_at timestamps
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -606,5 +578,10 @@ CREATE TRIGGER update_business_story_updated_at
 
 CREATE TRIGGER update_staff_blocked_periods_updated_at
     BEFORE UPDATE ON staff_blocked_periods
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_business_categories_updated_at
+    BEFORE UPDATE ON business_categories
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();

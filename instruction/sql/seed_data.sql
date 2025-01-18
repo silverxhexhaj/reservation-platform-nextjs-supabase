@@ -22,9 +22,44 @@ DELETE FROM reviews;
 DELETE FROM staff_services;
 DELETE FROM points_transactions;
 DELETE FROM profiles;
+DELETE FROM business_categories;
 
 
 -- Insert 5 users in auth.users manually 
+
+
+-- Insert default categories
+INSERT INTO business_categories (name, display_name, sub_categories) VALUES
+  ('hair_salon', 'Hair Salon', ARRAY['hair_salon', 'hair_stylist', 'hair_removal', 'hair_styling']),
+  ('nail_salon', 'Nail Salon', ARRAY['nail_salon', 'manicure', 'pedicure', 'gel_nails']),
+  ('waxing_salon', 'Waxing Salon', ARRAY['waxing_salon']),
+  ('beauty_salon', 'Beauty Salon', ARRAY['beauty_salon']),
+  ('barbershop', 'Barbershop', ARRAY['barbershop']),
+  ('eyebrows_and_lashes', 'Eyebrows & Lashes', ARRAY['eyebrows_and_lashes']),
+  ('massage', 'Massage', ARRAY['massage']),
+  ('spa', 'Spa', ARRAY['spa']),
+  ('gym_and_fitness', 'Gym & Fitness', ARRAY['gym_and_fitness']),
+  ('personal_trainer', 'Personal Trainer', ARRAY['personal_trainer']),
+  ('therapy_centre', 'Therapy Centre', ARRAY['therapy_centre']),
+  ('tattoo_and_piercing', 'Tattoo & Piercing', ARRAY['tattoo_and_piercing']),
+  ('tanning_studio', 'Tanning Studio', ARRAY['tanning_studio']),
+  ('aesthetics', 'Aesthetics', ARRAY['aesthetics']),
+  ('weight_loss', 'Weight Loss', ARRAY['weight_loss']),
+  ('yoga_studio', 'Yoga Studio', ARRAY['yoga_studio']),
+  ('pilates_studio', 'Pilates Studio', ARRAY['pilates_studio']),
+  ('dental_clinic', 'Dental Clinic', ARRAY['dental_clinic']),
+  ('chiropractor', 'Chiropractor', ARRAY['chiropractor']),
+  ('physiotherapy', 'Physiotherapy', ARRAY['physiotherapy']),
+  ('acupuncture', 'Acupuncture', ARRAY['acupuncture']),
+  ('meditation_centre', 'Meditation Centre', ARRAY['meditation_centre']),
+  ('wellness_centre', 'Wellness Centre', ARRAY['wellness_centre']),
+  ('makeup_artist', 'Makeup Artist', ARRAY['makeup_artist']),
+  ('hair_removal', 'Hair Removal', ARRAY['hair_removal']),
+  ('cosmetics', 'Cosmetics', ARRAY['cosmetics']),
+  ('hair_stylist', 'Hair Stylist', ARRAY['hair_stylist']),
+  ('manicure', 'Manicure', ARRAY['manicure']);
+
+
 
 -- Insert seed data for clients
 INSERT INTO clients (id, user_id, first_name, last_name, phone, created_at, updated_at) VALUES
@@ -43,11 +78,11 @@ INSERT INTO locations (id, name, address, city, state, country, postal_code, lat
 (uuid_generate_v4(), 'Location E1', '202 Maple St', 'City E', 'State E', 'Country E', '56789', 48.8566, 2.3522, '7778889999', true, true, 'UTC', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO businesses (id, name, description, category, price_range, phone, website_url, profile_picture, cover_picture, is_premium, tags, external_link_facebook, external_link_instagram, external_link_tiktok, external_link_linkedin, owner_id, location_id, created_at, updated_at) VALUES
-(uuid_generate_v4(), 'Salon A', 'A premium hair salon', ARRAY['hair_salon'::business_category], 2, '1234567890', 'www.salonA.com', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', false, ARRAY['Hair', 'Beauty', 'top'], 'salonA', '@salonA', '@salonA', 'salon-a', (SELECT id FROM auth.users LIMIT 1 OFFSET 0), (SELECT id FROM locations LIMIT 1 OFFSET 0), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), 'Salon B', 'Expert nail care', ARRAY['nail_salon'::business_category], 3, '0987654321', 'www.salonB.com', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', true, ARRAY['Nails', 'Beauty'], 'salonB', '@salonB', '@salonB', 'salon-b', (SELECT id FROM auth.users LIMIT 1 OFFSET 1), (SELECT id FROM locations LIMIT 1 OFFSET 1), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), 'Salon C', 'Luxury spa treatments', ARRAY['spa'::business_category], 4, '1112223333', 'www.salonC.com', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', true, ARRAY['Spa', 'Wellness'], 'salonC', '@salonC', '@salonC', 'salon-c', (SELECT id FROM auth.users LIMIT 1 OFFSET 2), (SELECT id FROM locations LIMIT 1 OFFSET 2), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), 'Salon D', 'Modern fitness center', ARRAY['gym_and_fitness'::business_category], 1, '4445556666', 'www.salonD.com', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', false, ARRAY['Fitness', 'Gym'], 'salonD', '@salonD', '@salonD', 'salon-d', (SELECT id FROM auth.users LIMIT 1 OFFSET 3), (SELECT id FROM locations LIMIT 1 OFFSET 3), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), 'Salon E', 'Professional massage services', ARRAY['massage'::business_category], 2, '7778889999', 'www.salonE.com', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', true, ARRAY['Massage', 'Wellness'], 'salonE', '@salonE', '@salonE', 'salon-e', (SELECT id FROM auth.users LIMIT 1 OFFSET 4), (SELECT id FROM locations LIMIT 1 OFFSET 4), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+(uuid_generate_v4(), 'Salon A', 'A premium hair salon', (select id from business_categories limit 1 offset 0), 2, '1234567890', 'www.salonA.com', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', false, ARRAY['Hair', 'Beauty', 'top'], 'salonA', '@salonA', '@salonA', 'salon-a', (SELECT id FROM auth.users LIMIT 1 OFFSET 0), (SELECT id FROM locations LIMIT 1 OFFSET 0), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), 'Salon B', 'Expert nail care', (select id from business_categories limit 1 offset 1), 3, '0987654321', 'www.salonB.com', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', true, ARRAY['Nails', 'Beauty'], 'salonB', '@salonB', '@salonB', 'salon-b', (SELECT id FROM auth.users LIMIT 1 OFFSET 1), (SELECT id FROM locations LIMIT 1 OFFSET 1), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), 'Salon C', 'Luxury spa treatments', (select id from business_categories limit 1 offset 2), 4, '1112223333', 'www.salonC.com', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', true, ARRAY['Spa', 'Wellness'], 'salonC', '@salonC', '@salonC', 'salon-c', (SELECT id FROM auth.users LIMIT 1 OFFSET 2), (SELECT id FROM locations LIMIT 1 OFFSET 2), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), 'Salon D', 'Modern fitness center', (select id from business_categories limit 1 offset 3), 1, '4445556666', 'www.salonD.com', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', false, ARRAY['Fitness', 'Gym'], 'salonD', '@salonD', '@salonD', 'salon-d', (SELECT id FROM auth.users LIMIT 1 OFFSET 3), (SELECT id FROM locations LIMIT 1 OFFSET 3), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), 'Salon E', 'Professional massage services', (select id from business_categories limit 1 offset 4), 2, '7778889999', 'www.salonE.com', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', true, ARRAY['Massage', 'Wellness'], 'salonE', '@salonE', '@salonE', 'salon-e', (SELECT id FROM auth.users LIMIT 1 OFFSET 4), (SELECT id FROM locations LIMIT 1 OFFSET 4), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
 -- Insert seed data for business_staff
@@ -124,11 +159,11 @@ INSERT INTO campaigns (id, business_id, name, description, start_date, end_date,
 
 -- Insert seed data for deals
 INSERT INTO deals (id, business_id, campaign_id, service_id, original_price, now_price, description, title, start_date, end_date, is_active, created_at, updated_at, image_url, category) VALUES
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), (SELECT id FROM campaigns LIMIT 1 OFFSET 0), (SELECT id FROM services LIMIT 1 OFFSET 0), 20.00, 18.00, '10% off haircut services', 'Summer Haircut Special', NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', 'hair_salon'),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), (SELECT id FROM campaigns LIMIT 1 OFFSET 1), (SELECT id FROM services LIMIT 1 OFFSET 1), 25.00, 21.25, '15% off manicure services', 'Winter Manicure Deal', NOW(), NOW() + INTERVAL '2 months', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', 'manicure'),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), (SELECT id FROM campaigns LIMIT 1 OFFSET 2), (SELECT id FROM services LIMIT 1 OFFSET 2), 50.00, 40.00, '20% off massage services', 'Spring Massage Offer', NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', 'massage'),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), (SELECT id FROM campaigns LIMIT 1 OFFSET 3), (SELECT id FROM services LIMIT 1 OFFSET 3), 40.00, 30.00, '25% off personal training', 'Autumn Fitness Deal', NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', 'nail_salon'),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), (SELECT id FROM campaigns LIMIT 1 OFFSET 4), (SELECT id FROM services LIMIT 1 OFFSET 4), 30.00, 21.00, '30% off facial treatments', 'Holiday Beauty Special', NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', 'nail_salon');
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), (SELECT id FROM campaigns LIMIT 1 OFFSET 0), (SELECT id FROM services LIMIT 1 OFFSET 0), 20.00, 18.00, '10% off haircut services', 'Summer Haircut Special', NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', (select id from business_categories limit 1 offset 0)),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), (SELECT id FROM campaigns LIMIT 1 OFFSET 1), (SELECT id FROM services LIMIT 1 OFFSET 1), 25.00, 21.25, '15% off manicure services', 'Winter Manicure Deal', NOW(), NOW() + INTERVAL '2 months', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', (select id from business_categories limit 1 offset 1)),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), (SELECT id FROM campaigns LIMIT 1 OFFSET 2), (SELECT id FROM services LIMIT 1 OFFSET 2), 50.00, 40.00, '20% off massage services', 'Spring Massage Offer', NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', (select id from business_categories limit 1 offset 2)),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), (SELECT id FROM campaigns LIMIT 1 OFFSET 3), (SELECT id FROM services LIMIT 1 OFFSET 3), 40.00, 30.00, '25% off personal training', 'Autumn Fitness Deal', NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', (select id from business_categories limit 1 offset 3)),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), (SELECT id FROM campaigns LIMIT 1 OFFSET 4), (SELECT id FROM services LIMIT 1 OFFSET 4), 30.00, 21.00, '30% off facial treatments', 'Holiday Beauty Special', NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', (select id from business_categories limit 1 offset 4));
 
 -- Insert seed data for products
 INSERT INTO products (id, business_id, name, description, price, stock_quantity, is_active, created_at, updated_at) VALUES

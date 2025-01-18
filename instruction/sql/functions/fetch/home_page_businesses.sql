@@ -16,7 +16,12 @@ BEGIN
                 'description', b.description,
                 'image_url', b.cover_picture,
                 'tags', b.tags,
-                'category', b.category,
+                'category', json_build_object(
+                    'id', bc.id,
+                    'name', bc.name,
+                    'display_name', bc.display_name,
+                    'sub_categories', bc.sub_categories
+                ),
                 'price_range', b.price_range,
                 'is_premium', b.is_premium,
                 'created_at', b.created_at,
@@ -33,6 +38,7 @@ BEGIN
             ))
             FROM businesses b
             LEFT JOIN locations l ON b.location_id = l.id
+            LEFT JOIN business_categories bc ON b.category = bc.id
             WHERE 'top' = ANY(b.tags)
             LIMIT 5
         ),
@@ -55,7 +61,12 @@ BEGIN
                     'id', b.id,
                     'name', b.name,
                     'image_url', b.cover_picture,
-                    'category', b.category,
+                    'category', json_build_object(
+                        'id', bc.id,
+                        'name', bc.name,
+                        'display_name', bc.display_name,
+                        'sub_categories', bc.sub_categories
+                    ),
                     'price_range', b.price_range,
                     'is_premium', b.is_premium,
                     'created_at', b.created_at,
@@ -74,6 +85,7 @@ BEGIN
             FROM deals d
             INNER JOIN businesses b ON d.business_id = b.id
             LEFT JOIN locations l ON b.location_id = l.id
+            LEFT JOIN business_categories bc ON b.category = bc.id
             WHERE d.start_date <= CURRENT_DATE 
             AND d.end_date >= CURRENT_DATE
             LIMIT 5
@@ -87,7 +99,12 @@ BEGIN
                 'description', b.description,
                 'image_url', b.cover_picture,
                 'tags', b.tags,
-                'category', b.category,
+                'category', json_build_object(
+                    'id', bc.id,
+                    'name', bc.name,
+                    'display_name', bc.display_name,
+                    'sub_categories', bc.sub_categories
+                ),
                 'price_range', b.price_range,
                 'is_premium', b.is_premium,
                 'created_at', b.created_at,
@@ -104,6 +121,7 @@ BEGIN
             ))
             FROM businesses b
             LEFT JOIN locations l ON b.location_id = l.id
+            LEFT JOIN business_categories bc ON b.category = bc.id
             WHERE b.created_at >= (CURRENT_DATE - INTERVAL '30 days')
             LIMIT 5
         ),
@@ -127,7 +145,12 @@ BEGIN
                 'description', b.description,
                 'image_url', b.profile_picture,
                 'tags', b.tags,
-                'category', b.category,
+                'category', json_build_object(
+                    'id', bc.id,
+                    'name', bc.name,
+                    'display_name', bc.display_name,
+                    'sub_categories', bc.sub_categories
+                ),
                 'price_range', b.price_range,
                 'is_premium', b.is_premium,
                 'created_at', b.created_at,
@@ -145,6 +168,7 @@ BEGIN
             FROM review_stats r
             INNER JOIN businesses b ON b.id = r.business_id
             LEFT JOIN locations l ON b.location_id = l.id
+            LEFT JOIN business_categories bc ON b.category = bc.id
         )
     );
 END;

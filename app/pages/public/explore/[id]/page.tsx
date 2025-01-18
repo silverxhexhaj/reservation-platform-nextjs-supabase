@@ -163,16 +163,16 @@ export default function BusinessDetailPage() {
   }, [selectedDate, selectedTime, business?.working_hours]);
 
 
-  const addToBooking = (service: any, categoryName: string) => {
-    if (!selectedServices.some(s => s.name === service.name)) {
-      setSelectedServices(prev => [...prev, { ...service, categoryName }]);
-      setBookingItems(prev => [...prev, { name: service.name, price: service.price }]);
+  const addToBooking = (service: any) => {
+    if (!selectedServices.some(s => s.id === service.id)) {
+      setSelectedServices(prev => [...prev, { ...service }]);
+      setBookingItems(prev => [...prev, { id: service.id, name: service.name, price: service.base_price }]);
     }
   };
 
-  const removeFromBooking = (serviceName: string) => {
-    setSelectedServices(prev => prev.filter(s => s.name !== serviceName));
-    setBookingItems(prev => prev.filter(item => item.name !== serviceName));
+  const removeFromBooking = (serviceId: string) => {
+    setSelectedServices(prev => prev.filter(s => s.id !== serviceId));
+    setBookingItems(prev => prev.filter(item => item.id !== serviceId));
   };
 
   const totalPrice = bookingItems.reduce((sum, item) => sum + item.price, 0);
@@ -252,7 +252,7 @@ export default function BusinessDetailPage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-black/70 flex items-end">
               <div className="p-6 text-white max-w-screen-2xl mx-auto w-full">
                 <h1 className="text-3xl lg:text-5xl font-bold mb-2">{business?.business?.name ?? ''}</h1>
-                <p className="lg:text-xl mb-4 opacity-90">{business?.business?.category ?? ''}</p>
+                <p className="lg:text-xl mb-4 opacity-90">{business?.business?.category?.display_name ?? ''}</p>
                 <div className="flex items-center justify-between space-x-4">
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center bg-white/20 rounded-full px-3 py-1">
@@ -306,7 +306,7 @@ export default function BusinessDetailPage() {
                     <div className="flex items-center space-x-2 overflow-x-auto scrollbar-hide">
                       {/* todo get categories from services */}
                       {
-                        business?.business?.category.map((category, index) => (
+                        business?.business?.category?.sub_categories?.map((category, index) => (
                           <button
                             key={index}
                             onClick={() => setActiveTab(category)}
@@ -322,48 +322,26 @@ export default function BusinessDetailPage() {
                   </div>
                 </div>
 
-                {/* Services List */}
-                {activeTab === 'Featured' ? (
                   <div className="flex flex-col gap-4 pt-6">
-                    {business?.services?.map((service, serviceIndex) => {
-                      const isSelected = selectedServices.some(s => s.name === service.name);
+                    {business?.services?.map((service) => {
+                      const isSelected = selectedServices.some(s => s.id === service.id);
                       return (
                         <ServiceItem
-                          key={serviceIndex}
+                          key={service.id}
                           name={service.name}
                           price={service.base_price}
                           description={service.description}
                           duration={service.duration}
                           isSelected={isSelected}
                           onToggle={() => isSelected
-                            ? removeFromBooking(service.name)
-                            : addToBooking(service, activeTab)
+                            ? removeFromBooking(service.id)
+                            : addToBooking(service)
                           }
                         />
                       );
                     })}
                   </div>
-                ) : (
-                  <div className="flex flex-col gap-4 pt-6">
-                    {business?.services?.map((service, serviceIndex) => {
-                      const isSelected = selectedServices.some(s => s.name === service.name);
-                      return (
-                        <ServiceItem
-                          key={service.name}
-                          name={service.name}
-                          price={service.base_price}
-                          description={service.description}
-                          duration={service.duration}
-                          isSelected={isSelected}
-                          onToggle={() => isSelected
-                            ? removeFromBooking(service.name)
-                            : addToBooking(service, activeTab)
-                          }
-                        />
-                      );
-                    })}
-                  </div>
-                )}
+              
               </section>
 
               {/* Team Section */}

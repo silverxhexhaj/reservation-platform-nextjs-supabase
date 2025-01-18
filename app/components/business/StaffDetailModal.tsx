@@ -63,7 +63,7 @@ export function StaffDetailModal({ isOpen, onClose, staff }: StaffDetailModalPro
               Specialties
             </h3>
             <div className="flex flex-wrap gap-2">
-              {staff.profile.specialties.map((specialty, index) => (
+              {staff?.profile?.specialties?.map((specialty, index) => (
                 <Badge key={index} variant="secondary" className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700">
                   {specialty}
                 </Badge>
@@ -75,7 +75,7 @@ export function StaffDetailModal({ isOpen, onClose, staff }: StaffDetailModalPro
           <div>
             <h3 className="text-lg font-semibold mb-3 text-gray-800">Services</h3>
             <div className="space-y-2">
-              {staff.services.map((service, index) => (
+              {staff?.services?.map((service, index) => (
                 <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
                   <span className="font-medium text-gray-700">{service.name}</span>
                   <span className="text-gray-500">{service.duration} min</span>

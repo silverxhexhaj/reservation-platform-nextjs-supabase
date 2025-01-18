@@ -52,7 +52,7 @@ export function ServiceOffer({
             {Math.round(((offer?.original_price ?? 0) - (offer?.now_price ?? 0)) / (offer?.original_price ?? 0) * 100)}% OFF
           </Badge>
           <Badge variant="outline">
-            {offer?.category ?? ''}
+            {offer?.category?.display_name ?? ''}
           </Badge>
         </div>
 

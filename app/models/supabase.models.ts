@@ -115,12 +115,20 @@ export interface Notification extends Timestamps {
   is_read: boolean;
 }
 
+
+export interface Category extends Timestamps {
+  id: string;
+  name: string;
+  display_name: string;
+  sub_categories: string[];
+}
+
 // Business
 export interface Business extends Timestamps {
   id: string;
   name: string;
   description?: string | null;
-  category: BusinessCategory;
+  category: Category;
   price_range: PriceRange;
   phone?: string | null;
   website_url?: string | null;

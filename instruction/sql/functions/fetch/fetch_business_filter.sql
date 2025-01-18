@@ -2,7 +2,7 @@ DROP FUNCTION IF EXISTS fetch_businesses_with_filters;
 
 CREATE OR REPLACE FUNCTION fetch_businesses_with_filters(
     search_term TEXT DEFAULT NULL,
-    selected_category business_category DEFAULT NULL,
+    selected_category TEXT DEFAULT NULL,
     limit_count INTEGER DEFAULT 25,
     offset_count INTEGER DEFAULT 0
 )
@@ -21,7 +21,12 @@ BEGIN
             'description', b.description,
             'image_url', b.profile_picture,
             'tags', b.tags,
-            'category', b.category,
+            'category', json_build_object(
+                'id', bc.id,
+                'name', bc.name,
+                'display_name', bc.display_name,
+                'sub_categories', bc.sub_categories
+            ),
             'price_range', b.price_range,
             'is_premium', b.is_premium,
             'created_at', b.created_at,
@@ -38,6 +43,7 @@ BEGIN
         ) as business_json
         FROM businesses b
         LEFT JOIN locations l ON b.location_id = l.id
+        LEFT JOIN business_categories bc ON b.category = bc.id
         WHERE 
             (
                 CASE 
@@ -46,7 +52,7 @@ BEGIN
                 END
             )
             AND
-            (selected_category IS NULL OR b.category = selected_category)
+            (selected_category IS NULL OR bc.name = selected_category)
         ORDER BY 
             b.is_premium DESC,
             (SELECT COALESCE(AVG(rating), 0) FROM reviews r WHERE r.business_id = b.id) DESC,

@@ -1,3 +1,5 @@
+import { Category } from "../supabase.models";
+
 export interface LoadInitialBusinessesResponse {
     popular?: BusinessSummary[];
     all_businesses?: BusinessSummary[];
@@ -12,7 +14,7 @@ export interface BusinessSummary {
     description?: string | null;
     image_url?: string | null;
     tags?: string[] | null;
-    category?: string;
+    category?: Category;
     price_range?: number;
     is_premium?: boolean;
     location?: BusinessLocation;
