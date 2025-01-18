@@ -13,9 +13,8 @@ import { BookingModal } from "../../../../components/business/BookingModal";
 import { StaffDetailModal } from '../../../../components/business/StaffDetailModal';
 import { Reviews } from '../../../../components/business/Reviews';
 import { BookingItem, SelectedService } from '@/app/models/custom.models';
-import { BusinessDetails, Staff } from '@/app/models/functions/businessDetails.model';
+import { BusinessDetails, Service, Staff } from '@/app/models/functions/businessDetails.model';
 import { fetchBusinessById } from '@/app/service/business/business.service';
-import { businessCategories } from '@/app/models/supabase.models';
 import { ServiceItem } from '../../../../components/business/ServiceItem';
 import { ServiceOffer } from '@/app/components/ServiceOffer';
 import { BusinessGallery } from '@/app/components/business/BusinessGallery';
@@ -53,7 +52,7 @@ export default function BusinessDetailPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState('');
   const [bookingItems, setBookingItems] = useState<BookingItem[]>([]);
-  const [selectedServices, setSelectedServices] = useState<SelectedService[]>([]);
+  const [selectedServices, setSelectedServices] = useState<Service[]>([]);
   const [selectedTeamMember, setSelectedTeamMember] = useState<string>('');
   const [activeTab, setActiveTab] = useState<string>('Featured');
   const [bookingError, setBookingError] = useState<string | null>(null);
@@ -340,9 +339,28 @@ export default function BusinessDetailPage() {
                         />
                       );
                     })}
-                  </div>
-              
+                  </div>              
               </section>
+
+              {(business?.offers?.length ?? 0) > 0 && (
+                <section className="mt-20">
+                  <h2 className="text-xl uppercase font-bold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">
+                    Special Offers
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {business?.offers?.map((offer) => (
+                      <ServiceOffer
+                        key={offer.id}
+                        offer={offer}
+                        onBook={() => {
+                          setSelectedServices(prev => [...prev, { name: offer.name, price: offer.now_price, categoryName: offer.category.display_name }]);
+                          setBookingItems(prev => [...prev, { name: offer.name, price: offer.now_price }]);
+                        }}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
 
               {/* Team Section */}
               <section>
@@ -456,26 +474,6 @@ export default function BusinessDetailPage() {
                   </section>
                 )}
               </div>
-
-              {(business?.offers?.length ?? 0) > 0 && (
-                <section className="mt-20">
-                  <h2 className="text-xl uppercase font-bold text-gray-950 pb-6 pt-6 sticky top-20 bg-white w-full">
-                    Special Offers
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {business?.offers?.map((offer) => (
-                      <ServiceOffer
-                        key={offer.id}
-                        offer={offer}
-                        onBook={() => {
-                          setSelectedServices(prev => [...prev, { name: offer.name, price: offer.now_price, categoryName: offer.category }]);
-                          setBookingItems(prev => [...prev, { name: offer.name, price: offer.now_price }]);
-                        }}
-                      />
-                    ))}
-                  </div>
-                </section>
-              )}
             </div>
 
             {/* Booking Section */}
@@ -568,8 +566,8 @@ export default function BusinessDetailPage() {
                   </div>
                 </div>
               </div>
-
-              {/* 
+                          
+                  {/* Booking Modal */}
 
               <BookingModal
                 isOpen={isBookingModalOpen}
@@ -589,21 +587,19 @@ export default function BusinessDetailPage() {
                 bookingError={bookingError}
                 handleBooking={handleBooking}
                 dateDragging={dateDragging}
-                dateStartX={dateStartX}
-                dateScrollLeft={dateScrollLeft}
                 handleDateMouseDown={handleDateMouseDown}
                 handleDateMouseLeave={handleDateMouseLeave}
                 handleDateMouseUp={handleDateMouseUp}
                 handleDateMouseMove={handleDateMouseMove}
                 dateContainerRef={dateContainerRef}
                 services={business?.services ?? []}
-                categories={businessCategories}
+                category={business?.business?.category}
                 addToBooking={addToBooking}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
-                filteredServices={business?.services ?? []}
+                filteredServices={selectedServices ?? []}
               />
-              Booking Modal */}
+            
             </section>
           </div>
         </div>

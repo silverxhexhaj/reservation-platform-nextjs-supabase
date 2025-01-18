@@ -45,7 +45,7 @@ export function Reviews({ businessId }: ReviewsProps) {
 
       {/* Reviews List */}
       <div className="space-y-6">
-        {reviews?.current_reviews?.map((review) => (
+        {reviews?.reviews?.map((review) => (
           <div key={review.id} className="border border-gray-100 rounded-xl p-6 space-y-4 hover:border-gray-200 transition-colors duration-200">
             {/* Review Header */}
             <div className="flex items-start justify-between">
