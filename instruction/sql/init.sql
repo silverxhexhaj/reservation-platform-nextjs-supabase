@@ -89,8 +89,7 @@ CREATE TYPE business_category AS ENUM (
   'hair_removal',
   'cosmetics',
   'hair_stylist',
-  'manicure',
-  'weight_loss'
+  'manicure'
 );
 
 -- Clients table
