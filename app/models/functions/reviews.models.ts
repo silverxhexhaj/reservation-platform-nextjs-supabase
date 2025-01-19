@@ -15,9 +15,8 @@ export interface Review {
 }
 
 export interface TotalReviews {
-    average_rating: number; 
+    average_rating: number;
     total_reviews: number;
-    avg_rating: number;
     total_pages: number;
     current_page: number;
     reviews: Review[];

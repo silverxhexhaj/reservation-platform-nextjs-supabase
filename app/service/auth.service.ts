@@ -69,6 +69,25 @@ function isAuthenticated() {
   return !!authState.user;
 }
 
+export async function isClient() {
+  try {
+    if (!getUser()) return false;
+    
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('profile_type')
+      .eq('user_id', getUser()?.id)
+      .single();
+
+    if (error) throw error;
+    
+    return profile?.profile_type === 'client';
+  } catch (error) {
+    return false;
+  }
+}
+
+
 function getAuthState() {
   return authState;
 }

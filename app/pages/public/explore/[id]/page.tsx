@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { Header } from '@/app/components/Header';
-import { format, addMonths, eachDayOfInterval } from 'date-fns';
 import { useLoadScript, GoogleMap, MarkerF } from '@react-google-maps/api';
 import Image from 'next/image';
 import { Button } from "@/app/components/ui/button";
@@ -12,12 +11,13 @@ import { Stories } from '../../../../components/business/Stories';
 import { BookingModal } from "../../../../components/business/BookingModal";
 import { StaffDetailModal } from '../../../../components/business/StaffDetailModal';
 import { Reviews } from '../../../../components/business/Reviews';
-import { BookingItem, SelectedService } from '@/app/models/custom.models';
+import { BookingItem } from '@/app/models/custom.models';
 import { BusinessDetails, Service, Staff } from '@/app/models/functions/businessDetails.model';
 import { fetchBusinessById } from '@/app/service/business/business.service';
 import { ServiceItem } from '../../../../components/business/ServiceItem';
 import { ServiceOffer } from '@/app/components/ServiceOffer';
 import { BusinessGallery } from '@/app/components/business/BusinessGallery';
+import { isClient } from '@/app/service/auth.service';
 
 const scrollbarHideStyles = `
   .scrollbar-hide {
@@ -28,7 +28,6 @@ const scrollbarHideStyles = `
     display: none;  /* Chrome, Safari and Opera */
   }
 `;
-
 
 const mapContainerStyle = {
   width: '100%',
@@ -48,20 +47,14 @@ export default function BusinessDetailPage() {
   const [business, setBusiness] = useState<BusinessDetails | null>(null);
   const [isBusinessOpen, setIsBusinessOpen] = useState<boolean>(false);
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
+  const [disableBookingButton, setDisableBookingButton] = useState<boolean>(false);
 
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedTime, setSelectedTime] = useState('');
   const [bookingItems, setBookingItems] = useState<BookingItem[]>([]);
   const [selectedServices, setSelectedServices] = useState<Service[]>([]);
   const [selectedTeamMember, setSelectedTeamMember] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<string>('Featured');
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [isOpeningHoursOpen, setIsOpeningHoursOpen] = useState(false);
 
-  const [isValidBookingTime, setIsValidBookingTime] = useState(false);
-  const [dateDragging, setDateDragging] = useState(false);
-  const [dateStartX, setDateStartX] = useState(0);
-  const [dateScrollLeft, setDateScrollLeft] = useState(0);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
   const today = new Date().getDay(); // 0 is Sunday, 1 is Monday, etc.
@@ -84,83 +77,18 @@ export default function BusinessDetailPage() {
       setBusiness(businessData);
     };
 
-    fetchBusinessDetails();
+    const disableBookingButton = async () => {
+      const isClientType = await isClient();
+      // const disableBookingButton = selectedServices.length === 0 && !isClientType;
 
+      setDisableBookingButton(false);
+    };
+
+    disableBookingButton();
+    fetchBusinessDetails();
   }, [id]);
 
   const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const dateContainerRef = useRef<HTMLDivElement>(null);
-
-  const availableDates = useMemo(() => {
-    const today = new Date();
-    const twoMonthsFromNow = addMonths(today, 2);
-    const dates = eachDayOfInterval({
-      start: today,
-      end: twoMonthsFromNow,
-    });
-    return dates;
-  }, []);
-
-
-  const availableTimeSlots = useMemo(() => {
-    if (!selectedDate || !business?.working_hours) return [];
-
-    const dayOfWeek = selectedDate.getDay();
-    const todayHours = business.working_hours[dayOfWeek === 0 ? 6 : dayOfWeek - 1]?.start_time;
-
-    if (!todayHours || todayHours === 'Closed') return [];
-
-    const [openTime, closeTime] = todayHours.split(' - ').map((t: string) => {
-      const [hours, minutes] = t.split(':').map(Number);
-      return hours * 60 + minutes;
-    });
-
-    const slots = [];
-    const currentDate = new Date();
-    const isToday = selectedDate.toDateString() === currentDate.toDateString();
-    const currentTime = isToday ? currentDate.getHours() * 60 + currentDate.getMinutes() : 0;
-
-    for (let time = openTime; time < closeTime; time += 30) {
-      const hour = Math.floor(time / 60);
-      const minute = time % 60;
-      const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-
-      if (isToday && time <= currentTime) continue;
-
-      slots.push(timeString);
-    }
-
-    return slots;
-  }, [selectedDate, business?.working_hours]);
-
-  useEffect(() => {
-    validateBookingTime();
-  }, [selectedDate, selectedTime]);
-
-
-  const validateBookingTime = useCallback(() => {
-    if (!selectedDate || !selectedTime || !business?.working_hours) {
-      setIsValidBookingTime(false);
-      return;
-    }
-
-    const dayOfWeek = selectedDate.getDay();
-    const timeInMinutes = parseInt(selectedTime.split(':')[0]) * 60 + parseInt(selectedTime.split(':')[1]);
-
-    const todayHours = business.working_hours[dayOfWeek === 0 ? 6 : dayOfWeek - 1]?.start_time;
-    if (!todayHours || todayHours === 'Closed') {
-      setIsValidBookingTime(false);
-      return;
-    }
-
-    const [openTime, closeTime] = todayHours.split(' - ').map((t: string) => {
-      const [hours, minutes] = t.split(':').map(Number);
-      return hours * 60 + minutes;
-    });
-
-    setIsValidBookingTime(timeInMinutes >= openTime && timeInMinutes < closeTime);
-  }, [selectedDate, selectedTime, business?.working_hours]);
-
 
   const addToBooking = (service: any) => {
     if (!selectedServices.some(s => s.id === service.id)) {
@@ -174,8 +102,6 @@ export default function BusinessDetailPage() {
     setBookingItems(prev => prev.filter(item => item.id !== serviceId));
   };
 
-  const totalPrice = bookingItems.reduce((sum, item) => sum + item.price, 0);
-
   const handleBooking = () => {
     // Clear any existing timeout
     if (errorTimeoutRef.current) {
@@ -186,15 +112,8 @@ export default function BusinessDetailPage() {
 
     if (bookingItems.length === 0) {
       errorMessage = "Please select at least one service.";
-    } else if (!selectedTime) {
-      errorMessage = "Please select a time for your appointment.";
     } else if (!selectedTeamMember) {
       errorMessage = "Please select a team member or choose 'Random'.";
-    } else if (!isValidBookingTime) {
-      errorMessage = "Please select a time within the business opening hours.";
-    } else {
-      const bookingDate = new Date(selectedDate);
-      alert(`Booking confirmed for ${business?.business?.name ?? ''} on ${format(bookingDate, 'MMMM d, yyyy')} at ${selectedTime}\nTotal: $${totalPrice}\nTeam Member: ${selectedTeamMember || 'Random'}`);
     }
 
     setBookingError(errorMessage);
@@ -206,31 +125,6 @@ export default function BusinessDetailPage() {
       }, 5000);
     }
   };
-
-  const handleDateMouseDown = (e: React.MouseEvent) => {
-    setDateDragging(true);
-    setDateStartX(e.pageX - (dateContainerRef.current?.offsetLeft || 0));
-    setDateScrollLeft(dateContainerRef.current?.scrollLeft || 0);
-  };
-
-  const handleDateMouseLeave = () => {
-    setDateDragging(false);
-  };
-
-  const handleDateMouseUp = () => {
-    setDateDragging(false);
-  };
-
-  const handleDateMouseMove = (e: React.MouseEvent) => {
-    if (!dateDragging) return;
-    e.preventDefault();
-    if (!dateContainerRef.current) return;
-
-    const x = e.pageX - (dateContainerRef.current.offsetLeft || 0);
-    const walk = (x - dateStartX) * 2;
-    dateContainerRef.current.scrollLeft = dateScrollLeft - walk;
-  };
-
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -260,7 +154,7 @@ export default function BusinessDetailPage() {
                     </div>
                     <div className="flex items-center bg-white/20 rounded-full px-3 py-1">
                       <span className="text-sm lg:text-lg font-semibold">
-                        {Array.from({ length: business?.business?.price_range === 'LUXURY' ? 4 : business?.business?.price_range === 'EXPENSIVE' ? 3 : business?.business?.price_range === 'MODERATE' ? 2 : 1 }).map((_, index) => (
+                        {Array.from({ length: business?.business?.price_range?.length ?? 1 }).map((_, index) => (
                           <span
                             key={index}
                             className="text-white"
@@ -289,30 +183,20 @@ export default function BusinessDetailPage() {
 
           <div className='flex flex-col lg:flex-row lg:space-x-16 px-6 max-w-screen-2xl mx-auto relative'>
             <div className='flex flex-col flex-1 lg:order-first order-last space-y-8 lg:space-y-16 pb-32 lg:pb-0'>
-
-              {/* Add Stories section here */}
               <div>
                 <Stories stories={business?.business_story ?? []} />
               </div>
-
-              {/* Services Section */}
-              <section>
-                <div className="sticky top-20 bg-white z-40">
+              <div>
+                <div className="bg-white z-40">
                   <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6">Services</h2>
 
-                  {/* Categories Tabs */}
                   <div className="relative">
                     <div className="flex items-center space-x-2 overflow-x-auto scrollbar-hide">
-                      {/* todo get categories from services */}
                       {
                         business?.business?.category?.sub_categories?.map((category, index) => (
                           <button
                             key={index}
-                            onClick={() => setActiveTab(category)}
-                            className={`flex-none px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 
-                              ${activeTab === category
-                                ? 'bg-black text-white'
-                                : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'}`}
+                            className="flex-none px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 hover:bg-gray-100 text-gray-600 hover:text-gray-900"
                           >
                             {category}
                           </button>
@@ -321,26 +205,26 @@ export default function BusinessDetailPage() {
                   </div>
                 </div>
 
-                  <div className="flex flex-col gap-4 pt-6">
-                    {business?.services?.map((service) => {
-                      const isSelected = selectedServices.some(s => s.id === service.id);
-                      return (
-                        <ServiceItem
-                          key={service.id}
-                          name={service.name}
-                          price={service.base_price}
-                          description={service.description}
-                          duration={service.duration}
-                          isSelected={isSelected}
-                          onToggle={() => isSelected
-                            ? removeFromBooking(service.id)
-                            : addToBooking(service)
-                          }
-                        />
-                      );
-                    })}
-                  </div>              
-              </section>
+                <div className="flex flex-col gap-4 pt-6">
+                  {business?.services?.map((service) => {
+                    const isSelected = selectedServices.some(s => s.id === service.id);
+                    return (
+                      <ServiceItem
+                        key={service.id}
+                        name={service.name}
+                        price={service.base_price}
+                        description={service.description}
+                        duration={service.duration}
+                        isSelected={isSelected}
+                        onToggle={() => isSelected
+                          ? removeFromBooking(service.id)
+                          : addToBooking(service)
+                        }
+                      />
+                    );
+                  })}
+                </div>
+              </div>
 
               {(business?.offers?.length ?? 0) > 0 && (
                 <section className="mt-20">
@@ -487,10 +371,11 @@ export default function BusinessDetailPage() {
                 </div>
 
                 <Button
+                  disabled={disableBookingButton}
                   className="w-full py-6 text-base font-semibold rounded-lg transition duration-300 ease-in-out bg-black hover:bg-gray-800 text-white"
                   onClick={() => setIsBookingModalOpen(true)}
                 >
-                  {selectedServices.length === 0 ? 'Book Now' : `Book Now • $${totalPrice}`}
+                  {selectedServices.length === 0 ? 'Book Now' : `Book Now • $${bookingItems.reduce((sum, item) => sum + item.price, 0)}`}
                 </Button>
 
                 {/* Opening Hours and Location */}
@@ -506,7 +391,7 @@ export default function BusinessDetailPage() {
                           {isBusinessOpen && (
                             <>
                               <span className="text-gray-600">•</span>
-                              <span className="text-gray-600">Closes at {business?.working_hours?.find(hours => hours.day_of_week === today)?.end_time}</span>
+                              <span className="text-gray-600">Closes at {business?.working_hours?.find(hours => hours.day_of_week === today)?.end_time?.slice(0, -3)}</span>
                             </>
                           )}
                         </div>
@@ -566,40 +451,25 @@ export default function BusinessDetailPage() {
                   </div>
                 </div>
               </div>
-                          
-                  {/* Booking Modal */}
+
+              {/* Booking Modal */}
 
               <BookingModal
                 isOpen={isBookingModalOpen}
                 onClose={() => setIsBookingModalOpen(false)}
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-                selectedTime={selectedTime}
-                setSelectedTime={setSelectedTime}
                 selectedTeamMember={selectedTeamMember}
                 setSelectedTeamMember={setSelectedTeamMember}
                 selectedServices={selectedServices}
                 removeFromBooking={removeFromBooking}
-                availableDates={availableDates}
-                availableTimeSlots={availableTimeSlots}
                 businessTeam={business?.staff ?? []}
-                totalPrice={totalPrice}
                 bookingError={bookingError}
                 handleBooking={handleBooking}
-                dateDragging={dateDragging}
-                handleDateMouseDown={handleDateMouseDown}
-                handleDateMouseLeave={handleDateMouseLeave}
-                handleDateMouseUp={handleDateMouseUp}
-                handleDateMouseMove={handleDateMouseMove}
-                dateContainerRef={dateContainerRef}
                 services={business?.services ?? []}
-                category={business?.business?.category}
+                category={business?.business?.category ?? {}}
                 addToBooking={addToBooking}
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
                 filteredServices={selectedServices ?? []}
               />
-            
+
             </section>
           </div>
         </div>

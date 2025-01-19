@@ -1,5 +1,5 @@
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabase';
 import { BusinessSummary, LoadInitialBusinessesResponse } from '@/app/models/functions/businessSummary.model'
 import { HomePageBusinesses } from '@/app/models/functions/homePageBusinesses.models'
 import { BusinessDetails } from '@/app/models/functions/businessDetails.model'
@@ -11,7 +11,6 @@ interface FetchBusinessesParams {
   offset?: number
 }
 
-const supabase = createClientComponentClient();
 
 export async function fetchBusinessesWithFilters({
   searchTerm = null,

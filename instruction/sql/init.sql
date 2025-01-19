@@ -1,5 +1,6 @@
 -- deprecated keeping for backwards compatibility
 DROP TABLE IF EXISTS staff_working_hours CASCADE;
+DROP TABLE IF EXISTS clients CASCADE;
 
 -- Drop tables if they exist (in reverse order of creation to handle dependencies)
 DROP TABLE IF EXISTS working_hours CASCADE;
@@ -18,7 +19,6 @@ DROP TABLE IF EXISTS business_gallery CASCADE;
 DROP TABLE IF EXISTS business_features CASCADE;
 DROP TABLE IF EXISTS businesses CASCADE;
 DROP TABLE IF EXISTS notifications CASCADE;
-DROP TABLE IF EXISTS clients CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
 DROP TABLE IF EXISTS staff_services CASCADE;
 DROP TABLE IF EXISTS points_transactions CASCADE;
@@ -72,18 +72,6 @@ CREATE TABLE business_categories (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-
-CREATE TABLE clients (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    first_name VARCHAR(100),
-    last_name VARCHAR(100),
-    avatar_url TEXT,
-    phone VARCHAR(20),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT unique_user_id UNIQUE (user_id)
-);
 
 -- Notifications table
 CREATE TABLE notifications (
@@ -441,7 +429,6 @@ CREATE INDEX idx_payments_booking ON payments(booking_id);
 CREATE INDEX idx_loyalty_points_user ON loyalty_points(user_id);
 CREATE INDEX idx_staff_working_hours ON working_hours(staff_id, day_of_week);
 CREATE INDEX idx_working_hours_business ON working_hours(business_id);
-CREATE INDEX idx_clients_user ON clients(user_id);
 CREATE INDEX idx_notifications_user ON notifications(user_id);
 CREATE INDEX idx_notifications_type ON notifications(type);
 CREATE INDEX idx_notifications_created ON notifications(created_at);
@@ -523,11 +510,6 @@ CREATE TRIGGER update_payments_updated_at
 
 CREATE TRIGGER update_working_hours_updated_at
     BEFORE UPDATE ON working_hours
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_clients_updated_at
-    BEFORE UPDATE ON clients
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 

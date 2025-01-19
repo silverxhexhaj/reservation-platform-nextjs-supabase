@@ -6,31 +6,20 @@ import { cn } from "@/lib/utils";
 import { X, AlertCircle, ArrowLeft, ArrowRight } from "lucide-react";
 import { useState, useRef } from "react";
 import { Category } from "@/app/models/supabase.models";
-import { Service } from "@/app/models/functions/businessDetails.model";
+import { Service, Staff } from "@/app/models/functions/businessDetails.model";
 
 
 interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedDate: Date;
-  setSelectedDate: (date: Date) => void;
-  selectedTime: string;
-  setSelectedTime: (time: string) => void;
   selectedTeamMember: string;
   setSelectedTeamMember: (member: string) => void;
   selectedServices: any[];
   removeFromBooking: (serviceName: string) => void;
-  availableDates: Date[];
-  availableTimeSlots: string[];
-  businessTeam: any[];
-  totalPrice: number;
+  businessTeam: Staff[];
   bookingError: string | null;
   handleBooking: () => void;
   dateDragging: boolean;
-  handleDateMouseDown: (e: React.MouseEvent) => void;
-  handleDateMouseLeave: () => void;
-  handleDateMouseUp: () => void;
-  handleDateMouseMove: (e: React.MouseEvent) => void;
   dateContainerRef: React.RefObject<HTMLDivElement>;
   services: Service[];
   category: Category;
@@ -42,33 +31,22 @@ interface BookingModalProps {
 
 const STEPS = {
   SERVICES: 0,
-  DATE_TIME: 1,
-  TEAM: 2,
+  TEAM: 1,
+  DATE_TIME: 2,
   REVIEW: 3
 };
 
 export function BookingModal({
   isOpen,
   onClose,
-  selectedDate,
-  setSelectedDate,
-  selectedTime,
-  setSelectedTime,
   selectedTeamMember,
   setSelectedTeamMember,
   selectedServices,
   removeFromBooking,
-  availableDates,
-  availableTimeSlots,
   businessTeam,
-  totalPrice,
   bookingError,
   handleBooking,
   dateDragging,
-  handleDateMouseDown,
-  handleDateMouseLeave,
-  handleDateMouseUp,
-  handleDateMouseMove,
   dateContainerRef,
   category,
   addToBooking,
@@ -81,8 +59,8 @@ export function BookingModal({
 
   const steps = [
     { id: STEPS.SERVICES, title: "Select Services" },
-    { id: STEPS.DATE_TIME, title: "Choose Date & Time" },
     { id: STEPS.TEAM, title: "Choose Team Member" },
+    { id: STEPS.DATE_TIME, title: "Choose Date & Time" },
     { id: STEPS.REVIEW, title: "Review & Book" }
   ];
 
@@ -90,10 +68,10 @@ export function BookingModal({
     switch (currentStep) {
       case STEPS.SERVICES:
         return true; // Can proceed without selecting services
+      case STEPS.TEAM:
+          return selectedTeamMember;
       case STEPS.DATE_TIME:
         return selectedDate && selectedTime;
-      case STEPS.TEAM:
-        return selectedTeamMember;
       case STEPS.REVIEW:
         return true;
       default:
@@ -171,6 +149,43 @@ export function BookingModal({
           </div>
         );
 
+        
+      case STEPS.TEAM:
+        return (
+          <div className="space-y-6">
+            <div className="flex flex-col space-y-2">
+              <Label className="text-gray-700">Select Team Member</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <Button
+                  key="random"
+                  variant="outline"
+                  className={cn(
+                    "h-auto py-4",
+                    selectedTeamMember === 'Random' && "bg-black text-white hover:bg-gray-800"
+                  )}
+                  onClick={() => setSelectedTeamMember('Random')}
+                >
+                  Random
+                </Button>
+                {businessTeam.map((member) => (
+                  <Button
+                    key={member.id}
+                    variant="outline"
+                    className={cn(
+                      "h-auto py-4",
+                      selectedTeamMember === member.id && "bg-black text-white hover:bg-gray-800"
+                    )}
+                    onClick={() => setSelectedTeamMember(member.id)}
+                  >
+                    {member.profile.first_name} {member.profile.last_name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+
+
       case STEPS.DATE_TIME:
         return (
           <div className="space-y-6">
@@ -182,13 +197,10 @@ export function BookingModal({
                   "overflow-x-scroll scrollbar-hide cursor-grab active:cursor-grabbing rounded-md",
                   dateDragging && "select-none"
                 )}
-                onMouseDown={handleDateMouseDown}
-                onMouseLeave={handleDateMouseLeave}
-                onMouseUp={handleDateMouseUp}
-                onMouseMove={handleDateMouseMove}
               >
                 <div className="flex space-x-2 w-max">
-                  {availableDates.map((date) => (
+                  { /*
+                  availableDates.map((date) => (
                     <Button
                       key={date.toISOString()}
                       variant="outline"
@@ -209,7 +221,8 @@ export function BookingModal({
                         {format(date, 'MMM')}
                       </span>
                     </Button>
-                  ))}
+                  ))
+                  */}
                 </div>
               </div>
             </div>
@@ -221,7 +234,9 @@ export function BookingModal({
                 className="overflow-x-scroll scrollbar-hide rounded-md"
               >
                 <div className="flex flex-wrap gap-2">
-                  {availableTimeSlots.length > 0 ? (
+
+                  { /*
+                  availableTimeSlots.length > 0 ? (
                     availableTimeSlots.map((time) => (
                       <Button
                         key={time}
@@ -239,43 +254,8 @@ export function BookingModal({
                     <div className="px-4 py-3 text-sm text-gray-500">
                       No available time slots for this date
                     </div>
-                  )}
+                  )*/}
                 </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case STEPS.TEAM:
-        return (
-          <div className="space-y-6">
-            <div className="flex flex-col space-y-2">
-              <Label className="text-gray-700">Select Team Member</Label>
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  key="random"
-                  variant="outline"
-                  className={cn(
-                    "h-auto py-4",
-                    selectedTeamMember === 'Random' && "bg-black text-white hover:bg-gray-800"
-                  )}
-                  onClick={() => setSelectedTeamMember('Random')}
-                >
-                  Random
-                </Button>
-                {businessTeam.map((member) => (
-                  <Button
-                    key={member.name}
-                    variant="outline"
-                    className={cn(
-                      "h-auto py-4",
-                      selectedTeamMember === member.name && "bg-black text-white hover:bg-gray-800"
-                    )}
-                    onClick={() => setSelectedTeamMember(member.name)}
-                  >
-                    {member.name}
-                  </Button>
-                ))}
               </div>
             </div>
           </div>
