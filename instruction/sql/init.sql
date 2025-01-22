@@ -340,14 +340,27 @@ CREATE TABLE bookings (
     business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
     staff_id UUID REFERENCES business_staff(id) ON DELETE CASCADE,
     service_id UUID REFERENCES services(id) ON DELETE CASCADE,
-    deal_id UUID REFERENCES deals(id),
-    booking_date TIMESTAMP WITH TIME ZONE NOT NULL,
+    deal_id UUID REFERENCES deals(id) DEFAULT NULL,
+    date DATE NOT NULL,
+    start_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    end_time TIMESTAMP WITH TIME ZONE NOT NULL,
     status booking_status DEFAULT 'pending',
-    total_amount DECIMAL(10,2) NOT NULL,
-    notes TEXT,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    note TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT valid_booking_time CHECK (end_time > start_time)
 );
+
+
+CREATE TABLE booking_timeslots (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
+    duration INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+);
+
 
 -- Payments table
 CREATE TABLE payments (
@@ -425,6 +438,8 @@ CREATE INDEX idx_deals_campaign ON deals(campaign_id);
 CREATE INDEX idx_bookings_user ON bookings(user_id);
 CREATE INDEX idx_bookings_business ON bookings(business_id);
 CREATE INDEX idx_bookings_staff ON bookings(staff_id);
+CREATE INDEX idx_bookings_service ON bookings(service_id);
+CREATE INDEX idx_bookings_deal ON bookings(deal_id);
 CREATE INDEX idx_payments_booking ON payments(booking_id);
 CREATE INDEX idx_loyalty_points_user ON loyalty_points(user_id);
 CREATE INDEX idx_staff_working_hours ON working_hours(staff_id, day_of_week);

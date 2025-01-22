@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { Header } from '@/app/components/Header';
 import { useLoadScript, GoogleMap, MarkerF } from '@react-google-maps/api';
 import Image from 'next/image';
@@ -38,6 +38,7 @@ const mapContainerStyle = {
 export default function BusinessDetailPage() {
 
   const { id } = useParams();
+  const searchParams = useSearchParams();
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string
@@ -51,8 +52,7 @@ export default function BusinessDetailPage() {
 
   const [bookingItems, setBookingItems] = useState<BookingItem[]>([]);
   const [selectedServices, setSelectedServices] = useState<Service[]>([]);
-  const [selectedTeamMember, setSelectedTeamMember] = useState<string>('');
-  const [bookingError, setBookingError] = useState<string | null>(null);
+
   const [isOpeningHoursOpen, setIsOpeningHoursOpen] = useState(false);
 
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -88,7 +88,6 @@ export default function BusinessDetailPage() {
     fetchBusinessDetails();
   }, [id]);
 
-  const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const addToBooking = (service: any) => {
     if (!selectedServices.some(s => s.id === service.id)) {
@@ -102,30 +101,7 @@ export default function BusinessDetailPage() {
     setBookingItems(prev => prev.filter(item => item.id !== serviceId));
   };
 
-  const handleBooking = () => {
-    // Clear any existing timeout
-    if (errorTimeoutRef.current) {
-      clearTimeout(errorTimeoutRef.current);
-    }
-
-    let errorMessage = null;
-
-    if (bookingItems.length === 0) {
-      errorMessage = "Please select at least one service.";
-    } else if (!selectedTeamMember) {
-      errorMessage = "Please select a team member or choose 'Random'.";
-    }
-
-    setBookingError(errorMessage);
-
-    // Clear the error message after 5 seconds
-    if (errorMessage) {
-      errorTimeoutRef.current = setTimeout(() => {
-        setBookingError(null);
-      }, 5000);
-    }
-  };
-
+  
   return (
     <div className="min-h-screen flex flex-col">
       <style jsx global>{scrollbarHideStyles}</style>
@@ -236,6 +212,7 @@ export default function BusinessDetailPage() {
                       <ServiceOffer
                         key={offer.id}
                         offer={offer}
+                        selected_offer_id={searchParams.get('offer') ?? ''}
                         onBook={() => {
                           setSelectedServices(prev => [...prev, { name: offer.name, price: offer.now_price, categoryName: offer.category.display_name }]);
                           setBookingItems(prev => [...prev, { name: offer.name, price: offer.now_price }]);
@@ -452,22 +429,14 @@ export default function BusinessDetailPage() {
                 </div>
               </div>
 
-              {/* Booking Modal */}
-
               <BookingModal
                 isOpen={isBookingModalOpen}
                 onClose={() => setIsBookingModalOpen(false)}
-                selectedTeamMember={selectedTeamMember}
-                setSelectedTeamMember={setSelectedTeamMember}
                 selectedServices={selectedServices}
                 removeFromBooking={removeFromBooking}
-                businessTeam={business?.staff ?? []}
-                bookingError={bookingError}
-                handleBooking={handleBooking}
-                services={business?.services ?? []}
-                category={business?.business?.category ?? {}}
+                category={business?.business?.category}
                 addToBooking={addToBooking}
-                filteredServices={selectedServices ?? []}
+                businessId={id as string}
               />
 
             </section>

@@ -3,18 +3,19 @@
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { Star } from "lucide-react";
 import Image from "next/image";
 import { Offer } from "../models/functions/businessDetails.model";
 
 interface ServiceOfferProps {
   offer: Offer;
+  selected_offer_id: string;
   onBook?: () => void;
 }
 
 export function ServiceOffer({
   offer,
   onBook,
+  selected_offer_id,
 }: ServiceOfferProps) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -26,7 +27,7 @@ export function ServiceOffer({
   };
 
   return (
-    <Card className="overflow-hidden group">
+    <Card className={`overflow-hidden group ${selected_offer_id === offer.id ? 'border-2 border-black' : ''}`}>
       <div className="relative aspect-video overflow-hidden">
         <Image
           src={offer?.image_url ?? ''}
@@ -63,7 +64,7 @@ export function ServiceOffer({
           <div className="text-sm text-gray-500">
             Valid until {formatDate(offer?.end_date ?? '')}
           </div>
-          <Button onClick={onBook}>
+          <Button onClick={onBook} className={`${selected_offer_id === offer.id ? 'bg-black text-white' : ''}`}>
             Book Now
           </Button>
         </div>
