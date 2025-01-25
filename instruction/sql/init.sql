@@ -28,6 +28,8 @@ DROP TABLE IF EXISTS additional_info CASCADE;
 DROP TABLE IF EXISTS business_story CASCADE;
 DROP TABLE IF EXISTS staff_blocked_periods CASCADE;
 DROP TABLE IF EXISTS business_categories CASCADE;
+DROP TABLE IF EXISTS timeslots CASCADE;
+DROP TABLE IF EXISTS booking_timeslots CASCADE;
 DROP TYPE IF EXISTS profile_type CASCADE;
 
 -- Drop enums if they exist
@@ -157,7 +159,7 @@ CREATE TABLE business_gallery (
     caption TEXT,
     sort_order INTEGER DEFAULT 0,
     is_featured BOOLEAN DEFAULT false,
-    media_type VARCHAR(50) DEFAULT 'image', -- 'image', 'video', etc.
+    media_type VARCHAR(50) DEFAULT 'image', 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -336,31 +338,34 @@ CREATE TABLE redeemed_rewards (
 -- Bookings table
 CREATE TABLE bookings (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_booked_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
     staff_id UUID REFERENCES business_staff(id) ON DELETE CASCADE,
     service_id UUID REFERENCES services(id) ON DELETE CASCADE,
     deal_id UUID REFERENCES deals(id) DEFAULT NULL,
-    date DATE NOT NULL,
-    start_time TIMESTAMP WITH TIME ZONE NOT NULL,
-    end_time TIMESTAMP WITH TIME ZONE NOT NULL,
     status booking_status DEFAULT 'pending',
-    total_amount DECIMAL(10, 2) NOT NULL,
+    date DATE NOT NULL,
     note TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT valid_booking_time CHECK (end_time > start_time)
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Timeslots table
+CREATE TABLE timeslots (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    CONSTRAINT chk_timeslot_duration CHECK (end_time > start_time)
 );
 
 
 CREATE TABLE booking_timeslots (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
-    duration INTEGER NOT NULL,
+    booking_id UUID NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+    timeslot_id UUID NOT NULL REFERENCES timeslots(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (timeslot_id, booking_id)
 );
-
 
 -- Payments table
 CREATE TABLE payments (
@@ -435,7 +440,7 @@ CREATE INDEX idx_services_business ON services(business_id);
 CREATE INDEX idx_products_business ON products(business_id);
 CREATE INDEX idx_campaigns_business ON campaigns(business_id);
 CREATE INDEX idx_deals_campaign ON deals(campaign_id);
-CREATE INDEX idx_bookings_user ON bookings(user_id);
+CREATE INDEX idx_bookings_user ON bookings(user_booked_id);
 CREATE INDEX idx_bookings_business ON bookings(business_id);
 CREATE INDEX idx_bookings_staff ON bookings(staff_id);
 CREATE INDEX idx_bookings_service ON bookings(service_id);
@@ -468,6 +473,29 @@ CREATE INDEX idx_business_story_business ON business_story(business_id);
 CREATE INDEX idx_business_story_available ON business_story(business_id, is_available) WHERE is_available = true;
 CREATE INDEX idx_staff_blocked_periods_staff_id ON staff_blocked_periods(staff_id);
 CREATE INDEX idx_business_categories_name ON business_categories(name);
+CREATE INDEX idx_timeslots_id ON timeslots(id);
+CREATE INDEX idx_timeslots_start_time ON timeslots(start_time);
+CREATE INDEX idx_timeslots_end_time ON timeslots(end_time);
+CREATE INDEX idx_booking_timeslots_id ON booking_timeslots(id);
+CREATE INDEX idx_booking_timeslots_booking_id ON booking_timeslots(booking_id);
+CREATE INDEX idx_booking_timeslots_timeslot_id ON booking_timeslots(timeslot_id);
+
+
+-- initalization of timeslots table
+DO $$
+DECLARE
+    start_time TIME := '00:00:00';
+    end_time TIME := '23:30:00';
+    interval_duration INTERVAL := '30 minutes';
+    current_start TIME;
+BEGIN
+    current_start := start_time;
+    WHILE current_start < end_time LOOP
+        INSERT INTO timeslots (start_time, end_time)
+        VALUES (current_start, current_start + interval_duration);
+        current_start := current_start + interval_duration;
+    END LOOP;
+END $$;
 
 -- Add triggers for updated_at timestamps
 CREATE OR REPLACE FUNCTION update_updated_at_column()

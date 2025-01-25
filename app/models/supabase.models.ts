@@ -274,6 +274,13 @@ export interface PointsTransaction {
   created_at: string;
 }
 
+// Time Slot
+export interface TimeSlot {
+  id: string;
+  start_time: string;
+  end_time: string;
+}
+
 // Reward
 export interface Reward extends Timestamps {
   id: string;

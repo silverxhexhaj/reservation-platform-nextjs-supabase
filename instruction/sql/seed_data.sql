@@ -17,7 +17,6 @@ DELETE FROM business_gallery;
 DELETE FROM business_features;
 DELETE FROM businesses;
 DELETE FROM notifications;
-DELETE FROM clients;
 DELETE FROM reviews;
 DELETE FROM staff_services;
 DELETE FROM points_transactions;
@@ -59,15 +58,6 @@ INSERT INTO business_categories (name, display_name, sub_categories) VALUES
   ('hair_stylist', 'Hair Stylist', ARRAY['hair_stylist']),
   ('manicure', 'Manicure', ARRAY['manicure']);
 
-
-
--- Insert seed data for clients
-INSERT INTO clients (id, user_id, first_name, last_name, phone, created_at, updated_at) VALUES
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), 'John', 'Doe', '1234567890', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), 'Jane', 'Smith', '0987654321', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), 'Alice', 'Johnson', '1112223333', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), 'Bob', 'Brown', '4445556666', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), 'Charlie', 'Davis', '7778889999', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Insert seed data for locations
 INSERT INTO locations (id, name, address, city, state, country, postal_code, latitude, longitude, phone, is_main_location, is_active, timezone, created_at, updated_at) VALUES
@@ -118,12 +108,12 @@ INSERT INTO services (id, business_id, name, description, duration, base_price, 
 (uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Facial', 'Rejuvenating facial treatment', 30, 30.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Insert seed data for bookings
-INSERT INTO bookings (id, user_id, business_id, staff_id, service_id, booking_date, status, total_amount, notes, created_at, updated_at) VALUES
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), (SELECT id FROM businesses LIMIT 1 OFFSET 0), (SELECT id FROM business_staff LIMIT 1 OFFSET 0), (SELECT id FROM services LIMIT 1 OFFSET 0), NOW() + INTERVAL '1 day', 'confirmed', 20.00, 'First time customer', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), (SELECT id FROM businesses LIMIT 1 OFFSET 1), (SELECT id FROM business_staff LIMIT 1 OFFSET 1), (SELECT id FROM services LIMIT 1 OFFSET 1), NOW() + INTERVAL '2 days', 'confirmed', 25.00, 'Regular customer', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), (SELECT id FROM businesses LIMIT 1 OFFSET 2), (SELECT id FROM business_staff LIMIT 1 OFFSET 2), (SELECT id FROM services LIMIT 1 OFFSET 2), NOW() + INTERVAL '3 days', 'confirmed', 50.00, 'Special requests noted', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), (SELECT id FROM businesses LIMIT 1 OFFSET 3), (SELECT id FROM business_staff LIMIT 1 OFFSET 3), (SELECT id FROM services LIMIT 1 OFFSET 3), NOW() + INTERVAL '4 days', 'confirmed', 40.00, 'Follow-up session', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), (SELECT id FROM businesses LIMIT 1 OFFSET 4), (SELECT id FROM business_staff LIMIT 1 OFFSET 4), (SELECT id FROM services LIMIT 1 OFFSET 4), NOW() + INTERVAL '5 days', 'confirmed', 30.00, 'VIP customer', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO bookings (id, user_booked_id, business_id, staff_id, service_id, status, note, date, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), (SELECT id FROM businesses LIMIT 1 OFFSET 0), (SELECT id FROM business_staff LIMIT 1 OFFSET 0), (SELECT id FROM services LIMIT 1 OFFSET 0), 'confirmed', 'First time customer', NOW() + INTERVAL '1 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), (SELECT id FROM businesses LIMIT 1 OFFSET 1), (SELECT id FROM business_staff LIMIT 1 OFFSET 1), (SELECT id FROM services LIMIT 1 OFFSET 1), 'confirmed', 'Regular customer', NOW() + INTERVAL '2 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), (SELECT id FROM businesses LIMIT 1 OFFSET 2), (SELECT id FROM business_staff LIMIT 1 OFFSET 2), (SELECT id FROM services LIMIT 1 OFFSET 2), 'confirmed', 'Special requests noted', NOW() + INTERVAL '3 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), (SELECT id FROM businesses LIMIT 1 OFFSET 3), (SELECT id FROM business_staff LIMIT 1 OFFSET 3), (SELECT id FROM services LIMIT 1 OFFSET 3), 'confirmed', 'Follow-up session', NOW() + INTERVAL '4 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), (SELECT id FROM businesses LIMIT 1 OFFSET 4), (SELECT id FROM business_staff LIMIT 1 OFFSET 4), (SELECT id FROM services LIMIT 1 OFFSET 4), 'confirmed', 'VIP customer', NOW() + INTERVAL '5 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Insert seed data for payments
 INSERT INTO payments (id, booking_id, amount, status, payment_method, stripe_payment_id, created_at, updated_at) VALUES

@@ -3,13 +3,14 @@ import { Button } from "@/app/components/ui/button";
 import { Label } from "@/app/components/ui/label";
 import { format, isSameDay, isToday } from 'date-fns';
 import { cn } from "@/lib/utils";
-import { X, AlertCircle, ArrowLeft, ArrowRight } from "lucide-react";
+import { X, ArrowLeft, ArrowRight } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Category } from "@/app/models/supabase.models";
+import { TimeSlot } from "@/app/models/functions/timeslot.model";
 import { Service } from "@/app/models/functions/businessDetails.model";
 import { fetchStaffThatPerformsService } from "@/app/service/staff/staff.service";
 import { StaffPerformingService } from "@/app/models/functions/staffPerformingService.model";
-import { getAvailableDatesToBook } from "@/app/service/booking/booking.service";
+import { getAvailableDatesToBook, getAvailableTimeSlotsForGivenDate } from "@/app/service/booking/booking.service";
 
 
 interface BookingModalProps {
@@ -39,6 +40,7 @@ export function BookingModal({
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [availableDates, setAvailableDates] = useState<Date[]>([]);
+  const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([]);
 
   const timeSlotContainerRef = useRef<HTMLDivElement>(null);
 
@@ -61,6 +63,16 @@ export function BookingModal({
       fetchAvailableDates();
     }
   }, [selectedTeamMember, selectedServices]);
+
+  useEffect(() => {
+    const fetchAvailableTimeSlots = async () => {
+      const availableTimeSlots = await getAvailableTimeSlotsForGivenDate(businessId, selectedDate);
+      setAvailableTimeSlots(availableTimeSlots);
+    } 
+    if (selectedDate) {
+      fetchAvailableTimeSlots();
+    }
+  }, [selectedDate]);
 
   const steps = [
     { id: STEPS.SERVICES, title: "Select Services" },
@@ -191,7 +203,7 @@ export function BookingModal({
           <div className="space-y-6">
             <div className="flex flex-col space-y-2">
               <Label className="text-gray-700">Select Date</Label>
-              <div className={cn("overflow-x-scroll scrollbar-hide cursor-grab active:cursor-grabbing rounded-md")}>
+              <div className="overflow-x-scroll scrollbar-hide cursor-grab active:cursor-grabbing rounded-md">
                 <div className="flex space-x-2 w-max">
                   {
                     availableDates.map((date) => (
@@ -229,26 +241,26 @@ export function BookingModal({
               >
                 <div className="flex flex-wrap gap-2">
 
-                  { /*
-                  availableTimeSlots.length > 0 ? (
-                    availableTimeSlots.map((time) => (
-                      <Button
-                        key={time}
+                  {
+                    availableTimeSlots.length > 0 ? (
+                      availableTimeSlots.map((time) => (
+                        <Button
+                        key={time.timeslot_id}
                         variant="outline"
                         className={cn(
                           "flex-none px-4 select-none",
-                          selectedTime === time && "bg-black text-white hover:bg-gray-800"
+                          selectedTime === time.timeslot_id && "bg-black text-white hover:bg-gray-800"
                         )}
-                        onClick={() => setSelectedTime(time)}
+                        onClick={() => setSelectedTime(time.timeslot_id)}
                       >
-                        {time}
+                        {time.start_time.slice(0, -3)} - {time.end_time.slice(0, -3)}
                       </Button>
                     ))
                   ) : (
                     <div className="px-4 py-3 text-sm text-gray-500">
                       No available time slots for this date
                     </div>
-                  )*/}
+                  ) }
                 </div>
               </div>
             </div>
