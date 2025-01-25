@@ -38,7 +38,7 @@ export function BookingModal({
   const [currentStep, setCurrentStep] = useState(STEPS.SERVICES);
   const [staff, setStaff] = useState<StaffPerformingService[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [selectedTime, setSelectedTime] = useState<string>("");
+  const [selectedTime, setSelectedTime] = useState<TimeSlot | null>(null);
   const [availableDates, setAvailableDates] = useState<Date[]>([]);
   const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([]);
 
@@ -84,13 +84,13 @@ export function BookingModal({
   const canProceed = () => {
     switch (currentStep) {
       case STEPS.SERVICES:
-        return true; // Can proceed without selecting services
+        return true;
       case STEPS.TEAM:
-        return true;
+        return selectedTeamMember !== null;
       case STEPS.DATE_TIME:
-        return true;
+        return selectedDate && selectedTime;
       case STEPS.REVIEW:
-        return true;
+        return selectedServices.length > 0 && selectedTeamMember !== null && selectedDate && selectedTime;
       default:
         return false;
     }
@@ -249,9 +249,9 @@ export function BookingModal({
                         variant="outline"
                         className={cn(
                           "flex-none px-4 select-none",
-                          selectedTime === time.timeslot_id && "bg-black text-white hover:bg-gray-800"
+                          selectedTime?.timeslot_id === time.timeslot_id && "bg-black text-white hover:bg-gray-800"
                         )}
-                        onClick={() => setSelectedTime(time.timeslot_id)}
+                        onClick={() => setSelectedTime(time)}
                       >
                         {time.start_time.slice(0, -3)} - {time.end_time.slice(0, -3)}
                       </Button>
@@ -304,7 +304,7 @@ export function BookingModal({
                 </div>
                 <div className="flex justify-between mt-2">
                   <span className="text-gray-600">Time</span>
-                  <span className="font-medium">{selectedTime}</span>
+                  <span className="font-medium">{selectedTime?.start_time.slice(0, -3)} - {selectedTime?.end_time.slice(0, -3)}</span>
                 </div>
                 <div className="flex justify-between mt-2">
                   <span className="text-gray-600">Team Member</span>
