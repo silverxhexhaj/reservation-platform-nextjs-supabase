@@ -120,7 +120,15 @@ export interface Category extends Timestamps {
   id: string;
   name: string;
   display_name: string;
-  sub_categories: string[];
+}
+
+export interface SubCategory extends Timestamps {
+  id: string;
+  category_id: string;
+  name: string;
+  display_name: string;
+  description?: string | null;
+  is_active: boolean;
 }
 
 // Business

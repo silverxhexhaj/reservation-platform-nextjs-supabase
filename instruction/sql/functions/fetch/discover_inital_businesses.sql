@@ -18,8 +18,7 @@ BEGIN
                     'category', json_build_object(
                         'id', bc.id,
                         'name', bc.name,
-                        'display_name', bc.display_name,
-                        'sub_categories', bc.sub_categories
+                        'display_name', bc.display_name
                     ),
                     'price_range', b.price_range,
                     'is_premium', b.is_premium,
@@ -53,8 +52,7 @@ BEGIN
                     'category', json_build_object(
                         'id', bc.id,
                         'name', bc.name,
-                        'display_name', bc.display_name,
-                        'sub_categories', bc.sub_categories
+                        'display_name', bc.display_name
                     ),
                     'price_range', b.price_range,
                     'is_premium', b.is_premium,
@@ -88,8 +86,7 @@ BEGIN
                     'category', json_build_object(
                         'id', bc.id,
                         'name', bc.name,
-                        'display_name', bc.display_name,
-                        'sub_categories', bc.sub_categories
+                        'display_name', bc.display_name
                     ),
                     'price_range', b.price_range,
                     'is_premium', b.is_premium,
@@ -123,8 +120,7 @@ BEGIN
                     'category', json_build_object(
                         'id', bc.id,
                         'name', bc.name,
-                        'display_name', bc.display_name,
-                        'sub_categories', bc.sub_categories
+                        'display_name', bc.display_name
                     ),
                     'price_range', b.price_range,
                     'is_premium', b.is_premium,
@@ -158,8 +154,7 @@ BEGIN
                     'category', json_build_object(
                         'id', bc.id,
                         'name', bc.name,
-                        'display_name', bc.display_name,
-                        'sub_categories', bc.sub_categories
+                        'display_name', bc.display_name
                     ),
                     'price_range', b.price_range,
                     'is_premium', b.is_premium,

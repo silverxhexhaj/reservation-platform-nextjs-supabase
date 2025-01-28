@@ -30,6 +30,7 @@ DROP TABLE IF EXISTS staff_blocked_periods CASCADE;
 DROP TABLE IF EXISTS business_categories CASCADE;
 DROP TABLE IF EXISTS timeslots CASCADE;
 DROP TABLE IF EXISTS booking_timeslots CASCADE;
+DROP TABLE IF EXISTS sub_categories CASCADE;
 DROP TYPE IF EXISTS profile_type CASCADE;
 
 -- Drop enums if they exist
@@ -64,16 +65,27 @@ CREATE TYPE notification_type AS ENUM (
     'schedule_changed'
 );
 
+
 -- Business Categories table
 CREATE TABLE business_categories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(50) NOT NULL UNIQUE,
     display_name VARCHAR(100) NOT NULL,
-    sub_categories TEXT[],
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Sub Categories table
+CREATE TABLE sub_categories (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    category_id UUID REFERENCES business_categories(id) ON DELETE CASCADE,
+    name VARCHAR(50) NOT NULL,
+    display_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Notifications table
 CREATE TABLE notifications (
@@ -228,7 +240,7 @@ CREATE TABLE services (
     business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    category UUID REFERENCES business_categories(id),
+    sub_category UUID REFERENCES sub_categories(id),
     image_url TEXT DEFAULT NULL,
     duration INTEGER NOT NULL, -- in minutes
     base_price DECIMAL(10,2) NOT NULL,
@@ -283,7 +295,7 @@ CREATE TABLE deals (
     description TEXT,
     title TEXT,
     image_url TEXT,
-    category UUID REFERENCES business_categories(id),
+    sub_category UUID REFERENCES sub_categories(id),
     start_date TIMESTAMP WITH TIME ZONE NOT NULL,
     end_date TIMESTAMP WITH TIME ZONE NOT NULL,
     is_active BOOLEAN DEFAULT true,
@@ -479,6 +491,9 @@ CREATE INDEX idx_timeslots_end_time ON timeslots(end_time);
 CREATE INDEX idx_booking_timeslots_id ON booking_timeslots(id);
 CREATE INDEX idx_booking_timeslots_booking_id ON booking_timeslots(booking_id);
 CREATE INDEX idx_booking_timeslots_timeslot_id ON booking_timeslots(timeslot_id);
+CREATE INDEX idx_sub_categories_category_id ON sub_categories(category_id);
+CREATE INDEX idx_services_sub_category ON services(sub_category);
+CREATE INDEX idx_deals_sub_category ON deals(sub_category);
 
 
 -- initalization of timeslots table

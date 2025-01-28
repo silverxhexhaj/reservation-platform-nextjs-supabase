@@ -19,8 +19,7 @@ BEGIN
                 'category', json_build_object(
                     'id', bc.id,
                     'name', bc.name,
-                    'display_name', bc.display_name,
-                    'sub_categories', bc.sub_categories
+                    'display_name', bc.display_name
                 ),
                 'price_range', b.price_range,
                 'is_premium', b.is_premium,
@@ -64,8 +63,7 @@ BEGIN
                     'category', json_build_object(
                         'id', bc.id,
                         'name', bc.name,
-                        'display_name', bc.display_name,
-                        'sub_categories', bc.sub_categories
+                        'display_name', bc.display_name
                     ),
                     'price_range', b.price_range,
                     'is_premium', b.is_premium,
@@ -86,8 +84,9 @@ BEGIN
             INNER JOIN businesses b ON d.business_id = b.id
             LEFT JOIN locations l ON b.location_id = l.id
             LEFT JOIN business_categories bc ON b.category = bc.id
-            WHERE d.start_date <= CURRENT_DATE 
-            AND d.end_date >= CURRENT_DATE
+            WHERE d.start_date <= NOW() 
+            AND d.end_date >= NOW()
+            AND d.is_active = true
             LIMIT 5
         ),
         
@@ -102,8 +101,7 @@ BEGIN
                 'category', json_build_object(
                     'id', bc.id,
                     'name', bc.name,
-                    'display_name', bc.display_name,
-                    'sub_categories', bc.sub_categories
+                    'display_name', bc.display_name
                 ),
                 'price_range', b.price_range,
                 'is_premium', b.is_premium,
@@ -122,7 +120,7 @@ BEGIN
             FROM businesses b
             LEFT JOIN locations l ON b.location_id = l.id
             LEFT JOIN business_categories bc ON b.category = bc.id
-            WHERE b.created_at >= (CURRENT_DATE - INTERVAL '30 days')
+            WHERE b.created_at >= (NOW() - INTERVAL '30 days')
             LIMIT 5
         ),
         
@@ -148,8 +146,7 @@ BEGIN
                 'category', json_build_object(
                     'id', bc.id,
                     'name', bc.name,
-                    'display_name', bc.display_name,
-                    'sub_categories', bc.sub_categories
+                    'display_name', bc.display_name
                 ),
                 'price_range', b.price_range,
                 'is_premium', b.is_premium,

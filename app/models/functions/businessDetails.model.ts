@@ -1,4 +1,4 @@
-import { BusinessCategory, Category } from "../supabase.models";
+import { BusinessCategory, Category, SubCategory } from "../supabase.models";
 
 export interface Location {
     address: string;
@@ -67,6 +67,7 @@ export interface Service {
     duration: number;
     base_price: number;
     is_active: boolean;
+    sub_category: SubCategory;
 }
 
 export interface Product {
@@ -111,6 +112,7 @@ export interface Business {
     name: string;
     description: string;
     category: Category;
+    sub_categories: SubCategory[];
     price_range: string;
     phone: string;
     website_url: string;

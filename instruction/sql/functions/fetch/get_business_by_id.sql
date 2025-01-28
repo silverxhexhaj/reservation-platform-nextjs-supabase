@@ -14,8 +14,18 @@ BEGIN
                 'category', json_build_object(
                     'id', bc.id,
                     'name', bc.name,
-                    'display_name', bc.display_name,
-                    'sub_categories', bc.sub_categories
+                    'display_name', bc.display_name
+                ),
+                'sub_categories', (
+                    SELECT json_agg(
+                        json_build_object(
+                            'id', sc.id,
+                            'name', sc.name,
+                            'display_name', sc.display_name
+                        )
+                    )
+                    FROM sub_categories sc
+                    WHERE sc.category_id = bc.id
                 ),
                 'price_range', b.price_range,
                 'phone', b.phone,
@@ -138,10 +148,15 @@ BEGIN
                     'description', s.description,
                     'duration', s.duration,
                     'base_price', s.base_price,
-                    'is_active', s.is_active
+                    'sub_category', json_build_object(
+                        'id', sc.id,
+                        'name', sc.name,
+                        'display_name', sc.display_name
+                    )
                 )
             )
             FROM services s
+            LEFT JOIN sub_categories sc ON s.sub_category = sc.id
             WHERE s.business_id = b_id and s.is_active
         ), 
         'products', (
@@ -169,16 +184,15 @@ BEGIN
                     'original_price', d.original_price,
                     'image_url', d.image_url,
                     'now_price', d.now_price,
-                    'category', json_build_object(
-                        'id', bc.id,
-                        'name', bc.name,
-                        'display_name', bc.display_name,
-                        'sub_categories', bc.sub_categories
+                    'sub_category', json_build_object(
+                        'id', sc.id,
+                        'name', sc.name,
+                        'display_name', sc.display_name
                     )
                 )
             )
             FROM deals d
-            LEFT JOIN business_categories bc ON d.category = bc.id
+            LEFT JOIN sub_categories sc ON d.sub_category = sc.id
             WHERE d.business_id = b_id and d.is_active
         ),
         'additional_info', (    

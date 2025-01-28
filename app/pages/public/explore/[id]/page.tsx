@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { Header } from '@/app/components/Header';
 import { useLoadScript, GoogleMap, MarkerF } from '@react-google-maps/api';
 import Image from 'next/image';
 import { Button } from "@/app/components/ui/button";
-import { StarIcon, CheckCircle, Clock, Camera, ChevronDown, XCircle } from "lucide-react";
+import { StarIcon, CheckCircle, Clock, ChevronDown, XCircle } from "lucide-react";
 import { Stories } from '../../../../components/business/Stories';
 import { BookingModal } from "../../../../components/business/BookingModal";
 import { StaffDetailModal } from '../../../../components/business/StaffDetailModal';
@@ -18,6 +18,7 @@ import { ServiceItem } from '../../../../components/business/ServiceItem';
 import { ServiceOffer } from '@/app/components/ServiceOffer';
 import { BusinessGallery } from '@/app/components/business/BusinessGallery';
 import { isClient } from '@/app/service/auth.service';
+import { SubCategory } from '@/app/models/supabase.models';
 
 const scrollbarHideStyles = `
   .scrollbar-hide {
@@ -53,6 +54,9 @@ export default function BusinessDetailPage() {
   const [bookingItems, setBookingItems] = useState<BookingItem[]>([]);
   const [selectedServices, setSelectedServices] = useState<Service[]>([]);
 
+  const [filteredServices, setFilteredServices] = useState<Service[]>([]);
+  const [selectedSubCategory, setSelectedSubCategory] = useState<SubCategory | null>(null);
+
   const [isOpeningHoursOpen, setIsOpeningHoursOpen] = useState(false);
 
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -74,6 +78,11 @@ export default function BusinessDetailPage() {
           setIsBusinessOpen(currentTotalMinutes < endTotalMinutes);
         }
       }
+
+      if (businessData?.services) {
+        setFilteredServices(businessData.services);
+      }
+
       setBusiness(businessData);
     };
 
@@ -99,6 +108,13 @@ export default function BusinessDetailPage() {
   const removeFromBooking = (serviceId: string) => {
     setSelectedServices(prev => prev.filter(s => s.id !== serviceId));
     setBookingItems(prev => prev.filter(item => item.id !== serviceId));
+  };
+
+  const filterServicesByCategory = (sub_category: SubCategory) => {
+    setSelectedSubCategory(sub_category);
+    console.log(sub_category);
+    console.log(business?.services);
+    setFilteredServices(business?.services?.filter(service => service.sub_category.id === sub_category.id) ?? []);
   };
 
   
@@ -169,12 +185,13 @@ export default function BusinessDetailPage() {
                   <div className="relative">
                     <div className="flex items-center space-x-2 overflow-x-auto scrollbar-hide">
                       {
-                        business?.business?.category?.sub_categories?.map((category, index) => (
+                        business?.business?.sub_categories?.map((sub_category, index) => (
                           <button
                             key={index}
-                            className="flex-none px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 hover:bg-gray-100 text-gray-600 hover:text-gray-900"
+                            className={`flex-none px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${selectedSubCategory?.id === sub_category.id ? 'bg-gray-200 text-gray-900' : 'text-gray-600 hover:text-gray-900'}`}
+                            onClick={() => filterServicesByCategory(sub_category)}
                           >
-                            {category}
+                            {sub_category.display_name}
                           </button>
                         ))}
                     </div>
@@ -182,7 +199,7 @@ export default function BusinessDetailPage() {
                 </div>
 
                 <div className="flex flex-col gap-4 pt-6">
-                  {business?.services?.map((service) => {
+                  {filteredServices?.map((service) => {
                     const isSelected = selectedServices.some(s => s.id === service.id);
                     return (
                       <ServiceItem
@@ -296,7 +313,7 @@ export default function BusinessDetailPage() {
                   <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6">Opening Hours</h2>
                   <div className="bg-white rounded-lg border border-gray-200 p-6">
                     <div className="space-y-2">
-                      {business?.working_hours?.map((item, index) => (
+                      {business?.working_hours?.map((item) => (
                         <div key={item.day_of_week} className={`${today === item.day_of_week ? 'font-bold' : ''} flex justify-between text-sm`}>
                           <span className="text-gray-600">
                             {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][item.day_of_week]}
@@ -434,7 +451,7 @@ export default function BusinessDetailPage() {
                 onClose={() => setIsBookingModalOpen(false)}
                 selectedServices={selectedServices}
                 removeFromBooking={removeFromBooking}
-                category={business?.business?.category}
+                subCategories={business?.business?.sub_categories ?? []}
                 addToBooking={addToBooking}
                 businessId={id as string}
               />

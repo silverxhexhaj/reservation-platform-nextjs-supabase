@@ -64,7 +64,8 @@ BEGIN
           WHEN p_staff_id IS NOT NULL THEN 
             (SELECT SUM(end_time - start_time) FROM staff_hours)
           ELSE 
-            (SELECT SUM(end_time - start_time) FROM business_hours)
+            (SELECT SUM(end_time - start_time) FROM business_hours) * 
+            (SELECT COUNT(*) FROM business_staff WHERE business_id = p_business_id)
         END,
         '0'::interval
       )
