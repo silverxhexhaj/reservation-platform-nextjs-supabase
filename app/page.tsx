@@ -20,7 +20,7 @@ import { businessCategories } from '@/app/models/supabase.models';
 import { categoryToIcon, testimonials } from '@/data';
 import { BusinessCard } from './components/business/BusinessCard';
 import { OfferCard } from './components/OfferCard';
-import { containerVariants, itemVariants } from '@/app/models/transitionEffects.models';
+import { itemVariants } from '@/app/models/transitionEffects.models';
 import { fetchHomePageBusinesses } from './service/business/business.service';
 import { HomePageBusinesses } from './models/functions/homePageBusinesses.models';
 
@@ -281,7 +281,7 @@ export default function HomePage() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="py-16 bg-white"
+          className="py-16 bg-white max-w-screen-2xl mx-auto"
         >
           <div className="px-8">
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">

@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/app/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 
 interface NewTransactionDialogProps {
   open: boolean;

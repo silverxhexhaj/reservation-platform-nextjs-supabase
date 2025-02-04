@@ -6,7 +6,7 @@ import {
   Dialog, 
   DialogContent 
 } from "@/app/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 import { format } from 'date-fns';
 import { ChevronLeft, ChevronRight, X, Clock } from 'lucide-react';
 import Image from 'next/image';

@@ -7,7 +7,7 @@ import { Header } from '@/app/components/Header'
 import { motion } from 'framer-motion'
 import { Button } from '@/app/components/ui/button'
 import { ArrowRight, Star, Users, Building2, Trophy, Calendar, Shield } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/app/lib/supabase'
 import { containerVariants, itemVariants } from "@/app/models/transitionEffects.models";
 
 const teamMembers = [

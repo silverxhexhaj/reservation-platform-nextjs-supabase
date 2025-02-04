@@ -9,7 +9,7 @@ import {
   ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { Button } from "@/app/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 
 const menuItems = [
   { name: 'Dashboard', icon: Home, href: '/pages/private/business/partner' },

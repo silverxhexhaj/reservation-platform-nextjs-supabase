@@ -13,12 +13,12 @@ import {
   SelectValue,
 } from "@/app/components/ui/select";
 import { CalendarHeader } from "./components/CalendarHeader";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 import type { CalendarEvent, TimeSlot, BusinessHours, Staff } from '@/app/types/calendar';
 import { 
   generateTimeSlots, 
   getDefaultBusinessHours
-} from '@/lib/calendar-utils';
+} from '@/app/lib/calendar-utils';
 import { CreateEventDialog } from './components/CreateEventDialog';
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import { ScrollArea } from "@/app/components/ui/scroll-area";

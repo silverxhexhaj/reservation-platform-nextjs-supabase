@@ -49,7 +49,9 @@ export default function BusinessDetailPage() {
   const [business, setBusiness] = useState<BusinessDetails | null>(null);
   const [isBusinessOpen, setIsBusinessOpen] = useState<boolean>(false);
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
-  const [disableBookingButton, setDisableBookingButton] = useState<boolean>(false);
+  const [disableBookingButton, setDisableBookingButton] = useState<boolean>(true);
+
+  const [businsessRating, setBusinsessRating] = useState<number | null>(null);
 
   const [bookingItems, setBookingItems] = useState<BookingItem[]>([]);
   const [selectedServices, setSelectedServices] = useState<Service[]>([]);
@@ -85,17 +87,19 @@ export default function BusinessDetailPage() {
 
       setBusiness(businessData);
     };
+    fetchBusinessDetails();
+  }, [id]);
 
+
+  useEffect(() => {
     const disableBookingButton = async () => {
       const isClientType = await isClient();
-      // const disableBookingButton = selectedServices.length === 0 && !isClientType;
 
-      setDisableBookingButton(false);
+      setDisableBookingButton(selectedServices.length === 0 || !isClientType);
     };
 
     disableBookingButton();
-    fetchBusinessDetails();
-  }, [id]);
+  }, [selectedServices]);
 
 
   const addToBooking = (service: any) => {
@@ -112,8 +116,6 @@ export default function BusinessDetailPage() {
 
   const filterServicesByCategory = (sub_category: SubCategory) => {
     setSelectedSubCategory(sub_category);
-    console.log(sub_category);
-    console.log(business?.services);
     setFilteredServices(business?.services?.filter(service => service.sub_category.id === sub_category.id) ?? []);
   };
 
@@ -142,7 +144,7 @@ export default function BusinessDetailPage() {
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center bg-white/20 rounded-full px-3 py-1">
                       <StarIcon className="w-4 lg:w-5 h-4 lg:h-5 text-yellow-400 mr-1" />
-                      {/* <span className="text-sm lg:text-lg font-semibold">{business?.business?.rating?.toFixed(1) ?? ''}</span> */}
+                      <span className="text-sm lg:text-lg font-semibold">{ businsessRating ?? ''}</span>
                     </div>
                     <div className="flex items-center bg-white/20 rounded-full px-3 py-1">
                       <span className="text-sm lg:text-lg font-semibold">
@@ -278,7 +280,7 @@ export default function BusinessDetailPage() {
               {/* Reviews Section */}
               <section>
                 <h2 className="text-3xl font-semibold text-gray-950 pb-6 pt-6">Reviews</h2>
-                <Reviews businessId={id as string} />
+                <Reviews businessId={id as string} setBusinsessRating={setBusinsessRating} />
               </section>
 
               {/* About Section */}

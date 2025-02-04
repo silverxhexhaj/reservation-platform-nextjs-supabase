@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/app/components/ui/select";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 import { format } from "date-fns";
 import { CreateClientDialog } from './components/CreateClientDialog';
 import type { Client } from './types';

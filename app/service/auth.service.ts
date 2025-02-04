@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/app/lib/supabase';
 import { AuthState } from '@/app/models/auth.models';
 
 let authState: AuthState = {
@@ -61,9 +61,10 @@ async function signOut() {
   }
 }
 
-function getUser() {
+export function getUser() {
   return authState.user;
 }
+
 
 function isAuthenticated() {
   return !!authState.user;

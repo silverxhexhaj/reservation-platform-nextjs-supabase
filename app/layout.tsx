@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { FooterWrapper } from './components/FooterWrapper'
 import { sharedMetadata, sharedViewport } from './config/shared-metadata'
+import { Toaster } from './components/ui/toaster'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -31,6 +32,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body className={inter.className} suppressHydrationWarning>
+        <Toaster />
         <div className="min-h-screen flex flex-col">
           <div className="flex-grow">
             {children}

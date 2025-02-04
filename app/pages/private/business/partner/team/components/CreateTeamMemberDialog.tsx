@@ -15,7 +15,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import { Separator } from "@/app/components/ui/separator";
 import { TeamMember } from "../types";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 import { CalendarIcon, CheckIcon, ChevronsUpDown, User } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/app/components/ui/calendar";

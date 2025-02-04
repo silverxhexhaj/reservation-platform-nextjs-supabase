@@ -1,6 +1,6 @@
 'use client'
 
-import { StarIcon, ThumbsUp, MessageCircle } from "lucide-react";
+import { StarIcon } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/app/components/ui/button";
 import { format } from "date-fns";
@@ -10,18 +10,20 @@ import { useEffect, useState } from "react";
 
 interface ReviewsProps {
   businessId: string;
+  setBusinsessRating: (rating: number) => void;
 }
 
-export function Reviews({ businessId }: ReviewsProps) {
+export function Reviews({ businessId, setBusinsessRating }: ReviewsProps) {
   
-  const [reviews, setReviews] = useState<TotalReviews | null>(null);
   const [page, setPage] = useState(1);
+  const [reviews, setReviews] = useState<TotalReviews | null>(null);
 
 
   useEffect(() => {
     const fetchReviews = async () => {
       const reviews = await fetchBusinessReviews(businessId, page, 25);
       setReviews(reviews);
+      setBusinsessRating(reviews?.average_rating ?? 0);
     };
     fetchReviews();
   }, [businessId, page]);

@@ -27,7 +27,7 @@ import {
 } from "@/app/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import { format } from 'date-fns';
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 
 interface Notification {

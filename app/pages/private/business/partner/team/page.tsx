@@ -21,7 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/app/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 import { CreateTeamMemberDialog } from './components/CreateTeamMemberDialog';
 import { ManageRolesDialog } from './components/ManageRolesDialog';
 import type { TeamMember } from './types';

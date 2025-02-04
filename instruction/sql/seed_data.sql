@@ -1,6 +1,7 @@
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+-- Delete records in reverse order of foreign key dependencies
 DELETE FROM working_hours;
 DELETE FROM payments;
 DELETE FROM bookings;
@@ -12,17 +13,18 @@ DELETE FROM campaigns;
 DELETE FROM products;
 DELETE FROM services;
 DELETE FROM business_staff;
-DELETE FROM locations;
 DELETE FROM business_gallery;
 DELETE FROM business_features;
-DELETE FROM businesses;
+DELETE FROM business_story;
+DELETE FROM additional_info;
+DELETE FROM businesses;  -- Delete businesses before locations since businesses reference locations
+DELETE FROM locations;
 DELETE FROM notifications;
 DELETE FROM reviews;
 DELETE FROM staff_services;
 DELETE FROM points_transactions;
 DELETE FROM profiles;
 DELETE FROM business_categories;
-
 
 -- Insert 5 users in auth.users manually 
 
@@ -132,12 +134,13 @@ INSERT INTO services (id, business_id, name, description, duration, base_price, 
 (uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Facial', 'Rejuvenating facial treatment', 30, 30.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 3), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Insert seed data for bookings
-INSERT INTO bookings (id, user_booked_id, business_id, staff_id, service_id, status, note, date, created_at, updated_at) VALUES
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), (SELECT id FROM businesses LIMIT 1 OFFSET 0), (SELECT id FROM business_staff LIMIT 1 OFFSET 0), (SELECT id FROM services LIMIT 1 OFFSET 0), 'confirmed', 'First time customer', NOW() + INTERVAL '1 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), (SELECT id FROM businesses LIMIT 1 OFFSET 1), (SELECT id FROM business_staff LIMIT 1 OFFSET 1), (SELECT id FROM services LIMIT 1 OFFSET 1), 'confirmed', 'Regular customer', NOW() + INTERVAL '2 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), (SELECT id FROM businesses LIMIT 1 OFFSET 2), (SELECT id FROM business_staff LIMIT 1 OFFSET 2), (SELECT id FROM services LIMIT 1 OFFSET 2), 'confirmed', 'Special requests noted', NOW() + INTERVAL '3 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), (SELECT id FROM businesses LIMIT 1 OFFSET 3), (SELECT id FROM business_staff LIMIT 1 OFFSET 3), (SELECT id FROM services LIMIT 1 OFFSET 3), 'confirmed', 'Follow-up session', NOW() + INTERVAL '4 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), (SELECT id FROM businesses LIMIT 1 OFFSET 4), (SELECT id FROM business_staff LIMIT 1 OFFSET 4), (SELECT id FROM services LIMIT 1 OFFSET 4), 'confirmed', 'VIP customer', NOW() + INTERVAL '5 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO bookings (id, user_booked_id, business_id, staff_id, status, note, date, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 0), (SELECT id FROM businesses LIMIT 1 OFFSET 0), (SELECT id FROM business_staff LIMIT 1 OFFSET 0), 'confirmed', 'First time customer', NOW() + INTERVAL '1 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 1), (SELECT id FROM businesses LIMIT 1 OFFSET 1), (SELECT id FROM business_staff LIMIT 1 OFFSET 1), 'confirmed', 'Regular customer', NOW() + INTERVAL '2 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 2), (SELECT id FROM businesses LIMIT 1 OFFSET 2), (SELECT id FROM business_staff LIMIT 1 OFFSET 2), 'confirmed', 'Special requests noted', NOW() + INTERVAL '3 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 3), (SELECT id FROM businesses LIMIT 1 OFFSET 3), (SELECT id FROM business_staff LIMIT 1 OFFSET 3), 'confirmed', 'Follow-up session', NOW() + INTERVAL '4 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), (SELECT id FROM businesses LIMIT 1 OFFSET 4), (SELECT id FROM business_staff LIMIT 1 OFFSET 4), 'confirmed', 'VIP customer', NOW() + INTERVAL '5 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
 
 -- Insert seed data for payments
 INSERT INTO payments (id, booking_id, amount, status, payment_method, stripe_payment_id, created_at, updated_at) VALUES

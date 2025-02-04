@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { DatePickerWithRange } from "@/app/components/ui/date-range-picker";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 
 interface Payment {
   id: string;

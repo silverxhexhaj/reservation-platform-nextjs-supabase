@@ -1,5 +1,5 @@
 import { Button } from "@/app/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 import { Service } from "@/app/models/functions/businessDetails.model";
 import { SubCategory } from "@/app/models/supabase.models";
 

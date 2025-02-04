@@ -1,5 +1,5 @@
 import { TotalReviews } from "@/app/models/functions/reviews.models";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/app/lib/supabase";
 
 export async function fetchBusinessReviews(businessId: string, pageNumber: number, pageSize: number): Promise<TotalReviews> {
     const { data, error } = await supabase.rpc('get_business_reviews', { b_id: businessId, page_number: pageNumber, page_size: pageSize })

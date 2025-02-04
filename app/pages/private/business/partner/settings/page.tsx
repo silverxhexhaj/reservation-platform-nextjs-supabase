@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from "@/app/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 import { BusinessInfoSection } from './BusinessInfoSection';
 import { ExternalLinksSection } from './ExternalLinksSection';
 import { LocationSection } from './LocationSection';

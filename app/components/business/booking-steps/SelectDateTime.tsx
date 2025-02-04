@@ -1,7 +1,7 @@
 import { Button } from "@/app/components/ui/button";
 import { Label } from "@/app/components/ui/label";
 import { format, isSameDay, isToday } from 'date-fns';
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 import { TimeSlot } from "@/app/models/functions/timeslot.model";
 import { useRef } from "react";
 
@@ -57,12 +57,12 @@ export function SelectDateTime({
       </div>
 
       <div className="flex flex-col space-y-2">
-        <Label className="text-gray-700">Select Time</Label>
+        <Label className="text-gray-700">Select Start Time</Label>
         <div
           ref={timeSlotContainerRef}
           className="overflow-x-scroll scrollbar-hide rounded-md"
         >
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col gap-2">
             {availableTimeSlots.length > 0 ? (
               availableTimeSlots.map((time) => (
                 <Button
@@ -74,7 +74,7 @@ export function SelectDateTime({
                   )}
                   onClick={() => setSelectedTime(time)}
                 >
-                  {time.start_time.slice(0, -3)} - {time.end_time.slice(0, -3)}
+                  {time.start_time.slice(0, -3)}
                 </Button>
               ))
             ) : (

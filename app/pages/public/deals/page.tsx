@@ -23,7 +23,6 @@ import {
 } from "@/app/components/ui/sheet";
 import { Slider } from "@/app/components/ui/slider";
 import { Badge } from "@/app/components/ui/badge";
-import { FeaturedDealCard } from "@/app/components/FeaturedDealCard";
 import { businessCategories } from "@/app/models/supabase.models";
 
 // Get unique categories from businesses

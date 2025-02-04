@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from "@/app/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 import { 
   DollarSign, 
   CreditCard, 

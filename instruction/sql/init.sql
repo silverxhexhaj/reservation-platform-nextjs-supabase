@@ -352,14 +352,21 @@ CREATE TABLE bookings (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_booked_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
-    staff_id UUID REFERENCES business_staff(id) ON DELETE CASCADE,
-    service_id UUID REFERENCES services(id) ON DELETE CASCADE,
+    staff_id UUID REFERENCES business_staff(id) DEFAULT NULL,
     deal_id UUID REFERENCES deals(id) DEFAULT NULL,
     status booking_status DEFAULT 'pending',
     date DATE NOT NULL,
     note TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE booking_services (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    booking_id UUID REFERENCES bookings(id) ON DELETE CASCADE,
+    service_id UUID REFERENCES services(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (booking_id, service_id)
 );
 
 -- Timeslots table
@@ -455,7 +462,6 @@ CREATE INDEX idx_deals_campaign ON deals(campaign_id);
 CREATE INDEX idx_bookings_user ON bookings(user_booked_id);
 CREATE INDEX idx_bookings_business ON bookings(business_id);
 CREATE INDEX idx_bookings_staff ON bookings(staff_id);
-CREATE INDEX idx_bookings_service ON bookings(service_id);
 CREATE INDEX idx_bookings_deal ON bookings(deal_id);
 CREATE INDEX idx_payments_booking ON payments(booking_id);
 CREATE INDEX idx_loyalty_points_user ON loyalty_points(user_id);
@@ -494,7 +500,8 @@ CREATE INDEX idx_booking_timeslots_timeslot_id ON booking_timeslots(timeslot_id)
 CREATE INDEX idx_sub_categories_category_id ON sub_categories(category_id);
 CREATE INDEX idx_services_sub_category ON services(sub_category);
 CREATE INDEX idx_deals_sub_category ON deals(sub_category);
-
+CREATE INDEX idx_booking_services_booking_id ON booking_services(booking_id);
+CREATE INDEX idx_booking_services_service_id ON booking_services(service_id);
 
 -- initalization of timeslots table
 DO $$

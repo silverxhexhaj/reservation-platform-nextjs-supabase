@@ -1,18 +1,22 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/app/components/ui/dialog";
 import { Button } from "@/app/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 import { useState, useEffect } from "react";
 import { SubCategory } from "@/app/models/supabase.models";
 import { TimeSlot } from "@/app/models/functions/timeslot.model";
 import { Service } from "@/app/models/functions/businessDetails.model";
 import { fetchStaffThatPerformsService } from "@/app/service/staff/staff.service";
 import { StaffPerformingService } from "@/app/models/functions/staffPerformingService.model";
-import { getAvailableDatesToBook, getAvailableTimeSlotsForGivenDate } from "@/app/service/booking/booking.service";
+import { createBooking, getAvailableDatesToBook, getAvailableTimeSlotsForGivenDate } from "@/app/service/booking/booking.service";
 import { SelectServices } from "./booking-steps/SelectServices";
 import { SelectTeam } from "./booking-steps/SelectTeam";
 import { SelectDateTime } from "./booking-steps/SelectDateTime";
 import { ReviewBooking } from "./booking-steps/ReviewBooking";
+import { useToast } from "@/app/hooks/use-toast";
+import { getUser } from "@/app/service/auth.service";
+import { format } from "date-fns";
+
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -42,7 +46,9 @@ export function BookingModal({
   const [availableDates, setAvailableDates] = useState<Date[]>([]);
   const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([]);
   const [selectedTeamMember, setSelectedTeamMember] = useState<StaffPerformingService | null>(null);
-
+  const [note, setNote] = useState<string>('');
+  
+  const { toast } = useToast()
 
   useEffect(() => {
     const fetchAvailableDates = async () => {
@@ -130,10 +136,44 @@ export function BookingModal({
             selectedDate={selectedDate}
             selectedTime={selectedTime}
             selectedTeamMember={selectedTeamMember}
+            note={note}
+            setNote={setNote}
           />
         );
     }
   };
+
+  const handleBooking = async () => {
+    const userBookedId = await getUser()?.id;
+
+    if (!userBookedId) {
+      toast({
+        title: "Error",
+        description: "Please login to book",
+        variant: "destructive",
+      })
+      return;
+    }
+
+    const bookingId = await createBooking(
+      userBookedId, 
+      businessId, 
+      selectedTeamMember?.staff_id ?? null,   
+      selectedServices.map(service => service.id),
+      selectedTime?.id ?? null, 
+      format(selectedDate, 'yyyy-MM-dd'), 
+      note
+    );
+
+    if (bookingId) {
+      toast({
+        title: "Booking created successfully",
+        description: "Your booking has been created successfully",
+        variant: "default",
+      })
+      onClose();
+    }
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -183,7 +223,7 @@ export function BookingModal({
               <Button
                 onClick={() => {
                   if (currentStep === steps.length - 1) {
-                    // handleBooking();
+                    handleBooking();
                   } else {
                     setCurrentStep(currentStep + 1);
                   }

@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/components/ui/table";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 
 const DAYS_OF_WEEK = [
   'Monday',

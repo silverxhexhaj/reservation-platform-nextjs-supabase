@@ -9,7 +9,7 @@ import { Textarea } from '@/app/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select";
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/app/lib/supabase';
 import Link from 'next/link';
 import { businessCategories } from '@/app/models/supabase.models';
 

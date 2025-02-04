@@ -12,7 +12,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { BusinessCategory, businessCategories } from "@/app/models/supabase.models";
 import { containerVariants, itemVariants } from "@/app/models/transitionEffects.models";
-import { categoryBackgrounds, categoryBorders } from "@/lib/color.utils";
+import { categoryBackgrounds, categoryBorders } from "@/app/lib/color.utils";
 
 export default function ExplorePage({
   searchParams,

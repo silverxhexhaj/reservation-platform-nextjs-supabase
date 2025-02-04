@@ -2,7 +2,7 @@ import { CheckCircle, PlusCircle } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { useState } from "react";
 import { ServiceDetailsModal } from "./ServiceDetailsModal";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 
 interface ServiceItemProps {
   name: string;

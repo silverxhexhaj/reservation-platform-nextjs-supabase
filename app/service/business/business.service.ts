@@ -1,5 +1,5 @@
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/app/lib/supabase';
 import { BusinessSummary, LoadInitialBusinessesResponse } from '@/app/models/functions/businessSummary.model'
 import { HomePageBusinesses } from '@/app/models/functions/homePageBusinesses.models'
 import { BusinessDetails } from '@/app/models/functions/businessDetails.model'
