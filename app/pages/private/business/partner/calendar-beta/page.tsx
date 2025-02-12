@@ -1,11 +1,10 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
+import { useState, useRef } from "react";
+import { Card, CardContent, CardHeader } from "@/app/components/ui/card";
 import { Heading } from "@/app/components/ui/heading";
 import { Separator } from "@/app/components/ui/separator";
 import { Button } from "@/app/components/ui/button";
-import { useState, useRef } from "react";
-import { format } from "date-fns";
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';

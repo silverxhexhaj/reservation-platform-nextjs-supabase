@@ -114,6 +114,11 @@ export default function BusinessDetailPage() {
     setBookingItems(prev => prev.filter(item => item.id !== serviceId));
   };
 
+  const clearSelectedItems = () => {
+    setSelectedServices([]);
+    setBookingItems([]);
+  };
+
   const filterServicesByCategory = (sub_category: SubCategory) => {
     setSelectedSubCategory(sub_category);
     setFilteredServices(business?.services?.filter(service => service.sub_category.id === sub_category.id) ?? []);
@@ -453,6 +458,7 @@ export default function BusinessDetailPage() {
                 onClose={() => setIsBookingModalOpen(false)}
                 selectedServices={selectedServices}
                 removeFromBooking={removeFromBooking}
+                clearSelectedItems={clearSelectedItems}
                 subCategories={business?.business?.sub_categories ?? []}
                 addToBooking={addToBooking}
                 businessId={id as string}

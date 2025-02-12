@@ -21,6 +21,7 @@ import { format } from "date-fns";
 interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
+  clearSelectedItems: () => void;
   selectedServices: Service[];
   removeFromBooking: (serviceName: string) => void;
   subCategories: SubCategory[];
@@ -33,6 +34,7 @@ const STEPS = { SERVICES: 0, TEAM: 1, DATE_TIME: 2, REVIEW: 3 };
 export function BookingModal({
   isOpen,
   onClose,
+  clearSelectedItems,
   selectedServices,
   removeFromBooking,
   subCategories,
@@ -143,6 +145,14 @@ export function BookingModal({
     }
   };
 
+  const flushState = () => {
+    clearSelectedItems();
+    setSelectedDate(new Date());
+    setSelectedTime(null);
+    setSelectedTeamMember(null);
+    setNote('');
+  }
+
   const handleBooking = async () => {
     const userBookedId = await getUser()?.id;
 
@@ -160,7 +170,7 @@ export function BookingModal({
       businessId, 
       selectedTeamMember?.staff_id ?? null,   
       selectedServices.map(service => service.id),
-      selectedTime?.id ?? null, 
+      selectedTime?.timeslot_id ?? null, 
       format(selectedDate, 'yyyy-MM-dd'), 
       note
     );
@@ -171,6 +181,8 @@ export function BookingModal({
         description: "Your booking has been created successfully",
         variant: "default",
       })
+
+      flushState();
       onClose();
     }
   }

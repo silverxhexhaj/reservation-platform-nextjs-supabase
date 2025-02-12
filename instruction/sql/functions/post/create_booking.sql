@@ -3,10 +3,10 @@ DROP FUNCTION IF EXISTS create_booking;
 CREATE OR REPLACE FUNCTION create_booking(
     p_user_id UUID,
     p_business_id UUID,
-    p_staff_id UUID DEFAULT NULL,
     p_service_ids UUID[],
     p_start_timeslot_id UUID,
     p_booking_date DATE, 
+    p_staff_id UUID DEFAULT NULL,
     p_note TEXT DEFAULT NULL
 ) RETURNS UUID AS $$
 DECLARE
@@ -59,7 +59,7 @@ BEGIN
     END LOOP;
 
     -- Insert booking timeslots
-    FOR i IN 1..(v_total_duration / 30) LOOP
+    FOR i IN 1..CEIL(v_total_duration::NUMERIC / 30) LOOP
         -- Check if timeslot is already booked
         PERFORM 1 
         FROM booking_timeslots 

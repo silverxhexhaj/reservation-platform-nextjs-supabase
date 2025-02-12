@@ -35,18 +35,19 @@ export async function createBooking(
     p_business_id: string,
     p_staff_id: string | null,
     p_service_ids: string[],
-    p_start_timeslot_id: string,
-    p_date: string,
-    p_note: string
+    p_start_timeslot_id: string | null,
+    p_booking_date: string,
+    p_note: string | null
 ) {
+
     const { data, error } = await supabase.rpc('create_booking', {
-        p_user_id: p_user_id,
-        p_business_id: p_business_id,
-        p_staff_id: p_staff_id,
-        p_service_ids: p_service_ids,
-        p_date: p_date,
-        p_start_timeslot_id: p_start_timeslot_id,
-        p_note: p_note
+        p_user_id,
+        p_business_id,
+        p_service_ids,
+        p_start_timeslot_id,
+        p_booking_date,
+        p_staff_id,
+        p_note
     });
 
 
