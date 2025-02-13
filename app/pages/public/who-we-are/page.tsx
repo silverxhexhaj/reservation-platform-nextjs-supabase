@@ -1,14 +1,13 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Card, CardContent } from '@/app/components/ui/card'
 import { Header } from '@/app/components/Header'
 import { motion } from 'framer-motion'
 import { Button } from '@/app/components/ui/button'
 import { ArrowRight, Star, Users, Building2, Trophy, Calendar, Shield } from 'lucide-react'
-import { supabase } from '@/app/lib/supabase'
 import { containerVariants, itemVariants } from "@/app/models/transitionEffects.models";
+import { AnimatedGradient } from '@/app/components/gradient/AnimatedGradient'
 
 const teamMembers = [
   {
@@ -56,24 +55,6 @@ const testimonials = [
   },
 ]
 
-const AnimatedGradient = () => {
-  return (
-    <motion.div
-      className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-800 to-pink-600"
-      animate={{
-        backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-      }}
-      transition={{
-        duration: 10,
-        repeat: Infinity,
-        ease: "linear"
-      }}
-      style={{
-        backgroundSize: '200% 200%',
-      }}
-    />
-  );
-};
 
 export default function WhoWeAre() {
   

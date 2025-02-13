@@ -52,7 +52,7 @@ export default function ExplorePage({
           animate="visible"
           className="space-y-6 md:space-y-8"
         >
-          {/* Hero Section */}
+        
           <motion.div
             variants={itemVariants}
             className={`h-[380px] relative mb-8 transition-colors duration-500 flex flex-col justify-center
@@ -74,7 +74,6 @@ export default function ExplorePage({
                 </Suspense>
               </motion.div>
 
-              {/* Categories Section */}
               <motion.div variants={itemVariants} className="w-full px-8">
                 <div className="flex overflow-x-auto md:overflow-x-visible pb-2 -mb-2 scrollbar-hide space-x-4 md:space-x-6">
                   <motion.div variants={itemVariants} custom={-1} className="flex-shrink-0">

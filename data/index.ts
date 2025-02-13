@@ -1,5 +1,3 @@
-import { ReactElement } from 'react';
-import { Scissors, Heart, Sun, Eye, Dumbbell, Syringe, Yoga, Flower2, Tooth, Activity, Stethoscope, Needle, Sparkles, Gem, Paintbrush, Zap } from 'lucide-react';
 import { BusinessCategory } from '@/app/models/supabase.models';
 
 // Types

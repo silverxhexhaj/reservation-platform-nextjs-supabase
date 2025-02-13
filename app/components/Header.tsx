@@ -95,6 +95,9 @@ export function Header() {
           <Link href="/pages/public/explore" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
             Discover
           </Link>
+          <Link href="/pages/public/deals" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
+            Deals
+          </Link>
           <Link href="/pages/public/who-we-are" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
             Who We Are?
           </Link>

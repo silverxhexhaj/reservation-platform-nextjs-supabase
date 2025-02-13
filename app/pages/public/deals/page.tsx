@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
-import { businesses } from "@/data/mock";
 import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
 import {
@@ -24,9 +23,10 @@ import {
 import { Slider } from "@/app/components/ui/slider";
 import { Badge } from "@/app/components/ui/badge";
 import { businessCategories } from "@/app/models/supabase.models";
+import { AnimatedGradient } from "@/app/components/gradient/AnimatedGradient";
 
 // Get unique categories from businesses
-const categories = Array.from(new Set(businesses.map(b => b.category)));
+const categories = Array.from(new Set());
 
 export default function DealsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -48,11 +48,11 @@ export default function DealsPage() {
   const hasActiveFilters = selectedCategory || priceRange[0] > 0 || priceRange[1] < 500 || minDiscount > 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-grow">
-        <div className="max-w-screen-2xl mx-auto px-4 py-8">
-          {/* Header Section */}
+      <main className="">
+        <div className="relative h-full flex items-center justify-center overflow-hidden bg-white pt-20">
+        <AnimatedGradient />
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">All Deals</h1>
             <p className="text-gray-600 mt-2">Discover the best offers from our partners</p>
@@ -114,12 +114,14 @@ export default function DealsPage() {
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent>
+                    {/* 
                     <SelectItem value="">All Categories</SelectItem>
                     {businessCategories.map((category: string) => (
                       <SelectItem key={category} value={category}>
                         {category}
                       </SelectItem>
                     ))}
+                        */}
                   </SelectContent>
                 </Select>
               </div>
@@ -133,8 +135,8 @@ export default function DealsPage() {
               {selectedCategory && (
                 <Badge variant="secondary" className="flex items-center gap-1">
                   {selectedCategory}
-                  <X 
-                    className="h-3 w-3 cursor-pointer" 
+                  <X
+                    className="h-3 w-3 cursor-pointer"
                     onClick={() => setSelectedCategory("")}
                   />
                 </Badge>
@@ -142,8 +144,8 @@ export default function DealsPage() {
               {(priceRange[0] > 0 || priceRange[1] < 500) && (
                 <Badge variant="secondary" className="flex items-center gap-1">
                   ${priceRange[0]} - ${priceRange[1]}
-                  <X 
-                    className="h-3 w-3 cursor-pointer" 
+                  <X
+                    className="h-3 w-3 cursor-pointer"
                     onClick={() => setPriceRange([0, 500])}
                   />
                 </Badge>
@@ -151,15 +153,15 @@ export default function DealsPage() {
               {minDiscount > 0 && (
                 <Badge variant="secondary" className="flex items-center gap-1">
                   Min {minDiscount}% off
-                  <X 
-                    className="h-3 w-3 cursor-pointer" 
+                  <X
+                    className="h-3 w-3 cursor-pointer"
                     onClick={() => setMinDiscount(0)}
                   />
                 </Badge>
               )}
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={clearFilters}
                 className="text-gray-500 hover:text-gray-700"
               >
@@ -184,9 +186,9 @@ export default function DealsPage() {
           {filteredDeals.length === 0 && (
             <div className="text-center py-12">
               <p className="text-gray-500">No deals found matching your criteria.</p>
-              <Button 
-                variant="outline" 
-                onClick={clearFilters} 
+              <Button
+                variant="outline"
+                onClick={clearFilters}
                 className="mt-4"
               >
                 Clear Filters
@@ -195,7 +197,6 @@ export default function DealsPage() {
           )}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
