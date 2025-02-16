@@ -1,6 +1,6 @@
 import { TimeSlot } from "@/app/models/functions/timeslot.model";
 import { Booking } from "@/app/models/supabase.models";
-import { supabase } from "@/app/lib/supabase";
+import { supabase } from "@/app/lib/supabase/client";
 
 export async function getAvailableDatesToBook(businessId: string, staffId?: string | null, serviceIds: string[] = []) {
     const { data, error } = await supabase.rpc('get_available_dates_to_book', {

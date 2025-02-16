@@ -1,5 +1,6 @@
-import { supabase } from '@/app/lib/supabase';
+import { supabase } from '@/app/lib/supabase/client';
 import { AuthState } from '@/app/models/auth.models';
+import { ProfileType } from '@/app/models/supabase.models';
 
 let authState: AuthState = {
     user: null,
@@ -62,15 +63,26 @@ async function signOut() {
 }
 
 export function getUser() {
+  if (!authState.user) {
+    initializeAuth();
+  }
+
   return authState.user;
 }
-
 
 function isAuthenticated() {
   return !!authState.user;
 }
 
-export async function isClient() {
+async function isPartner() {
+  return isUserType('staff');
+}
+
+async function isClient() {
+  return isUserType('client');
+}
+
+async function isUserType(type: ProfileType) {
   try {
     if (!getUser()) return false;
     
@@ -80,14 +92,15 @@ export async function isClient() {
       .eq('user_id', getUser()?.id)
       .single();
 
+    console.log(profile);
+
     if (error) throw error;
     
-    return profile?.profile_type === 'client';
+    return profile?.profile_type === type;
   } catch (error) {
     return false;
   }
 }
-
 
 function getAuthState() {
   return authState;
@@ -102,5 +115,7 @@ export const authService = {
   signOut,
   getUser,
   isAuthenticated,
-  getAuthState
+  getAuthState,
+  isPartner,
+  isClient,
 };

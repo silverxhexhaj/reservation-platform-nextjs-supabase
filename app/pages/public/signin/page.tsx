@@ -7,7 +7,7 @@ import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
 import Link from 'next/link';
-import { supabase } from '@/app/lib/supabase';
+import { supabase } from '@/app/lib/supabase/client';
 
 function SignInContent() {
   const router = useRouter();

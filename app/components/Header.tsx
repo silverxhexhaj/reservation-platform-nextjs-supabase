@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from "./ui/button";
-import { supabase } from '@/app/lib/supabase';
+import { supabase } from '@/app/lib/supabase/client';
 import { PlusCircle, Menu, X, User, Settings, HelpCircle, LogOut } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {

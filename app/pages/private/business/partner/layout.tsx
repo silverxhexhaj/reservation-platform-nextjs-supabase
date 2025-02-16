@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode, useState } from 'react';
-import PartnerNavigation from './PartnerNavigation';
+import PartnerNavigation from '../../../../components/navigation/PartnerNavigation';
 import { PartnerHeader } from './components/PartnerHeader';
 import { Menu, X } from 'lucide-react';
 
