@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/app/components/ui/card'
 import { Header } from '@/app/components/Header'
 import { motion } from 'framer-motion'
 import { Button } from '@/app/components/ui/button'
-import { ArrowRight, Star, Users, Building2, Trophy, Calendar, Shield } from 'lucide-react'
+import { ArrowRight, Star, Users, Building2, Trophy, Calendar, Shield, Instagram, Facebook, Music } from 'lucide-react'
 import { containerVariants, itemVariants } from "@/app/models/transitionEffects.models";
 import { AnimatedGradient } from '@/app/components/gradient/AnimatedGradient'
 
@@ -53,8 +53,46 @@ const testimonials = [
     role: "Spa Director",
     image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"
   },
+  {
+    quote: "I've tried many booking platforms, but this one stands out. The interface is intuitive and the customer service is exceptional.",
+    author: "Emily Chen",
+    role: "Regular Customer",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+    rating: 5
+  },
+  {
+    quote: "The platform has completely transformed how I manage my appointments. It's a must-have for any beauty professional.",
+    author: "David Wilson",
+    role: "Barber Shop Owner",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+    rating: 5
+  },
+  {
+    quote: "Outstanding service and support. The team goes above and beyond to ensure everything runs smoothly.",
+    author: "Sophie Martinez",
+    role: "Wellness Center Manager",
+    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1061&q=80",
+    rating: 5
+  }
 ]
 
+const socialProof = [
+  {
+    platform: "Instagram",
+    followers: "100K+",
+    handle: "@beautywellness"
+  },
+  {
+    platform: "Facebook",
+    followers: "50K+",
+    handle: "@beautywellness"
+  },
+  {
+    platform: "TikTok",
+    followers: "200K+",
+    handle: "@beautywellness"
+  }
+]
 
 export default function WhoWeAre() {
   
@@ -283,6 +321,59 @@ export default function WhoWeAre() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </motion.section>
+
+      {/* Social Proof Section */}
+      <motion.section
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="py-20 bg-white"
+      >
+        <div className="container mx-auto px-4">
+          <motion.h2
+            variants={itemVariants}
+            className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900"
+          >
+            Join Our Community
+          </motion.h2>
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {socialProof.map((social, index) => (
+              <motion.div
+                key={index}
+                variants={itemVariants}
+                className="text-center p-6 rounded-xl border border-gray-200 hover:border-purple-500 transition-colors"
+              >
+                <div className="mb-4">
+                  {social.platform === "Instagram" && <Instagram className="w-8 h-8 mx-auto text-pink-500" />}
+                  {social.platform === "Facebook" && <Facebook className="w-8 h-8 mx-auto text-blue-600" />}
+                  {social.platform === "TikTok" && <Music className="w-8 h-8 mx-auto text-black" />}
+                </div>
+                <h3 className="font-semibold text-xl mb-2">{social.followers}</h3>
+                <p className="text-gray-600 mb-4">{social.platform} Followers</p>
+                <p className="text-sm font-medium text-gray-800">{social.handle}</p>
+              </motion.div>
+            ))}
+          </div>
+          <motion.div
+            variants={itemVariants}
+            className="mt-12 text-center flex gap-3 justify-center items-center sm:flex-row flex-col"
+          >
+            <Button variant="outline" className="border-pink-500 text-pink-500 hover:bg-pink-50">
+              <Instagram className="w-4 h-4 mr-2" />
+              Follow on Instagram
+            </Button>
+            <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
+              <Facebook className="w-4 h-4 mr-2" />
+              Like on Facebook
+            </Button>
+            <Button variant="outline" className="border-black text-black hover:bg-gray-50">
+              <Music className="w-4 h-4 mr-2" />
+              Follow on TikTok
+            </Button>
+          </motion.div>
         </div>
       </motion.section>
 
