@@ -83,25 +83,25 @@ export function Header() {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 will-change-height ${isScrolled || isMenuOpen ? 'bg-white h-20' : 'bg-transparent h-20'}`}>
-      <div className={`max-w-screen-2xl mx-auto px-6 flex justify-between items-center h-full transition-colors duration-300 ${isScrolled || isMenuOpen ? '' : ''}`}>
+      <div className={`px-16 flex justify-between items-center h-full transition-colors duration-300 ${isScrolled || isMenuOpen ? '' : ''}`}>
         <Link href="/" className={`text-4xl font-semibold lg:w-96 ${bebasNeue.className} ${isScrolled || isMenuOpen ? 'text-black' : 'text-white'}`}>
           NOOOR
         </Link>
         
         <div className="hidden lg:flex flex-1 justify-center items-center space-x-8">
-          <Link href="/" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
+          <Link href="/" className={`hover:text-gray-300 text-sm ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
             Home
           </Link>
-          <Link href="/pages/public/explore" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
+          <Link href="/pages/public/explore" className={`hover:text-gray-300 text-sm ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
             Discover
           </Link>
-          <Link href="/pages/public/deals" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
+          <Link href="/pages/public/deals" className={`hover:text-gray-300 text-sm ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
             Deals
           </Link>
-          <Link href="/pages/public/who-we-are" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
+          <Link href="/pages/public/who-we-are" className={`hover:text-gray-300 text-sm ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
             Who We Are?
           </Link>
-          <Link href="/pages/public/pricing" className={`hover:text-gray-300 ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
+          <Link href="/pages/public/pricing" className={`hover:text-gray-300 text-sm ${isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white'}`}>
             Pricing
           </Link>
         </div>
