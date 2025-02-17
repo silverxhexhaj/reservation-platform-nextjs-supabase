@@ -41,15 +41,10 @@ export default function ExplorePage({
   }, [searchParams.category, searchParams.search]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white">
-        <Header />
-      </div>
+    <div className="flex flex-col bg-white">
+      <Header />
       <main className="flex-grow pt-20">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
+        <div
           className="space-y-6 md:space-y-8"
         >
         
@@ -74,7 +69,7 @@ export default function ExplorePage({
                 </Suspense>
               </motion.div>
 
-              <motion.div variants={itemVariants} className="w-full px-8">
+              <motion.div variants={itemVariants} className="w-full px-16">
                 <div className="flex overflow-x-auto md:overflow-x-visible pb-2 -mb-2 scrollbar-hide space-x-4 md:space-x-6">
                   <motion.div variants={itemVariants} custom={-1} className="flex-shrink-0">
                     <Link href="/pages/public/explore" className="block w-[120px]">
@@ -121,7 +116,7 @@ export default function ExplorePage({
             </div>
           </motion.div>
 
-          <motion.div variants={itemVariants} className="w-full px-8">
+          <motion.div variants={itemVariants} className="w-full px-16">
             <Suspense fallback={<div>Loading businesses...</div>}>
               <BusinessesCollection searchParams={{
                 category: selectedCategory,
@@ -129,7 +124,7 @@ export default function ExplorePage({
               }} />
             </Suspense>
           </motion.div>
-        </motion.div>
+        </div>
       </main>
     </div>
   )
