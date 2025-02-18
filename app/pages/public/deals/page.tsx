@@ -14,15 +14,36 @@ import { motion } from "framer-motion";
 import { Command } from "@/app/components/ui/command";
 import { itemVariants } from "@/app/models/transitionEffects.models";
 import { useState, useEffect } from "react";
+import { DealCard } from "@/app/components/DealCard";
+
+// Add interface for Deal type
+interface Deal {
+  id: number;
+  title: string;
+  services: string[];
+  originalPrice: number;
+  category: string;
+  expiresAt: Date;
+  business: {
+    name: string;
+    rating: number;
+    reviews: number;
+    image: string;
+  };
+}
 
 // Static data for deals
 const DEALS = [
   {
     id: 1,
     title: "Summer Special Massage",
-    description: "60-minute relaxation massage with aromatherapy",
+    services: [
+      "60-minute relaxation massage",
+      "Aromatherapy treatment",
+      "Hot stone therapy",
+      "Foot reflexology"
+    ],
     originalPrice: 120,
-    discountedPrice: 89,
     category: "Wellness",
     expiresAt: new Date(Date.now() + 5 * 60 * 60 * 1000), // 5 hours from now
     business: {
@@ -35,9 +56,13 @@ const DEALS = [
   {
     id: 2,
     title: "Haircut & Style Package",
-    description: "Professional haircut, wash, and styling",
+    services: [
+      "Professional haircut",
+      "Deep conditioning treatment",
+      "Blow dry styling",
+      "Hair consultation"
+    ],
     originalPrice: 85,
-    discountedPrice: 59,
     category: "Hair",
     expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours from now
     business: {
@@ -50,9 +75,13 @@ const DEALS = [
   {
     id: 3,
     title: "Dental Cleaning Special",
-    description: "Complete dental cleaning and check-up",
+    services: [
+      "Complete dental cleaning",
+      "Dental check-up",
+      "X-rays",
+      "Fluoride treatment"
+    ],
     originalPrice: 200,
-    discountedPrice: 149,
     category: "Dental",
     expiresAt: new Date(Date.now() + 45 * 60 * 1000), // 45 minutes from now
     business: {
@@ -65,9 +94,13 @@ const DEALS = [
   {
     id: 4,
     title: "Full Body Facial",
-    description: "Luxurious facial treatment with premium products",
+    services: [
+      "Deep cleansing facial",
+      "Premium skincare products",
+      "Face massage",
+      "Hydration treatment"
+    ],
     originalPrice: 150,
-    discountedPrice: 99,
     category: "Beauty",
     expiresAt: new Date(Date.now() + 12 * 60 * 60 * 1000), // 12 hours from now
     business: {
@@ -80,9 +113,13 @@ const DEALS = [
   {
     id: 5,
     title: "Personal Training Sessions",
-    description: "5 sessions with certified personal trainer",
+    services: [
+      "5 one-hour training sessions",
+      "Fitness assessment",
+      "Customized workout plan",
+      "Nutrition consultation"
+    ],
     originalPrice: 300,
-    discountedPrice: 199,
     category: "Fitness",
     expiresAt: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days from now
     business: {
@@ -95,9 +132,13 @@ const DEALS = [
   {
     id: 6,
     title: "Teeth Whitening Treatment",
-    description: "Professional grade teeth whitening session",
+    services: [
+      "Professional whitening session",
+      "Dental cleaning",
+      "Sensitivity treatment",
+      "Take-home care kit"
+    ],
     originalPrice: 250,
-    discountedPrice: 175,
     category: "Dental",
     expiresAt: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000), // 20 days from now
     business: {
@@ -110,9 +151,13 @@ const DEALS = [
   {
     id: 7,
     title: "Hot Stone Massage",
-    description: "90-minute therapeutic hot stone massage",
+    services: [
+      "90-minute hot stone massage",
+      "Aromatherapy",
+      "Heat therapy",
+      "Stress relief treatment"
+    ],
     originalPrice: 160,
-    discountedPrice: 119,
     category: "Wellness",
     expiresAt: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000), // 25 days from now
     business: {
@@ -125,9 +170,13 @@ const DEALS = [
   {
     id: 8,
     title: "Hair Color & Highlights",
-    description: "Full color treatment with partial highlights",
+    services: [
+      "Full color treatment",
+      "Partial highlights",
+      "Toner application",
+      "Style finishing"
+    ],
     originalPrice: 180,
-    discountedPrice: 129,
     category: "Hair",
     expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
     business: {
@@ -140,9 +189,13 @@ const DEALS = [
   {
     id: 9,
     title: "CrossFit Membership",
-    description: "1-month unlimited CrossFit classes",
+    services: [
+      "1-month unlimited classes",
+      "Personal assessment",
+      "Nutrition guide",
+      "Community events access"
+    ],
     originalPrice: 200,
-    discountedPrice: 149,
     category: "Fitness",
     expiresAt: new Date(Date.now() + 35 * 24 * 60 * 60 * 1000), // 35 days from now
     business: {
@@ -155,9 +208,13 @@ const DEALS = [
   {
     id: 10,
     title: "Anti-Aging Facial",
-    description: "Premium anti-aging treatment with collagen boost",
+    services: [
+      "Collagen boost treatment",
+      "Anti-aging serum application",
+      "LED light therapy",
+      "Take-home skincare kit"
+    ],
     originalPrice: 180,
-    discountedPrice: 135,
     category: "Beauty",
     expiresAt: new Date(Date.now() + 40 * 24 * 60 * 60 * 1000), // 40 days from now
     business: {
@@ -170,9 +227,13 @@ const DEALS = [
   {
     id: 11,
     title: "Deep Tissue Massage",
-    description: "75-minute therapeutic deep tissue massage",
+    services: [
+      "75-minute deep tissue massage",
+      "Target area focus",
+      "Heat therapy",
+      "Post-massage consultation"
+    ],
     originalPrice: 140,
-    discountedPrice: 99,
     category: "Wellness",
     expiresAt: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000), // 45 days from now
     business: {
@@ -185,9 +246,13 @@ const DEALS = [
   {
     id: 12,
     title: "Invisalign Consultation",
-    description: "Comprehensive consultation with 3D scanning",
+    services: [
+      "3D dental scanning",
+      "Treatment plan creation",
+      "Before/after simulation",
+      "Financial consultation"
+    ],
     originalPrice: 300,
-    discountedPrice: 199,
     category: "Dental",
     expiresAt: new Date(Date.now() + 50 * 24 * 60 * 60 * 1000), // 50 days from now
     business: {
@@ -207,23 +272,6 @@ const CATEGORIES = [
     icon: categoryToIcon[category as BusinessCategory]
   }))
 ];
-
-// Add interface for Deal type
-interface Deal {
-  id: number;
-  title: string;
-  description: string;
-  originalPrice: number;
-  discountedPrice: number;
-  category: string;
-  expiresAt: Date;
-  business: {
-    name: string;
-    rating: number;
-    reviews: number;
-    image: string;
-  };
-}
 
 // Add CountdownTimer component
 function CountdownTimer({ expiresAt }: { expiresAt: Date }) {
@@ -332,49 +380,9 @@ export default function DealsPage() {
             </div>
 
             {/* Deals Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-$ lg:grid-cols-5 gap-6 mb-12">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-12">
               {DEALS.map((deal) => (
-                <Card key={deal.id} className="group hover:shadow-lg transition-shadow cursor-pointer">
-                  <div className="relative h-48 w-full">
-                    <img
-                      src={deal.business.image}
-                      alt={deal.business.name}
-                      className="object-cover w-full h-full rounded-t-lg"
-                    />
-                    <div className="absolute bottom-3 left-3 z-10">
-                      <Badge variant="outline" className="rounded-full border transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 hover:bg-secondary/80 bg-white/90 backdrop-blur-sm text-neutral-900 border-neutral-200/50 font-medium text-xs flex items-center px-2 py-1">
-                        {deal.category}
-                      </Badge>
-                    </div>
-                    <CountdownTimer expiresAt={deal.expiresAt} />
-                  </div>
-                  <CardHeader className="p-3">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-xl">{deal.title}</CardTitle>
-                        <CardDescription className="text-sm mt-1">
-                          {deal.business.name}
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-3">
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">{deal.description}</p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl font-bold">${deal.discountedPrice}</span>
-                      <span className="text-gray-500 line-through text-sm">
-                        ${deal.originalPrice}
-                      </span>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="p-3">
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <span>⭐ {deal.business.rating}</span>
-                      <span>•</span>
-                      <span>{deal.business.reviews} reviews</span>
-                    </div>
-                  </CardFooter>
-                </Card>
+                <DealCard key={deal.id} deal={deal} />
               ))}
             </div>
           </div>
