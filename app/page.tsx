@@ -84,11 +84,11 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen font-sans bg-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <Header />
       <main className="relative">
         {/* Hero Section */}
-        <div className="p-16 pt-32 pb-12 w-full relative justify-center">
+        <div className="p-16 pt-32 pb-16 w-full relative justify-center">
           <motion.div
             className='relative z-10 flex flex-col space-y-12'
             variants={itemVariants}
@@ -96,21 +96,20 @@ export default function HomePage() {
             animate="visible"
           >
             <div className='flex flex-col justify-end items-center space-y-4 flex-1'>
-              <motion.div
-                variants={itemVariants}
+              <div
                 className="flex justify-center"
               >
                 <span className="px-4 py-1.5 bg-white bg-opacity-10 backdrop-blur-xs rounded-full text-white text-sm font-medium transition-all duration-300 hover:bg-opacity-20">
                   1# Choice in Albania
                 </span>
-              </motion.div>
-              <motion.div variants={itemVariants} className=''>
+              </div>
+              <div className=''>
                 <h1 className="text-3xl md:text-4xl font-bold mb-6 text-center text-white flex flex-col space-y-2">
                   <span>Discover, Book, Relax</span>
                   <span>Beauty and Wellness Made Easy.</span>
                 </h1>
-              </motion.div>
-              <motion.div variants={itemVariants} className="relative w-full md:w-[500px]">
+              </div>
+              <div className="relative w-full md:w-[500px]">
                 <div className="relative w-full flex items-center justify-center" ref={searchContainerRef}>
                   <Command className="rounded-full border bg-white shadow-md">
                     <div className="flex items-center px-3 space-x-2">
@@ -168,7 +167,7 @@ export default function HomePage() {
                     Search
                   </Button>
                 </div>
-              </motion.div>
+              </div>
             </div>
             {/* Categories Section */}
             <div
