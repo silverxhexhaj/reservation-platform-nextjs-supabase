@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { FooterWrapper } from './components/FooterWrapper'
 import { sharedMetadata, sharedViewport } from './config/shared-metadata'
-import { Toaster } from './components/ui/toaster'
+import { Toaster } from '@/app/components/ui/toaster'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -37,7 +37,6 @@ export default function RootLayout({
           <div className="flex-grow">
             {children}
           </div>
-          <FooterWrapper />
         </div>
       </body>
     </html>

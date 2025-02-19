@@ -23,14 +23,18 @@ const bebasNeue = Bebas_Neue({
   subsets: ['latin'],
 });
 
-export function Header() {
+interface HeaderProps {
+  isAlwaysScrolled?: boolean;
+}
+
+export function Header({ isAlwaysScrolled = false }: HeaderProps) {
   const [user, setUser] = useState<any>(null);
 
   const router = useRouter();
   const pathname = usePathname();
   
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(isAlwaysScrolled);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -48,6 +52,11 @@ export function Header() {
   }, []);
 
   useEffect(() => {
+    if (isAlwaysScrolled) {
+      setIsScrolled(true);
+      return;
+    }
+
     const handleScroll = () => {
       if (pathname?.includes('/explore')) {
         setIsScrolled(true);
@@ -60,7 +69,7 @@ export function Header() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [pathname]);
+  }, [pathname, isAlwaysScrolled]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -85,7 +94,7 @@ export function Header() {
     <header className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 will-change-height ${isScrolled || isMenuOpen ? 'bg-white h-20' : 'bg-transparent h-20'}`}>
       <div className={`px-16 flex justify-between items-center h-full transition-colors duration-300 ${isScrolled || isMenuOpen ? '' : ''}`}>
         <Link href="/" className={`text-4xl font-semibold lg:w-96 ${bebasNeue.className} ${isScrolled || isMenuOpen ? 'text-black' : 'text-white'}`}>
-          NOOOR
+          NURI
         </Link>
         
         <div className="hidden lg:flex flex-1 justify-center items-center space-x-8">
@@ -136,14 +145,18 @@ export function Header() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
-                    </DropdownMenuItem>
+                    <Link href="/pages/private/client/profile">
+                      <DropdownMenuItem>
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href="/pages/private/client/settings">
+                      <DropdownMenuItem>
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Settings</span>
+                      </DropdownMenuItem>
+                    </Link>
                     <DropdownMenuItem>
                       <HelpCircle className="mr-2 h-4 w-4" />
                       <span>Help Center</span>
@@ -236,14 +249,18 @@ export function Header() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
+                  <Link href="/pages/private/client/profile">
+                    <DropdownMenuItem>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/pages/private/client/settings">
+                    <DropdownMenuItem>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuItem>
                     <HelpCircle className="mr-2 h-4 w-4" />
                     <span>Help Center</span>
