@@ -46,15 +46,14 @@ BEGIN
         'special_offers', (
             SELECT ARRAY_AGG(json_build_object(
                 'deal', json_build_object(
-                    'id', d.id,
-                    'image_url', d.image_url,
-                    'description', d.description,
-                    'title', d.title,
-                    'start_date', d.start_date,
-                    'end_date', d.end_date,
-                    'original_price', d.original_price,
-                    'now_price', d.now_price,
-                    'is_active', d.is_active
+                    'id', s.id,
+                    'name', s.name,
+                    'image_url', s.image_url,
+                    'description', s.description,
+                    'start_date', s.start_date,
+                    'end_date', s.end_date,
+                    'price', s.price,
+                    'is_active', s.is_active
                 ),
                 'business', json_build_object(
                     'id', b.id,
@@ -80,13 +79,13 @@ BEGIN
                     'review_average', ROUND(CAST((SELECT COALESCE(AVG(rating), 0) FROM reviews r WHERE r.business_id = b.id) AS NUMERIC), 1)
                 )
             ))
-            FROM deals d
-            INNER JOIN businesses b ON d.business_id = b.id
+            FROM services s
+            INNER JOIN businesses b ON s.business_id = b.id
             LEFT JOIN locations l ON b.location_id = l.id
             LEFT JOIN business_categories bc ON b.category = bc.id
-            WHERE d.start_date <= NOW() 
-            AND d.end_date >= NOW()
-            AND d.is_active = true
+            WHERE s.start_date <= NOW() 
+            AND s.end_date >= NOW()
+            AND s.is_active = true
             LIMIT 5
         ),
         

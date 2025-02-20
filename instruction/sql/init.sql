@@ -1,6 +1,7 @@
 -- deprecated keeping for backwards compatibility
 DROP TABLE IF EXISTS staff_working_hours CASCADE;
 DROP TABLE IF EXISTS clients CASCADE;
+DROP TABLE IF EXISTS deals CASCADE;
 
 -- Drop tables if they exist (in reverse order of creation to handle dependencies)
 DROP TABLE IF EXISTS working_hours CASCADE;
@@ -9,7 +10,6 @@ DROP TABLE IF EXISTS bookings CASCADE;
 DROP TABLE IF EXISTS redeemed_rewards CASCADE;
 DROP TABLE IF EXISTS rewards CASCADE;
 DROP TABLE IF EXISTS loyalty_points CASCADE;
-DROP TABLE IF EXISTS deals CASCADE;
 DROP TABLE IF EXISTS campaigns CASCADE;
 DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS services CASCADE;
@@ -31,9 +31,10 @@ DROP TABLE IF EXISTS business_categories CASCADE;
 DROP TABLE IF EXISTS timeslots CASCADE;
 DROP TABLE IF EXISTS booking_timeslots CASCADE;
 DROP TABLE IF EXISTS sub_categories CASCADE;
-DROP TYPE IF EXISTS profile_type CASCADE;
+DROP TABLE IF EXISTS booking_services CASCADE;
 
 -- Drop enums if they exist
+DROP TYPE IF EXISTS profile_type CASCADE;
 DROP TYPE IF EXISTS payment_status CASCADE;
 DROP TYPE IF EXISTS booking_status CASCADE;
 DROP TYPE IF EXISTS campaign_status CASCADE;
@@ -243,7 +244,9 @@ CREATE TABLE services (
     sub_category UUID REFERENCES sub_categories(id),
     image_url TEXT DEFAULT NULL,
     duration INTEGER NOT NULL, -- in minutes
-    base_price DECIMAL(10,2) NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    start_date DATE DEFAULT NULL,
+    end_date DATE DEFAULT NULL,
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -284,24 +287,6 @@ CREATE TABLE campaigns (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Deals table
-CREATE TABLE deals (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
-    campaign_id UUID REFERENCES campaigns(id) ON DELETE CASCADE,
-    service_id UUID REFERENCES services(id) ON DELETE CASCADE,
-    original_price DECIMAL(10,2),
-    now_price DECIMAL(10,2),
-    description TEXT,
-    title TEXT,
-    image_url TEXT,
-    sub_category UUID REFERENCES sub_categories(id),
-    start_date TIMESTAMP WITH TIME ZONE NOT NULL,
-    end_date TIMESTAMP WITH TIME ZONE NOT NULL,
-    is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
 
 -- Loyalty points table
 CREATE TABLE loyalty_points (
@@ -353,7 +338,6 @@ CREATE TABLE bookings (
     user_booked_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
     staff_id UUID REFERENCES business_staff(id) DEFAULT NULL,
-    deal_id UUID REFERENCES deals(id) DEFAULT NULL,
     status booking_status DEFAULT 'pending',
     date DATE NOT NULL,
     note TEXT,
@@ -458,11 +442,9 @@ CREATE INDEX idx_staff_business ON business_staff(business_id);
 CREATE INDEX idx_services_business ON services(business_id);
 CREATE INDEX idx_products_business ON products(business_id);
 CREATE INDEX idx_campaigns_business ON campaigns(business_id);
-CREATE INDEX idx_deals_campaign ON deals(campaign_id);
 CREATE INDEX idx_bookings_user ON bookings(user_booked_id);
 CREATE INDEX idx_bookings_business ON bookings(business_id);
 CREATE INDEX idx_bookings_staff ON bookings(staff_id);
-CREATE INDEX idx_bookings_deal ON bookings(deal_id);
 CREATE INDEX idx_payments_booking ON payments(booking_id);
 CREATE INDEX idx_loyalty_points_user ON loyalty_points(user_id);
 CREATE INDEX idx_staff_working_hours ON working_hours(staff_id, day_of_week);
@@ -484,7 +466,6 @@ CREATE INDEX idx_business_gallery_business ON business_gallery(business_id);
 CREATE INDEX idx_business_gallery_featured ON business_gallery(business_id, is_featured) WHERE is_featured = true;
 CREATE INDEX idx_business_gallery_order ON business_gallery(business_id, sort_order);
 CREATE INDEX idx_profiles_user ON profiles(user_id);
-CREATE INDEX idx_deals_business_id ON deals(business_id);
 CREATE INDEX idx_additional_info_business_id ON additional_info(business_id);
 CREATE INDEX idx_additional_info_is_available ON additional_info(is_available);
 CREATE INDEX idx_business_story_business ON business_story(business_id);
@@ -499,7 +480,6 @@ CREATE INDEX idx_booking_timeslots_booking_id ON booking_timeslots(booking_id);
 CREATE INDEX idx_booking_timeslots_timeslot_id ON booking_timeslots(timeslot_id);
 CREATE INDEX idx_sub_categories_category_id ON sub_categories(category_id);
 CREATE INDEX idx_services_sub_category ON services(sub_category);
-CREATE INDEX idx_deals_sub_category ON deals(sub_category);
 CREATE INDEX idx_booking_services_booking_id ON booking_services(booking_id);
 CREATE INDEX idx_booking_services_service_id ON booking_services(service_id);
 
@@ -550,11 +530,6 @@ CREATE TRIGGER update_products_updated_at
 
 CREATE TRIGGER update_campaigns_updated_at
     BEFORE UPDATE ON campaigns
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_deals_updated_at
-    BEFORE UPDATE ON deals
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 

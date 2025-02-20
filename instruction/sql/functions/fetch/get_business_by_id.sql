@@ -128,7 +128,7 @@ BEGIN
                                 'name', s.name,
                                 'description', s.description,
                                 'duration', s.duration,
-                                'base_price', s.base_price
+                                'price', s.price
                             )
                         )
                         FROM staff_services ss
@@ -147,7 +147,8 @@ BEGIN
                     'name', s.name,
                     'description', s.description,
                     'duration', s.duration,
-                    'base_price', s.base_price,
+                    'price', s.price,                
+                    'is_active', s.is_active,
                     'sub_category', json_build_object(
                         'id', sc.id,
                         'name', sc.name,
@@ -176,14 +177,14 @@ BEGIN
         'offers', (
             SELECT json_agg(
                 json_build_object(
-                    'id', d.id,
-                    'name', d.title,
-                    'description', d.description,
-                    'start_date', d.start_date,
-                    'end_date', d.end_date,
-                    'original_price', d.original_price,
-                    'image_url', d.image_url,
-                    'now_price', d.now_price,
+                    'id', s.id,
+                    'name', s.name,
+                    'description', s.description,
+                    'start_date', s.start_date,
+                    'end_date', s.end_date,
+                    'price', s.price,
+                    'image_url', s.image_url,
+                    'is_active', s.is_active,
                     'sub_category', json_build_object(
                         'id', sc.id,
                         'name', sc.name,
@@ -191,9 +192,9 @@ BEGIN
                     )
                 )
             )
-            FROM deals d
-            LEFT JOIN sub_categories sc ON d.sub_category = sc.id
-            WHERE d.business_id = b_id and d.is_active
+            FROM services s
+            LEFT JOIN sub_categories sc ON s.sub_category = sc.id
+            WHERE s.business_id = b_id and s.is_active
         ),
         'additional_info', (    
             SELECT json_agg(

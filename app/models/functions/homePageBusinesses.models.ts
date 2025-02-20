@@ -15,11 +15,10 @@ export interface SpecialOffer {
 export interface DealSummary {
     id: string;
     description: string;
-    title: string; 
+    name: string; 
     start_date: string;
     end_date: string;
-    original_price: number;
-    now_price: number;
+    price: number;
     is_active: boolean;
     image_url: string;
 }

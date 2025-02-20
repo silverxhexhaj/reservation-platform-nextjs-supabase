@@ -17,13 +17,11 @@ export function ServiceOffer({
   onBook,
   selected_offer_id,
 }: ServiceOfferProps) {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    }).format(date);
+
+  const formatDate = (date: string) => {
+    const parts = date.split('-');
+    if (parts.length !== 3) return date;
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
   };
 
   return (
@@ -37,26 +35,14 @@ export function ServiceOffer({
         />
         <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500 line-through">
-              ${offer?.original_price ?? 0}
-            </span>
             <span className="text-lg font-bold text-red-600">
-              ${offer?.now_price ?? 0}
+              ${offer?.price ?? 0}
             </span>
           </div>
         </div>
       </div>
 
       <div className="p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Badge variant="destructive" className="bg-red-50 text-red-600 hover:bg-red-100">
-            {Math.round(((offer?.original_price ?? 0) - (offer?.now_price ?? 0)) / (offer?.original_price ?? 0) * 100)}% OFF
-          </Badge>
-          <Badge variant="outline">
-            {offer?.category?.display_name ?? ''}
-          </Badge>
-        </div>
-
         <h3 className="text-xl font-semibold mb-2">{offer?.name ?? ''}</h3>
         <p className="text-gray-600 mb-6">{offer?.description ?? ''}</p>
 

@@ -25,13 +25,10 @@ export function OfferCard({ offer, business }: OfferCardProps) {
                 <div className="relative aspect-[16/9] overflow-hidden">
                     <Image
                         src={offer.image_url}
-                        alt={offer.title}
+                        alt={offer.name}
                         fill
                         className="object-cover transition-transform duration-300 group-hover:scale-105"
                     />
-                    <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                        {Math.round(((offer.original_price - offer.now_price) / offer.original_price) * 100)}% OFF
-                    </div>
                     {business && (
                         <div className="absolute bottom-4 left-4 right-4">
                             <div className="bg-white/90 backdrop-blur-sm rounded-lg px-4 py-2 flex justify-between">
@@ -47,7 +44,7 @@ export function OfferCard({ offer, business }: OfferCardProps) {
 
                 {/* Content */}
                 <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{offer.title}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{offer.name}</h3>
                     <p className="text-sm text-gray-600 mb-4 min-h-[2.5rem] line-clamp-2">
                         {offer.description}
                     </p>
@@ -55,8 +52,7 @@ export function OfferCard({ offer, business }: OfferCardProps) {
                     {/* Price and CTA */}
                     <div className="flex items-end justify-between">
                         <div className="space-y-1">
-                            <p className="text-sm text-gray-500 line-through">${offer.original_price}</p>
-                            <p className="text-xl font-bold text-gray-900">${offer.now_price}</p>
+                            <p className="text-xl font-bold text-gray-900">${offer.price}</p>
                         </div>
                         <Button
                             variant="outline"

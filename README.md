@@ -39,3 +39,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 username: supabase
 password: this_password_is_insecure_and_should_be_updated
+
+
+--- 
+
+Talked with Silver 18.02.2025 and we agreed that:
+
+- a deal is just a service that has a start_date and end_date

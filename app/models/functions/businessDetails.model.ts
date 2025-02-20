@@ -85,10 +85,10 @@ export interface Offer {
     description: string;
     start_date: string;
     end_date: string;
-    original_price: number;
-    now_price: number;
+    price: number;
     image_url: string;
-    category: Category;
+    is_active: boolean;
+    sub_category: SubCategory;
 }
 
 export interface AdditionalInfo {

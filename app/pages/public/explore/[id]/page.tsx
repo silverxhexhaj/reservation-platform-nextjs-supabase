@@ -17,8 +17,8 @@ import { fetchBusinessById } from '@/app/service/business/business.service';
 import { ServiceItem } from '../../../../components/business/ServiceItem';
 import { ServiceOffer } from '@/app/components/ServiceOffer';
 import { BusinessGallery } from '@/app/components/business/BusinessGallery';
-import { isClient } from '@/app/service/auth.service';
 import { SubCategory } from '@/app/models/supabase.models';
+import { authService } from '@/app/service/auth.service';
 
 const scrollbarHideStyles = `
   .scrollbar-hide {
@@ -93,7 +93,7 @@ export default function BusinessDetailPage() {
 
   useEffect(() => {
     const disableBookingButton = async () => {
-      const isClientType = await isClient();
+      const isClientType = await authService.isClient();
 
       setDisableBookingButton(selectedServices.length === 0 || !isClientType);
     };
@@ -238,8 +238,8 @@ export default function BusinessDetailPage() {
                         offer={offer}
                         selected_offer_id={searchParams.get('offer') ?? ''}
                         onBook={() => {
-                          setSelectedServices(prev => [...prev, { name: offer.name, price: offer.now_price, categoryName: offer.category.display_name }]);
-                          setBookingItems(prev => [...prev, { name: offer.name, price: offer.now_price }]);
+                          setSelectedServices(prev => [...prev, { name: offer.name, price: offer.price, categoryName: offer.sub_category.display_name }]);
+                          setBookingItems(prev => [...prev, { name: offer.name, price: offer.price }]);
                         }}
                       />
                     ))}

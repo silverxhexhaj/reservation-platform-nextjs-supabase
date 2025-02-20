@@ -8,7 +8,6 @@ DELETE FROM bookings;
 DELETE FROM redeemed_rewards;
 DELETE FROM rewards;
 DELETE FROM loyalty_points;
-DELETE FROM deals;
 DELETE FROM campaigns;
 DELETE FROM products;
 DELETE FROM services;
@@ -110,28 +109,29 @@ INSERT INTO business_staff (id, business_id, user_id, position, is_active, creat
 (uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), (SELECT id FROM auth.users LIMIT 1 OFFSET 4), 'Staff', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
+
 -- Insert seed data for services
-INSERT INTO services (id, business_id, name, description, duration, base_price, is_active, sub_category, created_at, updated_at) VALUES
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Haircut', 'Professional haircut service', 30, 20.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 0), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Hair Coloring', 'Full hair coloring service', 120, 80.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 0), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Hair Treatment', 'Deep conditioning treatment', 45, 35.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 0), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Manicure', 'Nail care and polish', 45, 25.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 1), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Pedicure', 'Foot care and polish', 60, 35.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 1), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Gel Nails', 'Long-lasting gel nail application', 75, 45.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 1), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Swedish Massage', 'Relaxing full body massage', 60, 50.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 2), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Deep Tissue Massage', 'Therapeutic deep tissue work', 90, 75.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 2), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Hot Stone Massage', 'Massage with heated stones', 75, 65.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 2), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Personal Training', 'One-on-one fitness training', 60, 40.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 3), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Group Fitness Class', 'High-intensity group workout', 45, 15.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 3), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Yoga Session', 'Guided yoga practice', 75, 25.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 3), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Basic Facial', 'Rejuvenating facial treatment', 30, 30.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 4), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Deep Cleansing Facial', 'Advanced cleansing treatment', 60, 55.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 4), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Anti-Aging Facial', 'Premium anti-aging treatment', 90, 85.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 4), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Haircut', 'Professional haircut service', 30, 20.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 0), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Manicure', 'Nail care and polish', 45, 25.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 1), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Massage', 'Relaxing full body massage', 60, 50.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 2), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Personal Training', 'One-on-one fitness training', 60, 40.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 3), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Facial', 'Rejuvenating facial treatment', 30, 30.00, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 3), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO services (id, business_id, name, description, duration, price, start_date, end_date, is_active, sub_category, created_at, updated_at) VALUES
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Haircut', 'Professional haircut service', 30, 20.00, null, null, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 0), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Hair Coloring', 'Full hair coloring service', 120, 80.00, '2025-01-01'::date, '2025-04-01'::date, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 0), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Hair Treatment', 'Deep conditioning treatment', 45, 35.00, '2025-01-01'::date, '2025-04-01'::date, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 0), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Manicure', 'Nail care and polish', 45, 25.00, '2025-01-01'::date, '2025-04-01'::date, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 1), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Pedicure', 'Foot care and polish', 60, 35.00, null, null, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 1), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Gel Nails', 'Long-lasting gel nail application', 75, 45.00, null, null, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 1), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Swedish Massage', 'Relaxing full body massage', 60, 50.00, null, null, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 2), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Deep Tissue Massage', 'Therapeutic deep tissue work', 90, 75.00, null, null, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 2), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Hot Stone Massage', 'Massage with heated stones', 75, 65.00, null, null, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 2), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Personal Training', 'One-on-one fitness training', 60, 40.00, null, null, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 3), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Group Fitness Class', 'High-intensity group workout', 45, 15.00, null, null, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 3), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Yoga Session', 'Guided yoga practice', 75, 25.00, null, null, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 3), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Basic Facial', 'Rejuvenating facial treatment', 30, 30.00, null, null, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 4), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Deep Cleansing Facial', 'Advanced cleansing treatment', 60, 55.00, '2025-01-01'::date, '2025-04-01'::date, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 4), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Anti-Aging Facial', 'Premium anti-aging treatment', 90, 85.00, null, null, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 4), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), 'Haircut', 'Professional haircut service', 30, 20.00, '2025-01-01'::date, '2025-04-01'::date, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 0), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), 'Manicure', 'Nail care and polish', 45, 25.00, '2025-01-01'::date, '2025-04-01'::date, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 1), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Massage', 'Relaxing full body massage', 60, 50.00, null, null, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 2), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Personal Training', 'One-on-one fitness training', 60, 40.00, null, null, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 3), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Facial', 'Rejuvenating facial treatment', 30, 30.00, '2025-01-01'::date, '2025-04-01'::date, true, (SELECT id FROM sub_categories LIMIT 1 OFFSET 4), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Insert seed data for bookings
 INSERT INTO bookings (id, user_booked_id, business_id, staff_id, status, note, date, created_at, updated_at) VALUES
@@ -173,14 +173,6 @@ INSERT INTO campaigns (id, business_id, name, description, start_date, end_date,
 (uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), 'Spring Sale', 'Spring discounts', NOW(), NOW() + INTERVAL '1 month', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), 'Autumn Sale', 'Autumn special offers', NOW(), NOW() + INTERVAL '1 month', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), 'Holiday Sale', 'Holiday discounts', NOW(), NOW() + INTERVAL '1 month', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
--- Insert seed data for deals
-INSERT INTO deals (id, business_id, campaign_id, service_id, original_price, now_price, description, title, start_date, end_date, is_active, created_at, updated_at, image_url, sub_category) VALUES
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 0), (SELECT id FROM campaigns LIMIT 1 OFFSET 0), (SELECT id FROM services LIMIT 1 OFFSET 0), 20.00, 18.00, '10% off haircut services', 'Summer Haircut Special', NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', (select id from sub_categories limit 1 offset 0)),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 1), (SELECT id FROM campaigns LIMIT 1 OFFSET 1), (SELECT id FROM services LIMIT 1 OFFSET 1), 25.00, 21.25, '15% off manicure services', 'Winter Manicure Deal', NOW(), NOW() + INTERVAL '2 months', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', (select id from sub_categories limit 1 offset 1)),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 2), (SELECT id FROM campaigns LIMIT 1 OFFSET 2), (SELECT id FROM services LIMIT 1 OFFSET 2), 50.00, 40.00, '20% off massage services', 'Spring Massage Offer', NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', (select id from sub_categories limit 1 offset 2)),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 3), (SELECT id FROM campaigns LIMIT 1 OFFSET 3), (SELECT id FROM services LIMIT 1 OFFSET 3), 40.00, 30.00, '25% off personal training', 'Autumn Fitness Deal', NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', (select id from sub_categories limit 1 offset 3)),
-(uuid_generate_v4(), (SELECT id FROM businesses LIMIT 1 OFFSET 4), (SELECT id FROM campaigns LIMIT 1 OFFSET 4), (SELECT id FROM services LIMIT 1 OFFSET 4), 30.00, 21.00, '30% off facial treatments', 'Holiday Beauty Special', NOW(), NOW() + INTERVAL '1 month', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80', (select id from sub_categories limit 1 offset 4));
 
 -- Insert seed data for products
 INSERT INTO products (id, business_id, name, description, price, stock_quantity, is_active, created_at, updated_at) VALUES
