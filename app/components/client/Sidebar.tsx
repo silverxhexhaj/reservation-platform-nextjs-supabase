@@ -67,16 +67,19 @@ export function Sidebar({ isMobileMenuOpen }: SidebarProps) {
             transition-transform duration-300 ease-in-out
             lg:flex lg:flex-shrink-0 w-64 p-3 border rounded-lg h-fit mr-8
         `}>
-            <div className="space-y-1 flex flex-col">
+            <div className="space-y-1 flex flex-col w-full">
                 {sidebarItems.map((item) => (
                     <Button
                         key={item.title}
                         variant={pathname?.startsWith(item.href) ? "secondary" : "ghost"}
-                        className={cn(
-                            "w-full justify-start gap-2",
-                            pathname?.startsWith(item.href) ? "!bg-secondary" : "hover:!bg-secondary/80",
-                            "transition-colors duration-200"
-                        )}
+                        className={`
+                            w-full justify-start gap-2
+                            ${pathname?.startsWith(item.href) 
+                                ? "bg-gray-100" 
+                                : "bg-transparent hover:bg-gray-100/80"
+                            }
+                            transition-colors duration-200
+                        `}
                         asChild
                     >
                         <Link href={item.href} className="flex items-center gap-2">

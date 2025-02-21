@@ -11,7 +11,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
     return (
         <div className="flex">
             <Header isAlwaysScrolled />
-            <div className="flex mt-20 container mx-auto px-6 relative flex-col">
+            <div className="flex mt-20 px-16 relative flex-col w-full">
                 <div className="flex">
                     {/* Mobile menu button */}
                     <button
