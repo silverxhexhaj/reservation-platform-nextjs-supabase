@@ -51,7 +51,7 @@ export default function ClientProfilePage() {
     };
 
     return (
-        <div className="max-w-5xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        <div>
             <div className="mb-8 flex items-start justify-between">
                 <div>
                     <h1 className="text-2xl font-semibold text-gray-900">My Profile</h1>

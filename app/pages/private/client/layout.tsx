@@ -25,7 +25,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                     <Sidebar isMobileMenuOpen={isMobileMenuOpen} />
 
                     {/* Main content area */}
-                    <main className="flex-1">
+                    <main className="py-10 w-full">
                         {children}
                     </main>
 

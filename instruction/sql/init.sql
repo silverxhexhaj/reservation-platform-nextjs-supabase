@@ -35,6 +35,7 @@ DROP TABLE IF EXISTS booking_services CASCADE;
 
 -- Drop enums if they exist
 DROP TYPE IF EXISTS profile_type CASCADE;
+DROP TYPE IF EXISTS gender_type CASCADE;
 DROP TYPE IF EXISTS payment_status CASCADE;
 DROP TYPE IF EXISTS booking_status CASCADE;
 DROP TYPE IF EXISTS campaign_status CASCADE;
@@ -48,6 +49,7 @@ CREATE TYPE campaign_status AS ENUM ('draft', 'active', 'inactive', 'expired');
 CREATE TYPE booking_status AS ENUM ('pending', 'confirmed', 'cancelled', 'completed');
 CREATE TYPE payment_status AS ENUM ('pending', 'paid', 'refunded', 'failed');
 CREATE TYPE profile_type AS ENUM ('client', 'staff', 'business_owner');
+CREATE TYPE gender_type AS ENUM ('male', 'female', 'other');
 
 
 CREATE TYPE notification_type AS ENUM (
@@ -412,7 +414,7 @@ CREATE TABLE profiles (
     profile_picture TEXT,
     bio TEXT,
     date_of_birth DATE,
-    gender VARCHAR(50),
+    gender gender_type,
     preferred_language VARCHAR(50),
     specialties TEXT[],
     years_of_experience INTEGER,

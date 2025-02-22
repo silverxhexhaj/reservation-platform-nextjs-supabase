@@ -3,6 +3,7 @@ export type CampaignStatus = 'draft' | 'active' | 'inactive' | 'expired';
 export type BookingStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';
 export type PaymentStatus = 'pending' | 'paid' | 'refunded' | 'failed';
 export type ProfileType = 'client' | 'staff' | 'business_owner';
+export type GenderType = 'male' | 'female' | 'other';
 
 // Price range type (1 = $, 2 = $$, 3 = $$$, 4 = $$$$)
 export type PriceRange = 1 | 2 | 3 | 4;
@@ -354,7 +355,7 @@ export interface Profile extends Timestamps {
   profile_type: ProfileType;
   bio?: string | null;
   date_of_birth?: string | null;
-  gender?: string | null;
+  gender?: GenderType | null;
   preferred_language?: string | null;
   specialties?: string[] | null;
   years_of_experience?: number | null;
