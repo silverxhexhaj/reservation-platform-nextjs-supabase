@@ -4,20 +4,12 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from "./ui/button";
-import { supabase } from '@/app/lib/supabase/client';
-import { PlusCircle, Menu, X, User, Settings, HelpCircle, LogOut } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+import { Menu, X } from 'lucide-react';
 import { Bebas_Neue } from 'next/font/google';
-
+import { authService } from '../service/auth.service';
+import { User } from '@supabase/supabase-js';
+import { UserProfileMenu } from './menu/UserProfileMenu';
+import { Profile } from '../models/supabase.models';
 const bebasNeue = Bebas_Neue({
   weight: '400',
   subsets: ['latin'],
@@ -28,35 +20,28 @@ interface HeaderProps {
 }
 
 export function Header({ isAlwaysScrolled = false }: HeaderProps) {
-  const [user, setUser] = useState<any>(null);
 
   const router = useRouter();
   const pathname = usePathname();
   
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(isAlwaysScrolled);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
+    setUser(authService.getUser());
+    setProfile(authService.getAuthState().profile);
   }, []);
+
 
   useEffect(() => {
     if (isAlwaysScrolled) {
       setIsScrolled(true);
       return;
     }
-
+    
     const handleScroll = () => {
       if (pathname?.includes('/explore')) {
         setIsScrolled(true);
@@ -64,17 +49,13 @@ export function Header({ isAlwaysScrolled = false }: HeaderProps) {
       }
       setIsScrolled(window.scrollY > 0);
     };
-
+  
     handleScroll();
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [pathname, isAlwaysScrolled]);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push('/');
-  };
 
   const handleAuth = (mode: 'signin' | 'register', returnTo?: string) => {
     const currentPath = returnTo || window.location.pathname;
@@ -125,50 +106,8 @@ export function Header({ isAlwaysScrolled = false }: HeaderProps) {
                   For businesses
                 </Button>
               </Link>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage src="/avatars/01.png" alt={user.email} />
-                      <AvatarFallback className="bg-slate-100 text-slate-600">
-                        {user.email?.slice(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-white" align="end" forceMount>
-                  <DropdownMenuLabel>
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium">{user.email?.split('@')[0]}</p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <Link href="/pages/private/client/profile">
-                      <DropdownMenuItem>
-                        <User className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
-                      </DropdownMenuItem>
-                    </Link>
-                    <Link href="/pages/private/client/settings">
-                      <DropdownMenuItem>
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Settings</span>
-                      </DropdownMenuItem>
-                    </Link>
-                    <DropdownMenuItem>
-                      <HelpCircle className="mr-2 h-4 w-4" />
-                      <span>Help Center</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-red-600" onClick={handleSignOut}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              
+              <UserProfileMenu user={user} profile={profile} />
             </div>
           ) : (
             <div className="flex items-center space-x-4">
@@ -229,50 +168,7 @@ export function Header({ isAlwaysScrolled = false }: HeaderProps) {
                 For businesses
               </Button>
             </Link>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-                  <Avatar className="h-9 w-9">
-                    <AvatarImage src="/avatars/01.png" alt={user.email} />
-                    <AvatarFallback className="bg-slate-100 text-slate-600">
-                      {user.email?.slice(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-white" align="end" forceMount>
-                <DropdownMenuLabel>
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium">{user.email?.split('@')[0]}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <Link href="/pages/private/client/profile">
-                    <DropdownMenuItem>
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link href="/pages/private/client/settings">
-                    <DropdownMenuItem>
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
-                    </DropdownMenuItem>
-                  </Link>
-                  <DropdownMenuItem>
-                    <HelpCircle className="mr-2 h-4 w-4" />
-                    <span>Help Center</span>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600" onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <UserProfileMenu user={user} profile={profile} />
           </div>
         ) : (
           <div className="flex flex-col space-y-4">

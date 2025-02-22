@@ -2,7 +2,7 @@
 export type CampaignStatus = 'draft' | 'active' | 'inactive' | 'expired';
 export type BookingStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';
 export type PaymentStatus = 'pending' | 'paid' | 'refunded' | 'failed';
-export type ProfileType = 'client' | 'staff';
+export type ProfileType = 'client' | 'staff' | 'business_owner';
 
 // Price range type (1 = $, 2 = $$, 3 = $$$, 4 = $$$$)
 export type PriceRange = 1 | 2 | 3 | 4;
@@ -361,6 +361,9 @@ export interface Profile extends Timestamps {
   education?: string[] | null;
   certifications?: string[] | null;
   languages?: string[] | null;
+  profile_picture?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
 }
 
 // Loyalty Points

@@ -4,6 +4,7 @@ import { ProfileType } from '@/app/models/supabase.models';
 
 let authState: AuthState = {
     user: null,
+    profile: null,
     isLoading: true,
     error: null
 };
@@ -15,6 +16,22 @@ async function initializeAuth() {
     
     authState.user = session?.user ?? null;
     authState.isLoading = false;
+
+
+    // Fetch user profile if we have a user
+    if (authState.user) {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', authState.user.id)
+        .single();
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      authState.profile = profile;
+    }
 
     // Set up auth state change listener
     supabase.auth.onAuthStateChange((_event, session) => {
@@ -86,17 +103,11 @@ async function isUserType(type: ProfileType) {
   try {
     if (!getUser()) return false;
     
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('profile_type')
-      .eq('user_id', getUser()?.id)
-      .single();
+    if (authState.profile) {
+      return authState.profile.profile_type === type;
+    }
 
-    console.log(profile);
-
-    if (error) throw error;
-    
-    return profile?.profile_type === type;
+    return false;
   } catch (error) {
     return false;
   }
@@ -106,7 +117,7 @@ function getAuthState() {
   return authState;
 }
 
-// Initialize auth on module load
+
 initializeAuth();
 
 export const authService = {
@@ -114,6 +125,7 @@ export const authService = {
   signUp,
   signOut,
   getUser,
+
   isAuthenticated,
   getAuthState,
   isPartner,

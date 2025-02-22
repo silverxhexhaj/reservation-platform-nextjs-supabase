@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Header } from './components/Header';
 import { Button } from "./components/ui/button";
 import { Search, X, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image'
-import { Calendar, Shield, CheckCircle, Lock } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { CategoryIcon } from './components/CategoryIcon';
 import { motion } from 'framer-motion'
 import {
@@ -79,9 +78,6 @@ export default function HomePage() {
     setShowCategorySearch(true);
   };
 
-  const handleInputBlur = () => {
-
-  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -119,7 +115,6 @@ export default function HomePage() {
                         onChange={(e) => setSearchTerm(e.target.value)}
                         onKeyPress={handleKeyPress}
                         onFocus={handleInputFocus}
-                        onBlur={handleInputBlur}
                         className="flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
                         placeholder={'Search businesses...'}
                       />

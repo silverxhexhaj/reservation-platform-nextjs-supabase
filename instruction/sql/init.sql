@@ -47,7 +47,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TYPE campaign_status AS ENUM ('draft', 'active', 'inactive', 'expired');
 CREATE TYPE booking_status AS ENUM ('pending', 'confirmed', 'cancelled', 'completed');
 CREATE TYPE payment_status AS ENUM ('pending', 'paid', 'refunded', 'failed');
-CREATE TYPE profile_type AS ENUM ('client', 'staff');
+CREATE TYPE profile_type AS ENUM ('client', 'staff', 'business_owner');
 
 
 CREATE TYPE notification_type AS ENUM (
