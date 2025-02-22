@@ -17,12 +17,12 @@ const profileTypeToLinks = {
         settings: '/pages/private/client/settings'
     },
     'business_owner': {
-        profile: '/pages/private/business/partner',
-        settings: '/pages/private/business/partner'
+        profile: '/pages/private/business/partner/profile',
+        settings: '/pages/private/business/partner/settings'
     },
     'staff': {
-        profile: '/pages/private/business/partner',
-        settings: '/pages/private/business/partner'
+        profile: '/pages/private/business/partner/profile',
+        settings: '/pages/private/business/partner/settings'
     }
 } as const;
 
