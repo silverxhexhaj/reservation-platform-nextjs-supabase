@@ -79,9 +79,9 @@ async function signOut() {
   }
 }
 
-export function getUser() {
+export async function getUser() {
   if (!authState.user) {
-    initializeAuth();
+    await initializeAuth();
   }
 
   return authState.user;
@@ -101,7 +101,8 @@ async function isClient() {
 
 async function isUserType(type: ProfileType) {
   try {
-    if (!getUser()) return false;
+    const user = await getUser();
+    if (!user) return false;
     
     if (authState.profile) {
       return authState.profile.profile_type === type;
@@ -125,7 +126,6 @@ export const authService = {
   signUp,
   signOut,
   getUser,
-
   isAuthenticated,
   getAuthState,
   isPartner,

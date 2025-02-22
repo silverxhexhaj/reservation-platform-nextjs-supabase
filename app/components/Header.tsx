@@ -31,8 +31,14 @@ export function Header({ isAlwaysScrolled = false }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(isAlwaysScrolled);
 
   useEffect(() => {
-    setUser(authService.getUser());
-    setProfile(authService.getAuthState().profile);
+    const fetchUser = async () => {
+      const user = await authService.getUser();
+      setUser(user);
+      
+      const authState = await authService.getAuthState();
+      setProfile(authState.profile);
+    };
+    fetchUser();
   }, []);
 
 

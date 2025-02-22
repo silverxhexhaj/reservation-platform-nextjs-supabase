@@ -1,34 +1,36 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
 import { Button } from "@/app/components/ui/button";
 import { Label } from "@/app/components/ui/label";
 import { Input } from "@/app/components/ui/input";
-import { CalendarDays, MapPin, Phone, Mail, Building, Edit2, Camera, User, X } from 'lucide-react';
+import { CalendarDays, MapPin, Phone, Mail, Building, Edit2, Camera, User as UserIcon, X } from 'lucide-react';
 import { useToast } from "@/app/components/ui/use-toast";
 import { Separator } from "@/app/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/app/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select";
+import { authService } from '@/app/service/auth.service';
+import { Profile } from '@/app/models/supabase.models';
+import { User } from '@supabase/supabase-js';
+import { formatDate } from '@/app/lib/utils';
 
 export default function ClientProfilePage() {
     const [isEditing, setIsEditing] = useState(false);
+    const [profile, setProfile] = useState<Profile | null>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { toast } = useToast();
-    
-    // Placeholder data - replace with actual data from your backend
-    const profile = {
-        firstName: "John",
-        lastName: "Doe",
-        email: "john.doe@example.com",
-        phone: "+1 234 567 890",
-        address: "123 Main St, New York, NY 10001",
-        memberSince: "January 2024",
-        gender: "male",
-        birthDate: "1990-01-01",
-        avatarUrl: "/placeholder-avatar.jpg"
-    };
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const user = await authService.getUser();
+            setUser(user);
+            setProfile(authService.getAuthState().profile);
+        };
+        fetchUser();
+    }, []);
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -57,7 +59,7 @@ export default function ClientProfilePage() {
                     <h1 className="text-2xl font-semibold text-gray-900">My Profile</h1>
                     <p className="text-gray-500 mt-1">Manage your personal information and preferences</p>
                 </div>
-                <Button 
+                <Button
                     variant="outline"
                     onClick={() => setIsEditing(true)}
                     className="shadow-sm hover:shadow-md transition-all duration-200 bg-blue-600 hover:bg-blue-700 text-white"
@@ -74,13 +76,13 @@ export default function ClientProfilePage() {
                                 <Avatar className="h-32 w-32 ring-4 ring-white shadow-xl transition-transform duration-200 group-hover:scale-105">
                                     <AvatarImage src="/placeholder-avatar.jpg" alt="Profile" className="object-cover" />
                                     <AvatarFallback className="bg-gradient-to-br from-gray-100 to-gray-200 text-gray-700 text-2xl">
-                                        {profile.firstName[0]}{profile.lastName[0]}
+                                        {profile?.first_name?.[0]}{profile?.last_name?.[0]}
                                     </AvatarFallback>
                                 </Avatar>
                                 {isEditing && (
-                                    <Button 
-                                        size="icon" 
-                                        variant="secondary" 
+                                    <Button
+                                        size="icon"
+                                        variant="secondary"
                                         className="absolute -bottom-2 -right-2 rounded-full bg-white hover:bg-gray-50 shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 hover:border-gray-300"
                                     >
                                         <Camera className="h-4 w-4 text-gray-600" />
@@ -89,10 +91,10 @@ export default function ClientProfilePage() {
                             </div>
                             <div className="mt-4 text-center space-y-1">
                                 <h1 className="text-2xl font-bold text-gray-900">
-                                    {profile.firstName} {profile.lastName}
+                                    {profile?.first_name} {profile?.last_name}
                                 </h1>
                                 <p className="text-xs text-gray-500 flex items-center gap-1.5">
-                                    Member since {profile.memberSince}
+                                    Member since {formatDate(profile?.created_at)}
                                 </p>
                             </div>
                         </div>
@@ -104,7 +106,7 @@ export default function ClientProfilePage() {
                                 <Mail className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
                                 <div>
                                     <p className="text-sm font-medium text-gray-500">Email</p>
-                                    <p className="text-sm font-semibold text-gray-900">{profile.email}</p>
+                                    <p className="text-sm font-semibold text-gray-900">{user?.email}</p>
                                 </div>
                             </div>
 
@@ -112,7 +114,7 @@ export default function ClientProfilePage() {
                                 <Phone className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
                                 <div>
                                     <p className="text-sm font-medium text-gray-500">Phone</p>
-                                    <p className="text-sm font-semibold text-gray-900">{profile.phone}</p>
+                                    <p className="text-sm font-semibold text-gray-900">{user?.phone}</p>
                                 </div>
                             </div>
 
@@ -120,15 +122,15 @@ export default function ClientProfilePage() {
                                 <MapPin className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
                                 <div>
                                     <p className="text-sm font-medium text-gray-500">Address</p>
-                                    <p className="text-sm font-semibold text-gray-900">{profile.address}</p>
+                                    {/* <p className="text-sm font-semibold text-gray-900">{profile?.location?.address}</p> */}
                                 </div>
                             </div>
 
                             <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 transition-colors duration-200">
-                                <User className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                                <UserIcon className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
                                 <div>
                                     <p className="text-sm font-medium text-gray-500">Gender</p>
-                                    <p className="text-sm font-semibold text-gray-900 capitalize">{profile.gender}</p>
+                                    <p className="text-sm font-semibold text-gray-900 capitalize">{profile?.gender}</p>
                                 </div>
                             </div>
 
@@ -137,11 +139,7 @@ export default function ClientProfilePage() {
                                 <div>
                                     <p className="text-sm font-medium text-gray-500">Birth Date</p>
                                     <p className="text-sm font-semibold text-gray-900">
-                                        {new Date(profile.birthDate).toLocaleDateString('en-US', {
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric'
-                                        })}
+                                        {formatDate(profile?.date_of_birth)}
                                     </p>
                                 </div>
                             </div>
@@ -167,13 +165,13 @@ export default function ClientProfilePage() {
                         <div className="md:col-span-2 flex flex-col items-center space-y-4 pb-6">
                             <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                                 <Avatar className="h-32 w-32 ring-4 ring-white shadow-xl transition-transform duration-200 group-hover:scale-105">
-                                    <AvatarImage 
-                                        src={imagePreview || profile.avatarUrl} 
-                                        alt="Profile" 
+                                    <AvatarImage
+                                        src={imagePreview || profile?.profile_picture || ''}
+                                        alt="Profile"
                                         className="object-cover"
                                     />
                                     <AvatarFallback className="bg-gradient-to-br from-gray-100 to-gray-200 text-gray-700 text-2xl">
-                                        {profile.firstName[0]}{profile.lastName[0]}
+                                        {profile?.first_name?.[0]}{profile?.last_name?.[0]}
                                     </AvatarFallback>
                                 </Avatar>
                                 <input
@@ -212,9 +210,9 @@ export default function ClientProfilePage() {
                             <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
                                 First Name
                             </Label>
-                            <Input 
-                                id="firstName" 
-                                defaultValue={profile.firstName} 
+                            <Input
+                                id="firstName"
+                                defaultValue={profile?.first_name ?? ''}
                                 className="border-gray-200 focus:border-gray-300 focus:ring-gray-200"
                             />
                         </div>
@@ -222,9 +220,9 @@ export default function ClientProfilePage() {
                             <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
                                 Last Name
                             </Label>
-                            <Input 
-                                id="lastName" 
-                                defaultValue={profile.lastName} 
+                            <Input
+                                id="lastName"
+                                defaultValue={profile?.last_name ?? ''}
                                 className="border-gray-200 focus:border-gray-300 focus:ring-gray-200"
                             />
                         </div>
@@ -235,10 +233,11 @@ export default function ClientProfilePage() {
                             </Label>
                             <div className="relative">
                                 <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                <Input 
-                                    id="email" 
-                                    type="email" 
-                                    defaultValue={profile.email} 
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    readOnly
+                                    defaultValue={user?.email}
                                     className="pl-10 border-gray-200 focus:border-gray-300 focus:ring-gray-200"
                                 />
                             </div>
@@ -250,10 +249,10 @@ export default function ClientProfilePage() {
                             </Label>
                             <div className="relative">
                                 <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                <Input 
-                                    id="phone" 
-                                    type="tel" 
-                                    defaultValue={profile.phone} 
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    defaultValue={user?.phone}
                                     className="pl-10 border-gray-200 focus:border-gray-300 focus:ring-gray-200"
                                 />
                             </div>
@@ -263,7 +262,7 @@ export default function ClientProfilePage() {
                             <Label htmlFor="gender" className="text-sm font-medium text-gray-700">
                                 Gender
                             </Label>
-                            <Select defaultValue={profile.gender}>
+                            <Select defaultValue={profile?.gender ?? 'other'}>
                                 <SelectTrigger className="w-full border-gray-200 focus:border-gray-300 focus:ring-gray-200">
                                     <SelectValue placeholder="Select gender" />
                                 </SelectTrigger>
@@ -282,10 +281,10 @@ export default function ClientProfilePage() {
                             </Label>
                             <div className="relative">
                                 <CalendarDays className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                <Input 
-                                    id="birthDate" 
-                                    type="date" 
-                                    defaultValue={profile.birthDate}
+                                <Input
+                                    id="birthDate"
+                                    type="date"
+                                    defaultValue={profile?.date_of_birth ?? ''}
                                     className="pl-10 border-gray-200 focus:border-gray-300 focus:ring-gray-200"
                                 />
                             </div>
@@ -297,11 +296,11 @@ export default function ClientProfilePage() {
                             </Label>
                             <div className="relative">
                                 <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                <Input 
-                                    id="address" 
-                                    defaultValue={profile.address} 
+                                {/* <Input
+                                    id="address"
+                                    defaultValue={profile?.location?.address ?? ''}
                                     className="pl-10 border-gray-200 focus:border-gray-300 focus:ring-gray-200"
-                                />
+                                /> */}
                             </div>
                         </div>
                     </div>
