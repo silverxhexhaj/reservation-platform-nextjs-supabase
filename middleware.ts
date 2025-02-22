@@ -17,7 +17,7 @@ export async function middleware(request: NextRequest) {
   const isPartnerRoute = pathname.startsWith('/pages/private/business');
   const isClientRoute = pathname.startsWith('/pages/private/client');
 
-  const isPartner = await isUserType('staff');
+  const isPartner = await isUserType(['staff', 'business_owner']);
   if (isPartnerRoute) {
     if (!isPartner) {
       return NextResponse.redirect(new URL('/pages/unauthorized', request.url));
@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
     return res;
   }
 
-  const isClient = await isUserType('client');
+  const isClient = await isUserType(['client']);
 
   if (isClientRoute) {
     if (!isClient) {

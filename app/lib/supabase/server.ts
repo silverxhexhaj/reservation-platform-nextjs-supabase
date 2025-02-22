@@ -36,7 +36,7 @@ export async function getCurrentUser() {
 
 
 
-export async function isUserType(type: ProfileType) {
+export async function isUserType(type: ProfileType[]) {
     const supabase = await createClient()
 
     try {
@@ -52,7 +52,7 @@ export async function isUserType(type: ProfileType) {
   
       if (error) throw error;
       
-      return profile?.profile_type === type;
+      return type.includes(profile?.profile_type);
     } catch (error) {
       return false;
     }

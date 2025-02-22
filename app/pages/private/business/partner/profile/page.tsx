@@ -25,9 +25,9 @@ export default function ClientProfilePage() {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const user = await authService.getUser();
-            setUser(user);
-            setProfile(authService.getAuthState().profile);
+            const userInfo = await authService.getUser();
+            setUser(userInfo.user);
+            setProfile(userInfo.profile);
         };
         fetchUser();
     }, []);
@@ -53,7 +53,7 @@ export default function ClientProfilePage() {
     };
 
     return (
-        <div>
+        <div className="py-6">
             <div className="mb-8 flex items-start justify-between">
                 <div>
                     <h1 className="text-2xl font-semibold text-gray-900">My Profile</h1>

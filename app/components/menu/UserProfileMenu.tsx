@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { Profile } from "@/app/models/supabase.models";
 import { User } from "@supabase/supabase-js";
 import Link from "next/link";
-
+import { useEffect } from "react";
 const profileTypeToLinks = {
     'client': {
         profile: '/pages/private/client/profile',
@@ -56,21 +56,25 @@ export function UserProfileMenu({ user, profile }: { user: User | null, profile:
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
-                <DropdownMenuGroup>
-                    <Link href={profileTypeToLinks[profile?.profile_type ?? 'client'].profile}>
-                        <DropdownMenuItem>
-                            <UserIcon className="mr-2 h-4 w-4" />
-                            <span>Profile</span>
-                        </DropdownMenuItem>
-                    </Link>
-                    <Link href={profileTypeToLinks[profile?.profile_type ?? 'client'].settings}>
-                        <DropdownMenuItem>
-                            <Settings className="mr-2 h-4 w-4" />
-                            <span>Settings</span>
-                        </DropdownMenuItem>
-                    </Link>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
+                {profile && (
+                    <>
+                        <DropdownMenuGroup>
+                            <Link href={profileTypeToLinks[profile.profile_type].profile}>
+                                <DropdownMenuItem>
+                                    <UserIcon className="mr-2 h-4 w-4" />
+                                    <span>Profile</span>
+                                </DropdownMenuItem>
+                            </Link>
+                            <Link href={profileTypeToLinks[profile.profile_type].settings}>
+                                <DropdownMenuItem>
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    <span>Settings</span>
+                                </DropdownMenuItem>
+                            </Link>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                    </>
+                )}
 
                 <DropdownMenuItem className="text-red-600" onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />

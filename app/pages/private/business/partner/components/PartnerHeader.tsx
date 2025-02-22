@@ -7,12 +7,8 @@ import { Button } from "@/app/components/ui/button";
 import { 
   Bell, 
   Search, 
-  User, 
   Settings,
   HelpCircle,
-  LogOut,
-  Check,
-  Clock,
   Calendar,
   DollarSign
 } from 'lucide-react';
@@ -25,10 +21,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/app/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
+
 import { format } from 'date-fns';
 import { cn } from "@/app/lib/utils";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
+import { UserProfileMenu } from '@/app/components/menu/UserProfileMenu';
+import { authService } from '@/app/service/auth.service';
+import { Profile } from '@/app/models/supabase.models';
+import { useEffect } from 'react';
+import { User } from '@supabase/supabase-js';
 
 interface Notification {
   id: string;
@@ -39,38 +40,25 @@ interface Notification {
   timestamp: Date;
 }
 
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    title: 'New Appointment',
-    description: 'John Doe booked a haircut for tomorrow at 2:00 PM',
-    type: 'appointment',
-    status: 'unread',
-    timestamp: new Date()
-  },
-  {
-    id: '2',
-    title: 'Payment Received',
-    description: 'You received a payment of $50.00 from Sarah Wilson',
-    type: 'payment',
-    status: 'unread',
-    timestamp: new Date(Date.now() - 1000 * 60 * 30) // 30 minutes ago
-  },
-  {
-    id: '3',
-    title: 'System Update',
-    description: 'New features have been added to your dashboard',
-    type: 'system',
-    status: 'read',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2) // 2 hours ago
-  }
-];
+const mockNotifications: Notification[] = [];
 
 export function PartnerHeader() {
   const [searchQuery, setSearchQuery] = useState('');
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
 
   const unreadCount = notifications.filter(n => n.status === 'unread').length;
+
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userInfo = await authService.getUser();
+      setUser(userInfo.user);
+      setProfile(userInfo.profile);
+    };
+    fetchUser();
+  }, []);
 
   const markAllAsRead = () => {
     setNotifications(prev => 
@@ -212,44 +200,7 @@ export function PartnerHeader() {
           </Link>
 
           {/* User Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-                <Avatar className="h-9 w-9">
-                  <AvatarImage src="/avatars/01.png" alt="User" />
-                  <AvatarFallback className="bg-slate-100 text-slate-600">JD</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-white" align="end" forceMount>
-              <DropdownMenuLabel>
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium">John Doe</p>
-                  <p className="text-xs text-muted-foreground">john@example.com</p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <HelpCircle className="mr-2 h-4 w-4" />
-                  <span>Help Center</span>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <UserProfileMenu user={user} profile={profile} />
         </div>
       </div>
     </header>

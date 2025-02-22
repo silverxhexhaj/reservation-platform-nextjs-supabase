@@ -32,11 +32,9 @@ export function Header({ isAlwaysScrolled = false }: HeaderProps) {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const user = await authService.getUser();
-      setUser(user);
-      
-      const authState = await authService.getAuthState();
-      setProfile(authState.profile);
+      const userInfo = await authService.getUser();
+      setUser(userInfo.user);
+      setProfile(userInfo.profile);
     };
     fetchUser();
   }, []);

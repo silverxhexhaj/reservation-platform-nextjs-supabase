@@ -3,34 +3,24 @@ import { AuthState } from '@/app/models/auth.models';
 import { ProfileType } from '@/app/models/supabase.models';
 
 let authState: AuthState = {
-    user: null,
-    profile: null,
-    isLoading: true,
-    error: null
+  user: null,
+  profile: null,
+  isLoading: true,
+  error: null
 };
 
 async function initializeAuth() {
   try {
     const { data: { session }, error } = await supabase.auth.getSession();
     if (error) throw error;
-    
+
     authState.user = session?.user ?? null;
     authState.isLoading = false;
 
 
     // Fetch user profile if we have a user
     if (authState.user) {
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', authState.user.id)
-        .single();
-
-      if (profileError) {
-        throw profileError;
-      }
-
-      authState.profile = profile;
+      authState.profile = await getProfile(authState.user.id);
     }
 
     // Set up auth state change listener
@@ -79,12 +69,37 @@ async function signOut() {
   }
 }
 
+async function getProfile(userId: string | undefined) {
+  if (!userId) {
+    throw new Error('User ID is required');
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', userId)
+    .single();
+
+  if (profileError) {
+    throw profileError;
+  }
+
+  return profile;
+}
+
 export async function getUser() {
   if (!authState.user) {
     await initializeAuth();
   }
 
-  return authState.user;
+  if (!authState.profile) {
+    authState.profile = await getProfile(authState.user?.id);
+  }
+
+  return {
+    user: authState.user,
+    profile: authState.profile
+  };
 }
 
 function isAuthenticated() {
@@ -92,20 +107,20 @@ function isAuthenticated() {
 }
 
 async function isPartner() {
-  return isUserType('staff');
+  return isUserType(['staff', 'business_owner']);
 }
 
 async function isClient() {
-  return isUserType('client');
+  return isUserType(['client']);
 }
 
-async function isUserType(type: ProfileType) {
+async function isUserType(type: ProfileType[]) {
   try {
     const user = await getUser();
     if (!user) return false;
-    
-    if (authState.profile) {
-      return authState.profile.profile_type === type;
+
+    if (user.profile) {
+      return type.includes(user.profile.profile_type);
     }
 
     return false;

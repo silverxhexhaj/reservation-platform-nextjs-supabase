@@ -154,9 +154,9 @@ export function BookingModal({
   }
 
   const handleBooking = async () => {
-    const userBookedId = await getUser()?.id;
+    const userBookedId = await getUser();
 
-    if (!userBookedId) {
+    if (!userBookedId.user?.id) {
       toast({
         title: "Error",
         description: "Please login to book",
@@ -166,7 +166,7 @@ export function BookingModal({
     }
 
     const bookingId = await createBooking(
-      userBookedId, 
+      userBookedId.user.id, 
       businessId, 
       selectedTeamMember?.staff_id ?? null,   
       selectedServices.map(service => service.id),
