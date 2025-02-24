@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from "./ui/button";
 import { supabase } from '@/app/lib/supabase/client';
-import { PlusCircle, Menu, X, User, Settings, HelpCircle, LogOut } from 'lucide-react';
+import { PlusCircle, Menu, X, Settings, HelpCircle, LogOut } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   DropdownMenu,
@@ -16,6 +16,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { getUser } from '@/app/service/auth.service';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
+import type { Profile } from '@/app/models/supabase.models';
+import { UserProfileMenu } from './menu/UserProfileMenu';
 
 interface HeaderProps {
   isAlwaysScrolled?: boolean;
@@ -26,7 +30,7 @@ export function Header({ isAlwaysScrolled = false }: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,7 +38,7 @@ export function Header({ isAlwaysScrolled = false }: HeaderProps) {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const userInfo = await authService.getUser();
+      const userInfo = await getUser();
       setUser(userInfo.user);
       setProfile(userInfo.profile);
     };

@@ -12,12 +12,10 @@ import Link from "next/link";
 import { BusinessCategory, businessCategories } from "@/app/models/supabase.models";
 import { categoryBackgrounds, categoryBorders } from "@/app/lib/color.utils";
 import { FooterWrapper } from "@/app/components/FooterWrapper";
+import { useSearchParams } from "next/navigation"
 
-export default function ExplorePage({
-  searchParams,
-}: {
-  searchParams: { category?: string; search?: string }
-}) {
+export default function ExplorePage() {
+  const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
 
@@ -35,9 +33,9 @@ export default function ExplorePage({
   ];
 
   useEffect(() => {
-    setSelectedCategory(searchParams.category || null);
-    setSearchTerm(searchParams.search || null);
-  }, [searchParams.category, searchParams.search]);
+    setSelectedCategory(searchParams.get('category'));
+    setSearchTerm(searchParams.get('search'));
+  }, [searchParams]);
 
   return (
     <div className="flex flex-col bg-white min-h-screen">

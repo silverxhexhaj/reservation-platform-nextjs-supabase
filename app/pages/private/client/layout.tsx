@@ -52,17 +52,15 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
     const pathname = usePathname();
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col pb-16 lg:pb-0">
+        <div className="min-h-screen bg-gray-50 flex flex-col pb-16 lg:pb-0 relative">
             <Header isAlwaysScrolled />
 
-            <div className="flex container mx-auto mt-20 px-4 md:px-8 relative flex-grow">
+            <div className="flex container mx-auto mt-20 px-4 md:px-8 relative flex-grow space-0-4 md:space-x-16">
                 {/* Desktop Sidebar - hidden on mobile */}
-                <div className="hidden lg:block">
-                    <Sidebar isMobileMenuOpen={false} />
-                </div>
+                <Sidebar isMobileMenuOpen={false} />
 
                 {/* Main content */}
-                <main className="flex-1 min-h-screen pb-8">
+                <main className="flex-1 min-h-screen pb-8 pt-12">
                     {children}
                 </main>
             </div>

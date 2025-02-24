@@ -63,9 +63,9 @@ export function Sidebar({ isMobileMenuOpen }: SidebarProps) {
     return (
         <div className={`
             ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-            fixed lg:relative lg:translate-x-0 top-20 mt-8 bg-white left-0 z-40
+            fixed lg:relative lg:translate-x-0 bg-white left-0 z-40
             transition-transform duration-300 ease-in-out
-            flex lg:flex-shrink-0 w-64 p-3 border rounded-lg h-fit
+            flex lg:flex-shrink-0 w-64 p-3 border rounded-lg h-fit hidden lg:block !sticky top-32
         `}>
             <div className="space-y-1 flex flex-col w-full">
                 {sidebarItems.map((item) => (
