@@ -23,6 +23,7 @@ import { itemVariants, containerVariants } from '@/app/models/transitionEffects.
 import { fetchHomePageBusinesses } from './service/business/business.service';
 import { HomePageBusinesses } from './models/functions/homePageBusinesses.models';
 import { AnimatedGradient } from './components/gradient/AnimatedGradient';
+import { FooterWrapper } from './components/FooterWrapper';
 
 
 
@@ -84,7 +85,7 @@ export default function HomePage() {
       <Header />
       <main className="relative">
         {/* Hero Section */}
-        <div className="p-16 pt-32 pb-16 w-full relative justify-center">
+        <div className="px-4 md:px-8 pt-32 pb-16 w-full relative justify-center">
           <motion.div
             className='relative z-10 flex flex-col space-y-12'
             variants={itemVariants}
@@ -222,7 +223,7 @@ export default function HomePage() {
           </div>
         </div>
         {/* Business Sections */}
-        <div className="px-16 py-16">
+        <div className="px-4 md:px-8 py-16">
           <div className="space-y-12">
 
             <section>
@@ -279,6 +280,7 @@ export default function HomePage() {
           </div>
         </div>
       </main>
+      <FooterWrapper />
     </div>
   );
 }

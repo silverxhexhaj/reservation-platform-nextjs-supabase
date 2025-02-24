@@ -1,48 +1,106 @@
-import Link from 'next/link';
+import Link from 'next/link'
+import { Facebook, Instagram, Twitter } from 'lucide-react'
+
+const footerLinks = {
+  company: [
+    { name: 'About', href: '/about' },
+    { name: 'Contact', href: '/contact' },
+    { name: 'Terms', href: '/terms' },
+    { name: 'Privacy', href: '/privacy' },
+  ],
+  services: [
+    { name: 'Book Appointment', href: '/book' },
+    { name: 'Gift Cards', href: '/gift-cards' },
+    { name: 'Locations', href: '/locations' },
+    { name: 'Blog', href: '/blog' },
+  ],
+  support: [
+    { name: 'Help Center', href: '/help' },
+    { name: 'FAQs', href: '/faqs' },
+    { name: 'Cancellation Policy', href: '/cancellation' },
+    { name: 'Customer Support', href: '/support' },
+  ],
+}
+
+const socialLinks = [
+  { name: 'Facebook', icon: Facebook, href: '#' },
+  { name: 'Instagram', icon: Instagram, href: '#' },
+  { name: 'Twitter', icon: Twitter, href: '#' },
+]
 
 export function Footer() {
   return (
-    <footer className="text-gray-600 pb-8 pt-20">
-      <div className="px-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <h3 className="font-bold text-lg mb-4">About Us</h3>
-            <p className="text-sm">
-              We connect you with the best beauty and wellness services in your area.
-            </p>
+    <footer className="bg-white border-t border-gray-200">
+      <div className="mx-auto px-4 md:px-8">
+        <div className="py-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900">Company</h3>
+              <ul role="list" className="mt-6 space-y-4">
+                {footerLinks.company.map((item) => (
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className="text-sm text-gray-500 hover:text-gray-900"
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900">Services</h3>
+              <ul role="list" className="mt-6 space-y-4">
+                {footerLinks.services.map((item) => (
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className="text-sm text-gray-500 hover:text-gray-900"
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900">Support</h3>
+              <ul role="list" className="mt-6 space-y-4">
+                {footerLinks.support.map((item) => (
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className="text-sm text-gray-500 hover:text-gray-900"
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <div>
-            <h3 className="font-bold text-lg mb-4">Quick Links</h3>
-            <ul className="text-sm space-y-2">
-              <li><Link href="/" className="hover:text-gray-900">Home</Link></li>
-              <li><Link href="/services" className="hover:text-gray-900">Services</Link></li>
-              <li><Link href="/about" className="hover:text-gray-900">About</Link></li>
-              <li><Link href="/contact" className="hover:text-gray-900">Contact</Link></li>
-            </ul>
+          <div className="mt-12 border-t border-gray-200 pt-8">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-500">
+                © {new Date().getFullYear()} Your Company Name. All rights reserved.
+              </p>
+              <div className="flex space-x-6">
+                {socialLinks.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="text-gray-400 hover:text-gray-500"
+                  >
+                    <span className="sr-only">{item.name}</span>
+                    <item.icon className="h-6 w-6" aria-hidden="true" />
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
-          <div>
-            <h3 className="font-bold text-lg mb-4">Popular Categories</h3>
-            <ul className="text-sm space-y-2">
-              <li><Link href="/category/hair-salon" className="hover:text-gray-900">Hair Salon</Link></li>
-              <li><Link href="/category/nail-salon" className="hover:text-gray-900">Nail Salon</Link></li>
-              <li><Link href="/category/spa" className="hover:text-gray-900">Spa</Link></li>
-              <li><Link href="/category/barbershop" className="hover:text-gray-900">Barbershop</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-bold text-lg mb-4">Connect With Us</h3>
-            <ul className="text-sm space-y-2">
-              <li><a href="#" className="hover:text-gray-900">Facebook</a></li>
-              <li><a href="#" className="hover:text-gray-900">Twitter</a></li>
-              <li><a href="#" className="hover:text-gray-900">Instagram</a></li>
-              <li><a href="#" className="hover:text-gray-900">LinkedIn</a></li>
-            </ul>
-          </div>
-        </div>
-        <div className="mt-8 pt-8 border-t border-gray-200 text-sm text-center">
-          <p>&copy; 2023 Your Company Name. All rights reserved.</p>
         </div>
       </div>
     </footer>
-  );
+  )
 }

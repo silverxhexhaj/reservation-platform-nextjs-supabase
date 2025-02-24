@@ -8,6 +8,7 @@ import { Button } from '@/app/components/ui/button'
 import { ArrowRight, Star, Users, Building2, Trophy, Calendar, Shield, Instagram, Facebook, Music } from 'lucide-react'
 import { containerVariants, itemVariants } from "@/app/models/transitionEffects.models";
 import { AnimatedGradient } from '@/app/components/gradient/AnimatedGradient'
+import { FooterWrapper } from '@/app/components/FooterWrapper'
 
 const teamMembers = [
   {
@@ -404,6 +405,7 @@ export default function WhoWeAre() {
           </div>
         </div>
       </motion.section>
+      <FooterWrapper />
     </div>
   )
 }

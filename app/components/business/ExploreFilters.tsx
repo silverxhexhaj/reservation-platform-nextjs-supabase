@@ -3,7 +3,6 @@
 import { useSearchParams, useRouter } from "next/navigation"
 import { useCallback, useState, useEffect } from "react"
 import { Input } from "@/app/components/ui/input"
-import { motion } from "framer-motion"
 import { Search, SlidersHorizontal } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
 import {
@@ -116,16 +115,10 @@ export function ExploreFilters({ categories }: ExploreFiltersProps) {
   }
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+    <div 
       className="w-full"
     >
-      <motion.div 
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+      <div 
         className="relative"
       >
         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-500 h-5 w-5" />
@@ -255,7 +248,7 @@ export function ExploreFilters({ categories }: ExploreFiltersProps) {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   )
 } 

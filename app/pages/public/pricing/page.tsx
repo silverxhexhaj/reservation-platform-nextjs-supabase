@@ -13,7 +13,7 @@ import {
 } from "@/app/components/ui/accordion"
 import { containerVariants, itemVariants } from "@/app/models/transitionEffects.models";
 import { AnimatedGradient } from '@/app/components/gradient/AnimatedGradient';
-
+import { FooterWrapper } from '@/app/components/FooterWrapper';
 
 export default function PricingPage() {
  
@@ -243,6 +243,7 @@ export default function PricingPage() {
           </motion.div>
         </div>
       </motion.section>
+      <FooterWrapper />
     </div>
   )
 }

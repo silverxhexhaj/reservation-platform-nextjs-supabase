@@ -63,9 +63,9 @@ export function Sidebar({ isMobileMenuOpen }: SidebarProps) {
     return (
         <div className={`
             ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-            lg:translate-x-0 lg:sticky hidden lg:block top-20 mt-8 bg-white top-0 left-0 z-10
+            fixed lg:relative lg:translate-x-0 top-20 mt-8 bg-white left-0 z-40
             transition-transform duration-300 ease-in-out
-            lg:flex lg:flex-shrink-0 w-64 p-3 border rounded-lg h-fit mr-8
+            flex lg:flex-shrink-0 w-64 p-3 border rounded-lg h-fit
         `}>
             <div className="space-y-1 flex flex-col w-full">
                 {sidebarItems.map((item) => (
@@ -73,7 +73,7 @@ export function Sidebar({ isMobileMenuOpen }: SidebarProps) {
                         key={item.title}
                         variant={pathname?.startsWith(item.href) ? "secondary" : "ghost"}
                         className={`
-                            w-full justify-start gap-2
+                            w-full justify-start gap-2 px-3
                             ${pathname?.startsWith(item.href) 
                                 ? "bg-gray-100" 
                                 : "bg-transparent hover:bg-gray-100/80"

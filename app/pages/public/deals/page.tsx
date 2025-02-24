@@ -15,6 +15,7 @@ import { DealCard } from "@/app/components/DealCard";
 import { DealItem } from "@/app/models/functions/searchDeals.model";
 import { fetchDeals } from "@/app/service/deals/deals.service";
 import { useSearchParams, useRouter } from "next/navigation";
+import { FooterWrapper } from "@/app/components/FooterWrapper";
 
 // Categories with their respective icons
 const CATEGORIES = [
@@ -56,7 +57,7 @@ export default function DealsPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="relative">
+      <main className="relative flex-grow">
         <div className="relative">
           {/* Hero Section with Gradient */}
           <div className="relative flex items-center justify-center overflow-hidden">
@@ -124,6 +125,7 @@ export default function DealsPage() {
           </div>
         </div>
       </main>
+      <FooterWrapper />
     </div>
   );
 }

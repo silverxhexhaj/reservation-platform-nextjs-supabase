@@ -4,16 +4,18 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from "./ui/button";
-import { Menu, X } from 'lucide-react';
-import { Bebas_Neue } from 'next/font/google';
-import { authService } from '../service/auth.service';
-import { User } from '@supabase/supabase-js';
-import { UserProfileMenu } from './menu/UserProfileMenu';
-import { Profile } from '../models/supabase.models';
-const bebasNeue = Bebas_Neue({
-  weight: '400',
-  subsets: ['latin'],
-});
+import { supabase } from '@/app/lib/supabase/client';
+import { PlusCircle, Menu, X, User, Settings, HelpCircle, LogOut } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 interface HeaderProps {
   isAlwaysScrolled?: boolean;
@@ -77,9 +79,16 @@ export function Header({ isAlwaysScrolled = false }: HeaderProps) {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 will-change-height ${isScrolled || isMenuOpen ? 'bg-white h-20' : 'bg-transparent h-20'}`}>
-      <div className={`px-16 flex justify-between items-center h-full transition-colors duration-300 ${isScrolled || isMenuOpen ? '' : ''}`}>
-        <Link href="/" className={`text-4xl font-semibold lg:w-96 ${bebasNeue.className} ${isScrolled || isMenuOpen ? 'text-black' : 'text-white'}`}>
-          NURI
+      <div className={`px-4 md:px-8 flex justify-between items-center h-full transition-colors duration-300 ${isScrolled || isMenuOpen ? '' : ''}`}>
+        <Link 
+          href="/" 
+          className={`relative font-nunito-sans text-3xl !font-bold tracking-wide lg:w-96 ${
+            isScrolled || isMenuOpen ? 'text-black' : 'text-white'
+          } hover:opacity-90 transition-all group font-[--font-nunito-sans] font-bold`}
+        >
+          <span className="relative">
+            Ne<span className="">o</span>rar
+          </span>
         </Link>
         
         <div className="hidden lg:flex flex-1 justify-center items-center space-x-8">
