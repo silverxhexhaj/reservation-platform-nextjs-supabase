@@ -4,18 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from "./ui/button";
-import { supabase } from '@/app/lib/supabase/client';
-import { PlusCircle, Menu, X, Settings, HelpCircle, LogOut } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+import { Menu, X } from 'lucide-react';
 import { getUser } from '@/app/service/auth.service';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import type { Profile } from '@/app/models/supabase.models';
@@ -67,12 +56,11 @@ export function Header({ isAlwaysScrolled = false }: HeaderProps) {
   }, [pathname, isAlwaysScrolled]);
 
 
-  const handleAuth = (mode: 'signin' | 'register', returnTo?: string) => {
-    const currentPath = returnTo || window.location.pathname;
+  const handleAuth = (mode: 'signin' | 'register') => {
     if (mode === 'register') {
       router.push('/pages/public/signup');
     } else {
-      router.push(`/pages/public/signin?returnTo=${currentPath}`);
+      router.push(`/pages/public/signin`);
     }
     setIsMenuOpen(false);
   };

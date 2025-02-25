@@ -64,6 +64,8 @@ async function signOut() {
   try {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
+    
+    window.location.reload();
   } catch (error) {
     throw error;
   }
@@ -92,7 +94,7 @@ export async function getUser() {
     await initializeAuth();
   }
 
-  if (!authState.profile) {
+  if (!authState.profile && authState?.user?.id) {
     authState.profile = await getProfile(authState.user?.id);
   }
 
