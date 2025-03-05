@@ -26,8 +26,12 @@ export interface BusinessSummary {
 export interface BusinessLocation {
     id?: string;
     name?: string;
-    address?: string;
-    city?: string;
-    state?: string | null;
-    country: string;
+    floor?: string;
+    side?: string;
+    city_code?: string;
+    city_section?: string;
+    city_name?: string;
+    country?: string;
+    latitude?: number;
+    longitude?: number;
 }

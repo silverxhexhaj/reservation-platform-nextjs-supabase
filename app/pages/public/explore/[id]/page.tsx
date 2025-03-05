@@ -435,7 +435,7 @@ export default function BusinessDetailPage() {
                     </div>
                     <div>
                       <p className="text-gray-900">
-                        {business?.business?.location?.address}, {business?.business?.location?.city}, {business?.business?.location?.country}
+                        {business?.business?.location?.name ?? ''} {business?.business?.location?.floor ?? ''}, {business?.business?.location?.side ?? ''}, {business?.business?.location?.city_name ?? ''}, {business?.business?.location?.country ?? ''}
                       </p>
                       <a
                         href={business?.business?.location?.latitude ?

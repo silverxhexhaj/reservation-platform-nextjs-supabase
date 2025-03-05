@@ -1,11 +1,14 @@
-import { BusinessCategory, Category, SubCategory } from "../supabase.models";
+import { Category, SubCategory } from "../supabase.models";
 
 export interface Location {
-    address: string;
-    city: string;
-    state: string;
+    id: string;
+    name: string;
+    floor: string;
+    side: string;
+    city_code: string;
+    city_section: string;
+    city_name: string;
     country: string;
-    postal_code: string;
     latitude: number;
     longitude: number;
 }
@@ -115,8 +118,6 @@ export interface Business {
     sub_categories: SubCategory[];
     price_range: string;
     phone: string;
-    website_url: string;
-    profile_picture: string;
     cover_picture: string;
     is_premium: boolean;
     tags: string[];

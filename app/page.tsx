@@ -19,7 +19,7 @@ import { businessCategories, BusinessCategory } from '@/app/models/supabase.mode
 import { categoryToIcon } from '@/data';
 import { BusinessCard } from './components/business/BusinessCard';
 import { OfferCard } from './components/OfferCard';
-import { itemVariants, containerVariants } from '@/app/models/transitionEffects.models';
+import { itemVariants } from '@/app/models/transitionEffects.models';
 import { fetchHomePageBusinesses } from './service/business/business.service';
 import { HomePageBusinesses } from './models/functions/homePageBusinesses.models';
 import { AnimatedGradient } from './components/gradient/AnimatedGradient';

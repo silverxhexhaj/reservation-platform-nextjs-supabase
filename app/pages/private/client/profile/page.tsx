@@ -8,7 +8,7 @@ import { Input } from "@/app/components/ui/input";
 import { CalendarDays, MapPin, Phone, Mail, Building, Edit2, Camera, User as UserIcon, X } from 'lucide-react';
 import { useToast } from "@/app/components/ui/use-toast";
 import { Separator } from "@/app/components/ui/separator";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/app/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/app/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select";
 import { authService } from '@/app/service/auth.service';
 import { Profile } from '@/app/models/supabase.models';

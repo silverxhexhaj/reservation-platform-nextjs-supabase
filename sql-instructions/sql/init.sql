@@ -108,23 +108,17 @@ CREATE TABLE notifications (
 CREATE TABLE locations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
-    address TEXT NOT NULL,
-    city VARCHAR(100) NOT NULL,
-    state VARCHAR(100),
+    floor VARCHAR(3),
+    side VARCHAR(3),
+    city_code VARCHAR(20),
+    city_section VARCHAR(100) ,
+    city_name VARCHAR(100) NOT NULL,
     country VARCHAR(100) NOT NULL,
-    postal_code VARCHAR(20),
     latitude DECIMAL(10,8),
     longitude DECIMAL(11,8),
-    phone VARCHAR(20),
-    is_main_location BOOLEAN DEFAULT false,
     is_active BOOLEAN DEFAULT true,
-    timezone VARCHAR(50) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT valid_coordinates CHECK (
-        (latitude BETWEEN -90 AND 90) AND 
-        (longitude BETWEEN -180 AND 180)
-    )
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Businesses table
@@ -135,8 +129,6 @@ CREATE TABLE businesses (
     category UUID REFERENCES business_categories(id) ON DELETE CASCADE,
     price_range INTEGER NOT NULL CHECK (price_range BETWEEN 1 AND 4),
     phone VARCHAR(20),
-    website_url TEXT,
-    profile_picture TEXT,
     cover_picture TEXT,
     is_premium BOOLEAN DEFAULT false,
     tags TEXT[],
@@ -411,6 +403,7 @@ CREATE TABLE profiles (
     profile_type profile_type NOT NULL,
     first_name VARCHAR(100),
     last_name VARCHAR(100),
+    phone VARCHAR(100),
     profile_picture TEXT,
     bio TEXT,
     date_of_birth DATE,
@@ -460,7 +453,7 @@ CREATE INDEX idx_reviews_staff ON reviews(staff_id) WHERE review_type = 'staff';
 CREATE INDEX idx_reviews_user ON reviews(user_id);
 CREATE INDEX idx_reviews_type_rating ON reviews(review_type, rating);
 CREATE INDEX idx_reviews_booking ON reviews(booking_id);
-CREATE INDEX idx_locations_city_country ON locations(city, country);
+CREATE INDEX idx_locations_city_country ON locations(city_name, country);
 CREATE INDEX idx_locations_coordinates ON locations(latitude, longitude);
 CREATE INDEX idx_business_features ON business_features(business_id, feature_name);
 CREATE INDEX idx_business_features_available ON business_features(business_id, feature_name) WHERE is_available = true;

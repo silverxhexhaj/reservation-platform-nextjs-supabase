@@ -12,42 +12,85 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { supabase } from '@/app/lib/supabase/client';
 import Link from 'next/link';
 import { businessCategories } from '@/app/models/supabase.models';
+import { z } from 'zod';
 
 type Step = 'account' | 'business' | 'location' | 'additional';
 
+// Define validation schemas for each step
+const accountSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string()
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"]
+});
+
+const businessSchema = z.object({
+  businessName: z.string().min(1, "Business name is required"),
+  category: z.string().min(1, "Category is required"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  priceRange: z.string().min(1, "Price range is required"),
+  phone: z.string().min(10, "Valid phone number is required")
+});
+
+const locationSchema = z.object({
+  address: z.string().min(1, "Address is required"),
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(1, "State is required"),
+  zipCode: z.string().min(5, "Valid ZIP code is required")
+});
+
+const additionalSchema = z.object({
+  website: z.string().url("Must be a valid URL").optional().or(z.literal('')),
+  openingHours: z.string().min(1, "Opening hours are required"),
+  amenities: z.string().optional(),
+  tags: z.string().optional(),
+  instagram: z.string().optional(),
+  facebook: z.string().optional(),
+  twitter: z.string().optional()
+});
+
+// Combined schema for the entire form
+const formSchema = z.object({
+  ...accountSchema.shape,
+  ...businessSchema.shape,
+  ...locationSchema.shape,
+  ...additionalSchema.shape
+});
+
 export default function BusinessSignUpPage() {
   const router = useRouter();
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  
   const [currentStep, setCurrentStep] = useState<Step>('account');
   const [formData, setFormData] = useState({
-    // Account Information
-    fullName: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
     
-    // Business Information
     businessName: '',
     category: '',
     description: '',
     priceRange: '',
     phone: '',
     
-    // Location
     address: '',
     city: '',
     state: '',
     zipCode: '',
     
-    // Additional Information
     website: '',
-    openingHours: '',
-    amenities: '',
     tags: '',
     instagram: '',
     facebook: '',
-    twitter: ''
+    twitter: '',
+    profile_type: 'business_owner'
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -55,6 +98,15 @@ export default function BusinessSignUpPage() {
       ...prev,
       [name]: value
     }));
+    
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = {...prev};
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   const handleSelectChange = (value: string, field: string) => {
@@ -62,10 +114,56 @@ export default function BusinessSignUpPage() {
       ...prev,
       [field]: value
     }));
+    
+    // Clear error for this field when user selects a value
+    if (errors[field]) {
+      setErrors(prev => {
+        const newErrors = {...prev};
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
+
+  const validateCurrentStep = () => {
+    try {
+      switch (currentStep) {
+        case 'account':
+          accountSchema.parse(formData);
+          break;
+        case 'business':
+          businessSchema.parse(formData);
+          break;
+        case 'location':
+          locationSchema.parse(formData);
+          break;
+        case 'additional':
+          additionalSchema.parse(formData);
+          break;
+      }
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: Record<string, string> = {};
+        error.errors.forEach(err => {
+          if (err.path) {
+            newErrors[err.path[0]] = err.message;
+          }
+        });
+        setErrors(newErrors);
+      }
+      return false;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateCurrentStep()) {
+      return;
+    }
+    
     if (currentStep !== 'additional') {
       const nextSteps: Record<Step, Step> = {
         account: 'business',
@@ -76,61 +174,21 @@ export default function BusinessSignUpPage() {
       setCurrentStep(nextSteps[currentStep]);
     } else {
       try {
-        // First, create the user account
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        // Validate the entire form before submission
+        formSchema.parse(formData);
+        
+        
+       await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
           options: {
             data: {
-              full_name: formData.fullName,
+              full_name: `${formData.firstName} ${formData.lastName}`,
             },
             emailRedirectTo: `${window.location.origin}/auth/callback`
           }
         });
 
-        if (authError) {
-          console.error('Auth error:', authError);
-          throw new Error(authError.message);
-        }
-
-        if (!authData.user) {
-          throw new Error('No user data returned after signup');
-        }
-
-        // Then, create the business record
-        const { error: businessError } = await supabase
-          .from('businesses')
-          .insert([
-            {
-              owner_id: authData.user.id,
-              name: formData.businessName,
-              description: formData.description,
-              category: formData.category,
-              price_range: formData.priceRange,
-              image_url: null,
-              address: formData.address,
-              city: formData.city,
-              state: formData.state,
-              zip_code: formData.zipCode,
-              phone: formData.phone,
-              website: formData.website || null,
-              hours: formData.openingHours || null,
-              amenities: formData.amenities ? formData.amenities.split(',').map(item => item.trim()) : [],
-              tags: formData.tags ? formData.tags.split(',').map(item => item.trim()) : [],
-              social_media: {
-                instagram: formData.instagram || null,
-                facebook: formData.facebook || null,
-                twitter: formData.twitter || null
-              },
-              is_verified: false,
-              is_active: true
-            }
-          ]);
-
-        if (businessError) {
-          console.error('Business creation error:', businessError);
-          throw businessError;
-        }
 
         // Show success message and redirect
         router.push('/pages/private/business/partner/dashboard');
@@ -138,6 +196,15 @@ export default function BusinessSignUpPage() {
         console.error('Error during business registration:', error);
         if (error instanceof Error) {
           console.error(error.message);
+        }
+        if (error instanceof z.ZodError) {
+          const newErrors: Record<string, string> = {};
+          error.errors.forEach(err => {
+            if (err.path) {
+              newErrors[err.path[0]] = err.message;
+            }
+          });
+          setErrors(newErrors);
         }
       }
     }
@@ -163,19 +230,36 @@ export default function BusinessSignUpPage() {
         return (
           <>
             <div className="space-y-2">
-              <label htmlFor="fullName" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Full Name
+              <label htmlFor="firstName" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                First Name
               </label>
               <Input
-                id="fullName"
-                name="fullName"
+                id="firstName"
+                name="firstName"
                 type="text"
-                placeholder="Enter your full name"
-                value={formData.fullName}
+                placeholder="Enter your first name"
+                value={formData.firstName}
                 onChange={handleInputChange}
                 required
-                className="h-11"
+                className={`h-11 ${errors.firstName ? 'border-red-500' : ''}`}
               />
+              {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="lastName" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Last Name
+              </label>
+              <Input
+                id="lastName"
+                name="lastName"
+                type="text"
+                placeholder="Enter your last name"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                required
+                className={`h-11 ${errors.lastName ? 'border-red-500' : ''}`}
+              />
+              {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
             </div>
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -189,8 +273,9 @@ export default function BusinessSignUpPage() {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="h-11"
+                className={`h-11 ${errors.email ? 'border-red-500' : ''}`}
               />
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
             </div>
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -204,8 +289,9 @@ export default function BusinessSignUpPage() {
                 value={formData.password}
                 onChange={handleInputChange}
                 required
-                className="h-11"
+                className={`h-11 ${errors.password ? 'border-red-500' : ''}`}
               />
+              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
             </div>
             <div className="space-y-2">
               <label htmlFor="confirmPassword" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -219,8 +305,9 @@ export default function BusinessSignUpPage() {
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
                 required
-                className="h-11"
+                className={`h-11 ${errors.confirmPassword ? 'border-red-500' : ''}`}
               />
+              {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
             </div>
           </>
         );
@@ -240,15 +327,20 @@ export default function BusinessSignUpPage() {
                 value={formData.businessName}
                 onChange={handleInputChange}
                 required
-                className="h-11"
+                className={`h-11 ${errors.businessName ? 'border-red-500' : ''}`}
               />
+              {errors.businessName && <p className="text-red-500 text-xs mt-1">{errors.businessName}</p>}
             </div>
             <div className="space-y-2">
               <label htmlFor="category" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Business Category
               </label>
-              <Select name="category" onValueChange={(value) => handleSelectChange(value, 'category')}>
-                <SelectTrigger className="h-11">
+              <Select 
+                name="category" 
+                onValueChange={(value) => handleSelectChange(value, 'category')}
+                value={formData.category}
+              >
+                <SelectTrigger className={`h-11 ${errors.category ? 'border-red-500' : ''}`}>
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -259,6 +351,7 @@ export default function BusinessSignUpPage() {
                   ))}
                 </SelectContent>
               </Select>
+              {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
             </div>
             <div className="space-y-2">
               <label htmlFor="description" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -271,15 +364,20 @@ export default function BusinessSignUpPage() {
                 value={formData.description}
                 onChange={handleInputChange}
                 required
-                className="min-h-[100px]"
+                className={`min-h-[100px] ${errors.description ? 'border-red-500' : ''}`}
               />
+              {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
             </div>
             <div className="space-y-2">
               <label htmlFor="priceRange" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Price Range
               </label>
-              <Select name="priceRange" onValueChange={(value) => handleSelectChange(value, 'priceRange')}>
-                <SelectTrigger className="h-11">
+              <Select 
+                name="priceRange" 
+                onValueChange={(value) => handleSelectChange(value, 'priceRange')}
+                value={formData.priceRange}
+              >
+                <SelectTrigger className={`h-11 ${errors.priceRange ? 'border-red-500' : ''}`}>
                   <SelectValue placeholder="Select price range" />
                 </SelectTrigger>
                 <SelectContent>
@@ -289,6 +387,7 @@ export default function BusinessSignUpPage() {
                   <SelectItem value="$$$$">$$$$ - Luxury</SelectItem>
                 </SelectContent>
               </Select>
+              {errors.priceRange && <p className="text-red-500 text-xs mt-1">{errors.priceRange}</p>}
             </div>
             <div className="space-y-2">
               <label htmlFor="phone" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -302,8 +401,9 @@ export default function BusinessSignUpPage() {
                 value={formData.phone}
                 onChange={handleInputChange}
                 required
-                className="h-11"
+                className={`h-11 ${errors.phone ? 'border-red-500' : ''}`}
               />
+              {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
             </div>
           </>
         );
@@ -323,8 +423,9 @@ export default function BusinessSignUpPage() {
                 value={formData.address}
                 onChange={handleInputChange}
                 required
-                className="h-11"
+                className={`h-11 ${errors.address ? 'border-red-500' : ''}`}
               />
+              {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
             </div>
             <div className="space-y-2">
               <label htmlFor="city" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -338,8 +439,9 @@ export default function BusinessSignUpPage() {
                 value={formData.city}
                 onChange={handleInputChange}
                 required
-                className="h-11"
+                className={`h-11 ${errors.city ? 'border-red-500' : ''}`}
               />
+              {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
             </div>
             <div className="space-y-2">
               <label htmlFor="state" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -353,8 +455,9 @@ export default function BusinessSignUpPage() {
                 value={formData.state}
                 onChange={handleInputChange}
                 required
-                className="h-11"
+                className={`h-11 ${errors.state ? 'border-red-500' : ''}`}
               />
+              {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state}</p>}
             </div>
             <div className="space-y-2">
               <label htmlFor="zipCode" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -368,8 +471,9 @@ export default function BusinessSignUpPage() {
                 value={formData.zipCode}
                 onChange={handleInputChange}
                 required
-                className="h-11"
+                className={`h-11 ${errors.zipCode ? 'border-red-500' : ''}`}
               />
+              {errors.zipCode && <p className="text-red-500 text-xs mt-1">{errors.zipCode}</p>}
             </div>
           </>
         );
@@ -388,38 +492,11 @@ export default function BusinessSignUpPage() {
                 placeholder="https://example.com"
                 value={formData.website}
                 onChange={handleInputChange}
-                className="h-11"
+                className={`h-11 ${errors.website ? 'border-red-500' : ''}`}
               />
+              {errors.website && <p className="text-red-500 text-xs mt-1">{errors.website}</p>}
             </div>
-            <div className="space-y-2">
-              <label htmlFor="openingHours" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Opening Hours
-              </label>
-              <Textarea
-                id="openingHours"
-                name="openingHours"
-                placeholder="Enter your business hours"
-                value={formData.openingHours}
-                onChange={handleInputChange}
-                required
-                className="min-h-[100px]"
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="amenities" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Amenities (Optional)
-              </label>
-              <Input
-                id="amenities"
-                name="amenities"
-                type="text"
-                placeholder="Comma-separated list of amenities"
-                value={formData.amenities}
-                onChange={handleInputChange}
-                className="h-11"
-              />
-            </div>
-            <div className="space-y-2">
+    <div className="space-y-2">
               <label htmlFor="tags" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Tags (Optional)
               </label>
@@ -430,8 +507,9 @@ export default function BusinessSignUpPage() {
                 placeholder="Comma-separated list of tags"
                 value={formData.tags}
                 onChange={handleInputChange}
-                className="h-11"
+                className={`h-11 ${errors.tags ? 'border-red-500' : ''}`}
               />
+              {errors.tags && <p className="text-red-500 text-xs mt-1">{errors.tags}</p>}
             </div>
             <div className="space-y-2">
               <label htmlFor="instagram" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -444,8 +522,9 @@ export default function BusinessSignUpPage() {
                 placeholder="@username"
                 value={formData.instagram}
                 onChange={handleInputChange}
-                className="h-11"
+                className={`h-11 ${errors.instagram ? 'border-red-500' : ''}`}
               />
+              {errors.instagram && <p className="text-red-500 text-xs mt-1">{errors.instagram}</p>}
             </div>
             <div className="space-y-2">
               <label htmlFor="facebook" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -458,8 +537,9 @@ export default function BusinessSignUpPage() {
                 placeholder="Facebook page URL"
                 value={formData.facebook}
                 onChange={handleInputChange}
-                className="h-11"
+                className={`h-11 ${errors.facebook ? 'border-red-500' : ''}`}
               />
+              {errors.facebook && <p className="text-red-500 text-xs mt-1">{errors.facebook}</p>}
             </div>
             <div className="space-y-2">
               <label htmlFor="twitter" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -472,8 +552,9 @@ export default function BusinessSignUpPage() {
                 placeholder="@username"
                 value={formData.twitter}
                 onChange={handleInputChange}
-                className="h-11"
+                className={`h-11 ${errors.twitter ? 'border-red-500' : ''}`}
               />
+              {errors.twitter && <p className="text-red-500 text-xs mt-1">{errors.twitter}</p>}
             </div>
           </>
         );

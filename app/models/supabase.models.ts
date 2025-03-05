@@ -140,7 +140,6 @@ export interface Business extends Timestamps {
   category: Category;
   price_range: PriceRange;
   phone?: string | null;
-  website_url?: string | null;
   profile_picture?: string | null;
   cover_picture?: string | null;
   is_premium: boolean;

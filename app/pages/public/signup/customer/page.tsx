@@ -2,35 +2,84 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { Header } from '@/app/components/Header';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/app/components/ui/form';
+import { authService } from '@/app/service/auth.service';
+import { ProfileType } from '@/app/models/supabase.models';
+// Form validation schema
+const formSchema = z.object({
+  firstName: z.string().min(2, 'First name must be at least 2 characters'),
+  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email address'),
+  phone: z.string().min(10, 'Please enter a valid phone number'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export default function CustomerSignUpPage() {
   const router = useRouter();
-  const [user, setUser] = useState<{ username: string } | null>(null);
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phone: ''
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Initialize form with validation
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirmPassword: '',
+    },
+    mode: 'onChange',
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+
+
+  const onSubmit = async (values: FormValues) => {
+    setIsLoading(true);
+    try {      
+      await authService.signUp(values.email, values.password, {
+        profile: 'client', 
+        firstName: values.firstName,
+        lastName: values.lastName,
+        phone: values.phone
+      });
+      
+      router.push('/pages/public/signin');
+      
+    } catch (error: any) {
+      console.error('Registration error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // Add customer registration logic here
+
+  const handleButtonClick = () => {    
+    form.handleSubmit((data) => {
+      onSubmit(data);
+    })();
   };
 
   return (
@@ -142,86 +191,124 @@ export default function CustomerSignUpPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <label htmlFor="fullName" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      Full Name
-                    </label>
-                    <Input
-                      id="fullName"
-                      name="fullName"
-                      type="text"
-                      placeholder="Enter your full name"
-                      value={formData.fullName}
-                      onChange={handleInputChange}
-                      required
-                      className="h-11"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      Email
-                    </label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="name@example.com"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                      className="h-11"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="phone" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      Phone Number
-                    </label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      placeholder="Enter your phone number"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      required
-                      className="h-11"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="password" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      Password
-                    </label>
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      placeholder="Create a password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      required
-                      className="h-11"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="confirmPassword" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      Confirm Password
-                    </label>
-                    <Input
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type="password"
-                      placeholder="Confirm your password"
-                      value={formData.confirmPassword}
-                      onChange={handleInputChange}
-                      required
-                      className="h-11"
-                    />
-                  </div>
-                  <Button type="submit" className="w-full h-11 text-base font-medium bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white hover:opacity-90 transition-opacity mt-6">
-                    Create Account
+                <Form {...form}>
+                  <FormField
+                    control={form.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>First Name*</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter your first name"
+                            className="h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Last Name*</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter your last name"
+                            className="h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Email*</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="name@example.com"
+                            className="h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Phone Number*</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="tel"
+                            placeholder="Enter your phone number"
+                            className="h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Password*</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Create a password"
+                            className="h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Confirm Password*</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Confirm your password"
+                            className="h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    id="signup-button"
+                    type="button" // Changed from submit to button for direct handling
+                    className="w-full h-11 text-base font-medium bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white hover:opacity-90 transition-opacity mt-6"
+                    disabled={isLoading || !form.formState.isValid}
+                    onClick={handleButtonClick}
+                  >
+                    {isLoading ? 'Creating Account...' : 'Create Account'}
                   </Button>
-                </form>
+                </Form>
 
                 <div className="mt-6 space-y-4">
                   <div className="relative">

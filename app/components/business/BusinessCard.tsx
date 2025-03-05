@@ -100,7 +100,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
                                 <div className="flex items-center gap-2">
                                     <div className="flex items-center space-x-1 text-neutral-500 max-w-[200px]">
                                         <MapPin className="w-3 h-3 flex-shrink-0" />
-                                        <span className="text-xs truncate">{business.location?.city}</span>
+                                        <span className="text-xs truncate">{business.location?.city_name}</span>
                                     </div>
                                 </div>
                                 <p className="text-xs md:text-sm text-neutral-500 line-clamp-2 min-h-[2.5rem] md:min-h-[3rem] leading-[1.25rem] md:leading-[1.5rem]">

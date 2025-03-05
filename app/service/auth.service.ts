@@ -1,6 +1,7 @@
 import { supabase } from '@/app/lib/supabase/client';
 import { AuthState } from '@/app/models/auth.models';
 import { ProfileType } from '@/app/models/supabase.models';
+import { SignUpOptions } from '../models/signInOptions';
 
 let authState: AuthState = {
   user: null,
@@ -47,11 +48,35 @@ async function signIn(email: string, password: string) {
   }
 }
 
-async function signUp(email: string, password: string) {
+
+async function signUp(email: string, password: string, options: SignUpOptions) {
   try {
     const { data, error } = await supabase.auth.signUp({
       email,
-      password
+      password,
+      options: {
+        data: {
+          profile_type: options.profile,
+          first_name: options.firstName,
+          last_name: options.lastName,
+          phone: options.phone,
+          road_name: options.roadName,
+          floor: options.floor,
+          side: options.side,
+          city_code: options.cityCode,
+          city_section: options.citySection,  
+          city_name: options.cityName,
+          country: options.country,
+          business_name: options.businessName,
+          description: options.description,
+          external_link_facebook: options.facebook,
+          external_link_instagram: options.instagram,
+          external_link_tiktok: options.twitter,
+          external_link_linkedin: options.linkedin, 
+          price_range: options.priceRange,
+          category: options.category,
+        }
+      }
     });
     if (error) throw error;
     return data;
@@ -64,8 +89,7 @@ async function signOut() {
   try {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
-    
-    window.location.reload();
+
   } catch (error) {
     throw error;
   }

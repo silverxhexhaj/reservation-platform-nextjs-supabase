@@ -29,8 +29,6 @@ BEGIN
                 ),
                 'price_range', b.price_range,
                 'phone', b.phone,
-                'website_url', b.website_url,
-                'profile_picture', b.profile_picture,
                 'cover_picture', b.cover_picture,
                 'is_premium', b.is_premium,
                 'tags', b.tags,
@@ -44,11 +42,14 @@ BEGIN
                 'created_at', b.created_at,
                 'location', (
                     SELECT json_build_object(
-                        'address', l.address,
-                        'city', l.city,
-                        'state', l.state,
+                        'id', l.id,
+                        'name', l.name,
+                        'floor', l.floor,
+                        'side', l.side,
+                        'city_code', l.city_code,
+                        'city_section', l.city_section,
+                        'city_name', l.city_name,
                         'country', l.country,
-                        'postal_code', l.postal_code,
                         'latitude', l.latitude,
                         'longitude', l.longitude
                     )

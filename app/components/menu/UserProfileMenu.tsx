@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { Profile } from "@/app/models/supabase.models";
 import { User } from "@supabase/supabase-js";
 import Link from "next/link";
-import { useEffect } from "react";
+
 const profileTypeToLinks = {
     'client': {
         profile: '/pages/private/client/profile',

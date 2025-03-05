@@ -19,7 +19,7 @@ BEGIN
             'id', b.id,
             'name', b.name,
             'description', b.description,
-            'image_url', b.profile_picture,
+            'image_url', b.cover_picture,
             'tags', b.tags,
             'category', json_build_object(
                 'id', bc.id,
@@ -32,9 +32,11 @@ BEGIN
             'location', json_build_object(
                 'id', l.id,
                 'name', l.name,
-                'address', l.address,
-                'city', l.city,
-                'state', l.state,
+                'floor', l.floor,
+                'side', l.side,
+                'city_code', l.city_code,
+                'city_section', l.city_section,
+                'city_name', l.city_name,
                 'country', l.country
             ),
             'review_count', (SELECT COUNT(*) FROM reviews r WHERE r.business_id = b.id),
